@@ -22,8 +22,6 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
-    private String uuid;
-    @Column(nullable = false, unique = true)
     private Integer employee_id;
     @Column(nullable = false)
     private String username;
@@ -60,6 +58,9 @@ public class User {
     private ProductionLine productionLine;
     @ManyToOne
     private Shift shift;
-
+    @OneToMany(mappedBy = "user")
+    private List<HourlyProduction> hourlyProductions;
+    @OneToMany(mappedBy = "user")
+    private List<DowntimeRecord> downtimeRecords;
 
 }

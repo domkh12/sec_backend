@@ -13,12 +13,24 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class DefectDetail {
+    /**
+     * Field
+     * */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer hourProductionId;
-    private Integer defectTypeId;
+    @Column(nullable = false)
     private Integer qtyDefect;
     private String notes;
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    /**
+     * Relationship
+     * */
+    @ManyToOne
+    private HourlyProduction hourlyProduction;
+    @ManyToOne
+    private DefectType defectType;
+
 }

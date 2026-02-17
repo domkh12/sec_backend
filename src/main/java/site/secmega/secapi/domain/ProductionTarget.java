@@ -14,14 +14,24 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class ProductionTarget {
+    /**
+     * Field
+     * */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer lineId;
-    private Integer productId;
+    @Column(nullable = false)
     private TargetType targetType;
+    @Column(nullable = false)
     private LocalDateTime targetDate;
+    @Column(nullable = false)
     private Integer targetQuantity;
     private Double maxDefectRate;
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    @ManyToOne
+    private ProductionLine productionLine;
+    @ManyToOne
+    private Product product;
 }

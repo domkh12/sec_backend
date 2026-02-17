@@ -13,7 +13,9 @@ import java.util.List;
 @Getter
 @Setter
 public class ProductionLine {
-
+    /**
+     * Information
+     * */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,13 +25,22 @@ public class ProductionLine {
     private String code;
     private String department;
     private Integer capacityPerHour;
+    @Column(nullable = false)
     private ProductionLineStatus status;
     @Column(nullable = false)
     private LocalDateTime createdAt;
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    /**
+     * Relationship
+     * */
     @OneToMany(mappedBy = "productionLine")
     private List<User> users;
-
+    @OneToMany(mappedBy = "productionLines")
+    private List<HourlyProduction> hourlyProduction;
+    @OneToMany(mappedBy = "productionLine")
+    private List<ProductionTarget> productionTargets;
+    @OneToMany(mappedBy = "productionLine")
+    private List<DowntimeRecord> downtimeRecords;
 }

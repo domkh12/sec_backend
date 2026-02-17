@@ -14,16 +14,29 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class DowntimeRecord {
+    /**
+     * Field
+     * */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer line_id;
+    @Column(nullable = false)
     private LocalDateTime downTimeDate;
+    @Column(nullable = false)
     private Integer startHour;
     private Integer endHour;
     private String reason;
+    @Column(nullable = false)
     private DowntimeType downtimeType;
     private Integer minuteLost;
-    private Integer resolvedBy;
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+
+    /**
+     * Relationship
+     * */
+    @ManyToOne
+    private ProductionLine productionLine;
+    @ManyToOne
+    private User user;
 }

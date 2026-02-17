@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "hourly_productions")
@@ -13,10 +14,15 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class HourlyProduction {
+    /**
+     * Field
+     * */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false)
     private LocalDateTime productionDate;
+    @Column(nullable = false)
     private Integer hourNumber;
     private Integer qtyGood;
     private Integer qtyDefect;
@@ -24,9 +30,22 @@ public class HourlyProduction {
     private Integer qtyTotal;
     private Double efficiencyRate;
     private Integer operatorCount;
+    @Column(nullable = false)
+    private LocalDateTime entryTime;
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
 
-    private Integer line_id;
-    private Integer shift_id;
-    private Integer product_id;
-
+    /**
+     * Relationship
+     * */
+    @ManyToOne
+    private ProductionLine productionLines;
+    @ManyToOne
+    private Shift shift;
+    @ManyToOne
+    private Product product;
+    @ManyToOne
+    private User user;
+    @OneToMany(mappedBy = "hourlyProduction")
+    private List<DefectDetail> defectDetails;
 }

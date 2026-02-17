@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "products")
@@ -13,10 +14,15 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 public class Product {
+    /**
+     * Field
+     * */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, unique = true)
     private String code;
+    @Column(nullable = false)
     private String name;
     private String category;
     private String size;
@@ -24,6 +30,16 @@ public class Product {
     private Integer targetProductionPerHour;
     private Double standardMinuteValue;
     private String description;
+    @Column(nullable = false)
     private LocalDateTime createdAt;
+    @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    /**
+     * Relationship
+     * */
+    @OneToMany(mappedBy = "product")
+    private List<HourlyProduction> hourlyProductions;
+    @OneToMany(mappedBy = "product")
+    private List<ProductionTarget> productionTargets;
 }
