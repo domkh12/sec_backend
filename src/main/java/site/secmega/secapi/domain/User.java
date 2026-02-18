@@ -62,5 +62,10 @@ public class User {
     private List<HourlyProduction> hourlyProductions;
     @OneToMany(mappedBy = "user")
     private List<DowntimeRecord> downtimeRecords;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "dept_id", referencedColumnName = "id")
+    )
+    private List<Department> departments;
 
 }
