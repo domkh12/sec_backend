@@ -27,6 +27,10 @@ public class UserServiceImpl implements UserService{
     @Override
     public UserResponse createUser(UserRequest userRequest) {
 
+        if (userRepository.existsByUsername(userRequest.username())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Username already exist");
+        }
+
         if (userRepository.existsByPhoneNumber(userRequest.phoneNumber())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already exist");
         }

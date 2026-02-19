@@ -23,7 +23,7 @@ public class User {
     private Long id;
     @Column(nullable = false, unique = true)
     private String employee_id;
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false)
     private String password;
