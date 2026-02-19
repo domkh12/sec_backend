@@ -1,4 +1,18 @@
 services:
+  sec-api:
+    image: "sec-api"
+    build: .
+    container_name: sec-api
+    ports:
+      - "55555:8080"
+    volumes:
+      - C:\Users\SECMEGA\Desktop\Project\sec_api\file-server:/file-server/
+    networks:
+      - sec_net
+    depends_on:
+      - db
+    restart: unless-stopped
+
   db:
     container_name: sec_db
     image: postgres:17.4-alpine

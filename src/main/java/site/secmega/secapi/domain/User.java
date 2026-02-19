@@ -22,13 +22,13 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
-    private Integer employee_id;
+    private String employee_id;
     @Column(nullable = false)
     private String username;
     @Column(nullable = false)
     private String password;
     @Column(nullable = false, unique = true)
-    private String phoneNumber;
+    private Integer phoneNumber;
     private LocalDateTime hireDate;
     @Column(nullable = false)
     private LocalDateTime createdAt;

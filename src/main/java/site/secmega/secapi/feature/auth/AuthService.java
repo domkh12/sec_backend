@@ -1,0 +1,15 @@
+package site.secmega.secapi.feature.auth;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.ResponseEntity;
+import site.secmega.secapi.feature.auth.dto.JwtResponse;
+import site.secmega.secapi.feature.auth.dto.LoginRequest;
+
+public interface AuthService {
+    ResponseEntity<JwtResponse> login(LoginRequest loginRequest, HttpServletResponse httpServletResponse);
+
+    ResponseEntity<JwtResponse> refreshToken(HttpServletRequest request, HttpServletResponse response);
+
+    ResponseEntity<Void> logout(HttpServletResponse response);
+}
