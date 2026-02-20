@@ -2,6 +2,7 @@ package site.secmega.secapi.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.util.List;
 @Table(name = "departments")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Department {
     /**
      * Field

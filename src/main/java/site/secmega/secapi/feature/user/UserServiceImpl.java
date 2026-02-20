@@ -43,6 +43,10 @@ public class UserServiceImpl implements UserService{
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
         user.setPassword(passwordEncoder.encode(userRequest.password()));
+        user.setIsAccountNonExpired(true);
+        user.setIsAccountNonLocked(true);
+        user.setIsCredentialsNonExpired(true);
+        user.setIsEnabled(true);
         Role role = roleRepository.findById(userRequest.roleId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found!")
         );

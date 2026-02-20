@@ -2,6 +2,7 @@ package site.secmega.secapi.domain;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import site.secmega.secapi.base.ProductionLineStatus;
 
@@ -12,6 +13,7 @@ import java.util.List;
 @Table(name = "production_lines")
 @Getter
 @Setter
+@NoArgsConstructor
 public class ProductionLine {
     /**
      * Information

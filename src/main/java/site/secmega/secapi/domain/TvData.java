@@ -19,40 +19,29 @@ public class TvData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Line name (ex: F1, F2, Line A)
-    @Column(nullable = false, length = 50)
-    private String line;
-
-    // Style number
-    @Column(nullable = false, length = 100)
-    private String styleNo;
-
-    // Sewing start time
-    private LocalTime sewStart;
-
     // Production date
     @Column(nullable = false)
     private LocalDate day;
 
-    // Number of workers
-    private Integer worker;
-
     // Actual output (ACT)
     private Integer actualOutput;
 
-    // Targets
-    private Integer targetHour;
-    private Integer targetDay;
-    private Integer targetNow;
-
     // Defects
-    private Integer defect;
+
 
     // Performance
     private Double finishPercentage;
     private Integer finish;
     private Integer yesterdayFinish;
     private Double defectPercentage;
+
+    private String recordDate;
+    private Integer workHour;
+    private Integer dayTarget;
+    private Integer hourTarget;
+    private Integer input;
+    private Integer nowTarget;
+    private Integer defectQty;
 
     // Hourly outputs (8:00 — 18:00)
 

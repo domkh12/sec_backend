@@ -1,0 +1,82 @@
+package site.secmega.secapi.util;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
+import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
+import site.secmega.secapi.domain.Role;
+import site.secmega.secapi.domain.User;
+import site.secmega.secapi.feature.user.UserRepository;
+
+import java.util.List;
+
+@Component
+@RequiredArgsConstructor
+public class AuthUtil {
+    private final UserRepository userRepository;
+    private final JwtDecoder jwtDecoder;
+
+    private Jwt getJwtFromAuthentication() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof Jwt)) {
+            System.out.println("Principal: " + (authentication == null ? "null" : authentication.getPrincipal().toString()));
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Not authenticated user");
+        }
+        return (Jwt) authentication.getPrincipal();
+    }
+
+    public String getEmailFromJwtAccessToken(String token) {
+        try {
+            Jwt jwt = jwtDecoder.decode(token);
+            return jwt.getId();
+        } catch (JwtException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid JWT token");
+        }
+    }
+
+
+    private String getEmailFromAuthentication() {
+        Jwt jwt = getJwtFromAuthentication();
+        return jwt.getId();
+    }
+
+    public Long loggedUserId() {
+        return loggedUser().getId();
+    }
+
+    public User loggedUser() {
+        String email = getEmailFromAuthentication();
+        return userRepository.findByUsername(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+    }
+
+    public List<Role> loggedUserRoles() {
+        return loggedUser().getRoles();
+    }
+
+    public Long loggedUserUuid() {
+        return loggedUser().getId();
+    }
+
+    public List<String> loggedUserSites() {
+        Jwt jwt = getJwtFromAuthentication();
+        return jwt.getClaim("sites");
+    }
+
+    public boolean isAdminLoggedUser() {
+        return loggedUserRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("ADMIN"));
+    }
+
+    public boolean isManagerLoggedUser() {
+        return loggedUserRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("MANAGER"));
+    }
+
+    public boolean isUserLoggedUser() {
+        return loggedUserRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("USER"));
+    }
+}
