@@ -41,6 +41,19 @@ public class Tv {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
+    // Defect Hour
+
+    private Integer h8;
+    private Integer h9;
+    private Integer h10;
+    private Integer h11;
+    private Integer h13;
+    private Integer h14;
+    private Integer h15;
+    private Integer h16;
+    private Integer h17;
+    private Integer h18;
+
     @OneToMany(mappedBy = "tv")
     private List<TvData> tvDatas;
 

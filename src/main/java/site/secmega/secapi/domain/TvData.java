@@ -28,33 +28,33 @@ public class TvData {
 
     // Defects
 
-
     // Performance
     private Double finishPercentage;
     private Integer finish;
     private Integer yesterdayFinish;
     private Double defectPercentage;
 
-    private String recordDate;
+    private String date;
     private Integer workHour;
     private Integer dayTarget;
     private Integer hourTarget;
     private Integer input;
     private Integer nowTarget;
     private Integer defectQty;
+    private Boolean isToday;
 
     // Hourly outputs (8:00 — 18:00)
 
-    private Integer output08;
-    private Integer output09;
-    private Integer output10;
-    private Integer output11;
-    private Integer output13;
-    private Integer output14;
-    private Integer output15;
-    private Integer output16;
-    private Integer output17;
-    private Integer output18;
+    private Integer h8;
+    private Integer h9;
+    private Integer h10;
+    private Integer h11;
+    private Integer h13;
+    private Integer h14;
+    private Integer h15;
+    private Integer h16;
+    private Integer h17;
+    private Integer h18;
 
     @ManyToOne
     private Tv tv;

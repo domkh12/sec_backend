@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import site.secmega.secapi.domain.Role;
+import site.secmega.secapi.domain.Tv;
 import site.secmega.secapi.domain.User;
 import site.secmega.secapi.feature.role.RoleRepository;
+import site.secmega.secapi.feature.tv.TvRepository;
 import site.secmega.secapi.feature.user.UserRepository;
 
 import java.time.LocalDateTime;
@@ -19,12 +21,14 @@ public class initData {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
+    private final TvRepository tvRepository;
 
     @PostConstruct
     public void init(){
         try {
             initRole();
             initUser();
+            initTv();
         } catch (Exception e) {
             System.err.println("Error during initializations: " + e.getMessage());
             e.printStackTrace();
@@ -58,5 +62,12 @@ public class initData {
         userRepository.save(user);
     }
 
+    private void initTv(){
+        Tv tv = new Tv();
+        tv.setName("General");
+        tv.setCreatedAt(LocalDateTime.now());
+        tvRepository.save(tv);
+    }
 
 }
+

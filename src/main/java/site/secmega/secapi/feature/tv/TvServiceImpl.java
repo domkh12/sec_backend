@@ -13,9 +13,12 @@ import site.secmega.secapi.feature.tv.dto.TvDataResponse;
 import site.secmega.secapi.feature.tv.dto.TvRequest;
 import site.secmega.secapi.feature.tv.dto.TvResponse;
 import site.secmega.secapi.mapper.TvMapper;
+import site.secmega.secapi.util.AuthUtil;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +28,7 @@ public class TvServiceImpl implements TvService{
     private final TvMapper tvMapper;
     private final TvDataRepository tvDataRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final AuthUtil authUtil;
 
     @Override
     public TvDataResponse createDataTv(TvDataRequest tvDataRequest) {
@@ -79,7 +83,13 @@ public class TvServiceImpl implements TvService{
 
     @Override
     public List<TvResponse> findTv() {
-        List<Tv> tvs = tvRepository.findAll();
+        boolean isProdManager = authUtil.isManagerLoggedUser();
+        List<Tv> tvs;
+        if (isProdManager){
+            tvs = tvRepository.findAll().stream().filter(tv -> !Objects.equals(tv.getName(), "General")).toList();
+        }else {
+            tvs = tvRepository.findAll();
+        }
         return tvs.stream().map(tvMapper::toTvResponse).toList();
     }
 
