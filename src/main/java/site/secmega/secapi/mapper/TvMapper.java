@@ -19,4 +19,6 @@ public interface TvMapper {
     TvDataResponse toTvDataResponse(Tv tv);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateTvFromTvDataRequest(TvDataRequest tvDataRequest, @MappingTarget Tv tv);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateTvDataFromTvDataRequest(TvDataRequest tvDataRequest, @MappingTarget TvData tvData);
 }

@@ -10,6 +10,7 @@ import site.secmega.secapi.domain.User;
 import site.secmega.secapi.feature.role.RoleRepository;
 import site.secmega.secapi.feature.tv.TvRepository;
 import site.secmega.secapi.feature.user.UserRepository;
+import site.secmega.secapi.util.TvDataScheduler;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,6 +23,7 @@ public class initData {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TvRepository tvRepository;
+    private final TvDataScheduler tvDataScheduler;
 
     @PostConstruct
     public void init(){
@@ -29,6 +31,7 @@ public class initData {
             initRole();
             initUser();
             initTv();
+            tvDataScheduler.createDailyTvData();
         } catch (Exception e) {
             System.err.println("Error during initializations: " + e.getMessage());
             e.printStackTrace();
@@ -48,6 +51,7 @@ public class initData {
 
     private void initUser(){
         Role role = roleRepository.findById(3L).orElseThrow();
+        Role roleTv = roleRepository.findById(2L).orElseThrow();
         User user = new User();
         user.setRoles(List.of(role));
         user.setUsername("manager");
@@ -60,6 +64,18 @@ public class initData {
         user.setIsAccountNonLocked(true);
         user.setIsEnabled(true);
         userRepository.save(user);
+        User user1 = new User();
+        user1.setRoles(List.of(roleTv));
+        user1.setUsername("tv");
+        user1.setEmployee_id("0012");
+        user1.setPhoneNumber(987654320);
+        user1.setUpdatedAt(LocalDateTime.now());
+        user1.setCreatedAt(LocalDateTime.now());
+        user1.setPassword(passwordEncoder.encode("123"));
+        user1.setIsCredentialsNonExpired(true);
+        user1.setIsAccountNonLocked(true);
+        user1.setIsEnabled(true);
+        userRepository.save(user1);
     }
 
     private void initTv(){
@@ -67,6 +83,14 @@ public class initData {
         tv.setName("General");
         tv.setCreatedAt(LocalDateTime.now());
         tvRepository.save(tv);
+        Tv tv1 = new Tv();
+        tv1.setName("Sawing1");
+        tv1.setCreatedAt(LocalDateTime.now());
+        tvRepository.save(tv1);
+        Tv tv2 = new Tv();
+        tv2.setName("Sawing2");
+        tv2.setCreatedAt(LocalDateTime.now());
+        tvRepository.save(tv2);
     }
 
 }

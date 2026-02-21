@@ -1,6 +1,9 @@
 package site.secmega.secapi.feature.tv.dto;
 
-public record HourData(
+import lombok.Builder;
+
+@Builder
+public record DailyRecord(
     String date,
     Integer dTarg,
     Integer h8,

@@ -20,7 +20,7 @@ public class TvController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/data")
-    @ResponseStatus(HttpStatus.OK)
+    @ResponseStatus(HttpStatus.CREATED)
     TvDataResponse createDataTv(@RequestBody TvDataRequest tvDataRequest){
         return tvService.createDataTv(tvDataRequest);
     }

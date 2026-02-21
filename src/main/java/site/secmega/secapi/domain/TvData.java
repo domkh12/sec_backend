@@ -19,10 +19,6 @@ public class TvData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Production date
-    @Column(nullable = false)
-    private LocalDate day;
-
     // Actual output (ACT)
     private Integer actualOutput;
 
@@ -35,10 +31,7 @@ public class TvData {
     private Double defectPercentage;
 
     private String date;
-    private Integer workHour;
-    private Integer dayTarget;
-    private Integer hourTarget;
-    private Integer input;
+    private Integer dTarget;
     private Integer nowTarget;
     private Integer defectQty;
     private Boolean isToday;

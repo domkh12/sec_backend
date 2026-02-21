@@ -8,15 +8,14 @@ import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.Tv;
 import site.secmega.secapi.domain.TvData;
 import site.secmega.secapi.feature.message.dto.MessageRequest;
-import site.secmega.secapi.feature.tv.dto.TvDataRequest;
-import site.secmega.secapi.feature.tv.dto.TvDataResponse;
-import site.secmega.secapi.feature.tv.dto.TvRequest;
-import site.secmega.secapi.feature.tv.dto.TvResponse;
+import site.secmega.secapi.feature.tv.dto.*;
 import site.secmega.secapi.mapper.TvMapper;
 import site.secmega.secapi.util.AuthUtil;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,11 +35,21 @@ public class TvServiceImpl implements TvService{
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv not found")
         );
         tvMapper.updateTvFromTvDataRequest(tvDataRequest, tv);
-
+        tv.setInput(tvDataRequest.input());
+        tv.setWHour(tvDataRequest.wHour());
+        tv.setHTarg(tvDataRequest.hTarg());
         Tv savedTv = tvRepository.save(tv);
-//        TvData tvData = TvData.builder()
-//                .
-//                .build();
+
+        // Tv Data update
+        TvData tvData = tvDataRepository.findByIsTodayTrueAndTv_Id(tv.getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Today True not found!")
+        );
+
+        tvMapper.updateTvDataFromTvDataRequest(tvDataRequest, tvData);
+        tvData.setDTarget(tvDataRequest.dTarg());
+
+        tvDataRepository.save(tvData);
+
         messagingTemplate.convertAndSend("/topic/messages/tv-data-update", MessageRequest.builder()
                         .message("update")
                         .isUpdate(true)
@@ -57,6 +66,9 @@ public class TvServiceImpl implements TvService{
                 .qcRepairBack(savedTv.getQcRepairBack())
                 .orderInline(savedTv.getOrderInline())
                 .balanceDay(savedTv.getBalanceDay())
+                .wHour(savedTv.getWHour())
+                .hTarg(savedTv.getHTarg())
+                .input(savedTv.getInput())
                 .build();
     }
 
@@ -66,7 +78,57 @@ public class TvServiceImpl implements TvService{
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv not found!")
         );
 
-        return tvMapper.toTvDataResponse(tv);
+        List<DailyRecord> dailyRecords = tv.getTvDatas().stream()
+                .sorted(Comparator.comparing(TvData::getDate).reversed())
+                .limit(3)
+                .map(tvData -> DailyRecord.builder()
+                        .h8(tvData.getH8())
+                        .h9(tvData.getH9())
+                        .h10(tvData.getH10())
+                        .h11(tvData.getH11())
+                        .h13(tvData.getH13())
+                        .h14(tvData.getH14())
+                        .h15(tvData.getH15())
+                        .h16(tvData.getH16())
+                        .h17(tvData.getH17())
+                        .h18(tvData.getH18())
+                        .date(tvData.getDate())
+                        .dTarg(tvData.getDTarget())
+                        .isToday(tvData.getIsToday())
+                        .build()).toList();
+
+        Defect defects = Defect.builder()
+                .h8(tv.getDh8())
+                .h9(tv.getDh9())
+                .h10(tv.getDh10())
+                .h11(tv.getDh11())
+                .h13(tv.getDh13())
+                .h14(tv.getDh14())
+                .h15(tv.getDh15())
+                .h16(tv.getDh16())
+                .h17(tv.getDh17())
+                .h18(tv.getDh18())
+                .build();
+
+        return TvDataResponse.builder()
+                .line(tv.getLine())
+                .worker(tv.getWorker())
+                .orderNo(tv.getOrderNo())
+                .totalInLine(tv.getTotalInLine())
+                .balanceInLine(tv.getBalanceInLine())
+                .orderQty(tv.getOrderQty())
+                .totalOutput(tv.getTotalOutput())
+                .qcRepairBack(tv.getQcRepairBack())
+                .orderInline(tv.getOrderInline())
+                .balanceDay(tv.getBalanceDay())
+                .wHour(tv.getWHour())
+                .hTarg(tv.getHTarg())
+                .input(tv.getInput())
+                .dailyRecords(dailyRecords)
+                .defects(defects)
+                .startDate(tv.getStartDate())
+                .finishDate(tv.getFinishDate())
+                .build();
     }
 
     @Override
