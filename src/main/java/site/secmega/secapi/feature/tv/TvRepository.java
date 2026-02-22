@@ -1,10 +1,12 @@
 package site.secmega.secapi.feature.tv;
 
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import site.secmega.secapi.domain.Tv;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -14,6 +16,9 @@ public interface TvRepository extends JpaRepository<Tv, Long> {
 
     @Query("select t from Tv t where t.name = ?1")
     Optional<Tv> findByName(String name);
+
+    @Query("select t from Tv t where t.name <> ?1 order by t.line")
+    List<Tv> findByNameNotOrderByLineAsc(String name, Sort sort);
 
 
 }

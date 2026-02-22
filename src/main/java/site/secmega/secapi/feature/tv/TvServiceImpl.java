@@ -11,10 +11,8 @@ import site.secmega.secapi.feature.message.dto.MessageRequest;
 import site.secmega.secapi.feature.tv.dto.*;
 import site.secmega.secapi.mapper.TvMapper;
 import site.secmega.secapi.util.AuthUtil;
-
+import org.springframework.data.domain.Sort;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
@@ -28,6 +26,17 @@ public class TvServiceImpl implements TvService{
     private final TvDataRepository tvDataRepository;
     private final SimpMessagingTemplate messagingTemplate;
     private final AuthUtil authUtil;
+
+    @Override
+    public List<TvGeneralResponse> getTvGeneralData() {
+        Sort sort = Sort.by(Sort.Direction.ASC, "line");
+        List<Tv> tvs = tvRepository.findByNameNotOrderByLineAsc( "General", sort);
+        return tvs.stream()
+        .map(tv -> TvGeneralResponse.builder()
+                .line(tv.getLine())
+                .styleNo(tv.getOrderNo())
+                .build()).toList();
+    }
 
     @Override
     public TvDataResponse createDataTv(TvDataRequest tvDataRequest) {

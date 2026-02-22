@@ -4,10 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import site.secmega.secapi.feature.tv.dto.TvDataRequest;
-import site.secmega.secapi.feature.tv.dto.TvDataResponse;
-import site.secmega.secapi.feature.tv.dto.TvRequest;
-import site.secmega.secapi.feature.tv.dto.TvResponse;
+import site.secmega.secapi.feature.tv.dto.*;
 
 import java.util.List;
 
@@ -17,6 +14,13 @@ import java.util.List;
 public class TvController {
 
     private final TvService tvService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN')")
+    @GetMapping("/tv-general")
+    @ResponseStatus(HttpStatus.OK)
+    List<TvGeneralResponse> getTvGeneralData(){
+        return tvService.getTvGeneralData();
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/data")
