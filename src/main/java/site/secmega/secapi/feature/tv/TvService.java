@@ -11,7 +11,9 @@ public interface TvService {
 
     TvDataResponse getDataByTvName(String name);
 
-    TvDataResponse createDataTv(TvDataRequest tvDataRequest);
+    TvDataResponse updateDataTv(TvDataRequest tvDataRequest);
 
     List<TvGeneralResponse> getTvGeneralData();
+
+    TvDataResponse createDataTv(String name);
 }

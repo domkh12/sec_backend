@@ -19,25 +19,11 @@ public class TvData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Actual output (ACT)
-    private Integer actualOutput;
-
-    // Defects
-
-    // Performance
-    private Double finishPercentage;
-    private Integer finish;
-    private Integer yesterdayFinish;
-    private Double defectPercentage;
-
     private String date;
     private Integer dTarget;
-    private Integer nowTarget;
-    private Integer defectQty;
     private Boolean isToday;
 
     // Hourly outputs (8:00 — 18:00)
-
     private Integer h8;
     private Integer h9;
     private Integer h10;
@@ -48,6 +34,18 @@ public class TvData {
     private Integer h16;
     private Integer h17;
     private Integer h18;
+
+    // Defect Hour
+    private Integer dh8;
+    private Integer dh9;
+    private Integer dh10;
+    private Integer dh11;
+    private Integer dh13;
+    private Integer dh14;
+    private Integer dh15;
+    private Integer dh16;
+    private Integer dh17;
+    private Integer dh18;
 
     @ManyToOne
     private Tv tv;

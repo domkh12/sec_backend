@@ -10,7 +10,6 @@ import site.secmega.secapi.domain.User;
 import site.secmega.secapi.feature.role.RoleRepository;
 import site.secmega.secapi.feature.tv.TvRepository;
 import site.secmega.secapi.feature.user.UserRepository;
-import site.secmega.secapi.util.TvDataScheduler;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,15 +22,13 @@ public class initData {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TvRepository tvRepository;
-    private final TvDataScheduler tvDataScheduler;
 
-    @PostConstruct
+//    @PostConstruct
     public void init(){
         try {
             initRole();
             initUser();
             initTv();
-            tvDataScheduler.createDailyTvData();
         } catch (Exception e) {
             System.err.println("Error during initializations: " + e.getMessage());
             e.printStackTrace();

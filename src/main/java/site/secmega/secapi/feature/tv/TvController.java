@@ -15,7 +15,7 @@ public class TvController {
 
     private final TvService tvService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN', 'ROLE_TV_OPERATOR')")
     @GetMapping("/tv-general")
     @ResponseStatus(HttpStatus.OK)
     List<TvGeneralResponse> getTvGeneralData(){
@@ -23,10 +23,17 @@ public class TvController {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN')")
-    @PostMapping("/data")
+    @PostMapping("/data/{name}")
     @ResponseStatus(HttpStatus.CREATED)
-    TvDataResponse createDataTv(@RequestBody TvDataRequest tvDataRequest){
-        return tvService.createDataTv(tvDataRequest);
+    TvDataResponse createDataTv(@PathVariable String name){
+        return tvService.createDataTv(name);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN')")
+    @PutMapping("/data")
+    @ResponseStatus(HttpStatus.CREATED)
+    TvDataResponse updateDataTv(@RequestBody TvDataRequest tvDataRequest){
+        return tvService.updateDataTv(tvDataRequest);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_TV_OPERATOR', 'ROLE_ADMIN')")

@@ -10,6 +10,7 @@ import java.util.List;
 public record TvDataResponse(
         String line,
         Integer worker,
+        Long day,
         String orderNo,
         Integer orderQty,
         Integer totalInLine,

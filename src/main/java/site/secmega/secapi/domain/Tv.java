@@ -33,7 +33,6 @@ public class Tv {
     private Integer balanceInLine;
     private Integer qcRepairBack;
     private Integer balanceDay;
-    private String sewD;
     private String styleNo;
     private LocalDate startDate;
     private LocalDate finishDate;
@@ -47,7 +46,6 @@ public class Tv {
     private Integer hTarg;
 
     // Defect Hour
-
     private Integer dh8;
     private Integer dh9;
     private Integer dh10;
