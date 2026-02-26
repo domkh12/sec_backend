@@ -32,6 +32,8 @@ public class Department {
     /**
      * Relationship
      * */
+    @OneToMany(mappedBy = "department")
+    private List<ProductionLine> productionLines;
     @ManyToMany(mappedBy = "departments")
     private List<User> users;
 }

@@ -26,7 +26,9 @@ import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.User;
 import site.secmega.secapi.feature.auth.dto.JwtResponse;
 import site.secmega.secapi.feature.auth.dto.LoginRequest;
+import site.secmega.secapi.feature.auth.dto.ProfileResponse;
 import site.secmega.secapi.feature.user.UserRepository;
+import site.secmega.secapi.util.AuthUtil;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -44,13 +46,22 @@ public class AuthServiceImpl implements AuthService{
     private final UserRepository userRepository;
     private final DaoAuthenticationProvider daoAuthenticationProvider;
     private final JwtEncoder jwtEncoder;
+    private final AuthUtil authUtil;
     private JwtEncoder jwtEncoderRefreshToken;
     private JwtAuthenticationProvider jwtAuthenticationProvider;
+
 
     @Autowired
     @Qualifier("jwtEncoderRefreshToken")
     public void setJwtEnCoderRefreshToken(JwtEncoder jwtEnCoderRefreshToken){
         this.jwtEncoderRefreshToken = jwtEnCoderRefreshToken;
+    }
+
+    @Override
+    public ProfileResponse getProfile() {
+        Long useId = authUtil.loggedUserId();
+        log.info("User ID: {}", useId);
+        return null;
     }
 
     @Override

@@ -32,6 +32,11 @@ public class DepartmentServiceImpl implements DepartmentService{
 
     @Override
     public DepartmentResponse updateDept(Long id, DepartmentRequest deptRequest) {
+
+        if (departmentRepository.existsByNameIgnoreCaseAndIdNot(deptRequest.name(), id)){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Department name already exist!");
+        }
+
         Department dept = departmentRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found!")
         );
@@ -54,7 +59,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 
     @Override
     public DepartmentResponse createDept(DepartmentRequest deptRequest) {
-        if (departmentRepository.existsByName(deptRequest.name())){
+        if (departmentRepository.existsByNameIgnoreCase(deptRequest.name())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Department name already exist!");
         }
         Department dept = departmentMapper.fromDepartmentRequest(deptRequest);

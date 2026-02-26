@@ -25,7 +25,6 @@ public class ProductionLine {
     private String name;
     @Column(nullable = false, unique = true)
     private String code;
-    private String department;
     private Integer capacityPerHour;
     @Column(nullable = false)
     private ProductionLineStatus status;
@@ -37,6 +36,8 @@ public class ProductionLine {
     /**
      * Relationship
      * */
+    @ManyToOne
+    private Department department;
     @OneToMany(mappedBy = "productionLine")
     private List<User> users;
     @OneToMany(mappedBy = "productionLines")

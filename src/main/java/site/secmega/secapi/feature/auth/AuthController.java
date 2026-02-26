@@ -5,9 +5,11 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import site.secmega.secapi.feature.auth.dto.JwtResponse;
 import site.secmega.secapi.feature.auth.dto.LoginRequest;
+import site.secmega.secapi.feature.auth.dto.ProfileResponse;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -15,6 +17,13 @@ import site.secmega.secapi.feature.auth.dto.LoginRequest;
 public class AuthController {
 
     private final AuthService authService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN', 'ROLE_TV_OPERATOR')")
+    @GetMapping("/me")
+    @ResponseStatus(HttpStatus.OK)
+    ProfileResponse getProfile(){
+        return authService.getProfile();
+    }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
