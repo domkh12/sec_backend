@@ -23,6 +23,25 @@ public class DepartmentServiceImpl implements DepartmentService{
     private final DepartmentRepository departmentRepository;
 
     @Override
+    public void deleteDept(Long id) {
+        Department dept = departmentRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found!")
+        );
+        departmentRepository.delete(dept);
+    }
+
+    @Override
+    public DepartmentResponse updateDept(Long id, DepartmentRequest deptRequest) {
+        Department dept = departmentRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found!")
+        );
+        departmentMapper.updateFromDepartmentRequest(deptRequest, dept);
+        dept.setUpdatedAt(LocalDateTime.now());
+        Department updatedDept = departmentRepository.save(dept);
+        return departmentMapper.toDepartmentResponse(updatedDept);
+    }
+
+    @Override
     public Page<DepartmentResponse> findAllDept(Integer pageSize, Integer pageNo) {
         if (pageNo <= 0 || pageSize <= 0 ){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "PageNo or PageSize must bigger than 0");
@@ -35,6 +54,9 @@ public class DepartmentServiceImpl implements DepartmentService{
 
     @Override
     public DepartmentResponse createDept(DepartmentRequest deptRequest) {
+        if (departmentRepository.existsByName(deptRequest.name())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Department name already exist!");
+        }
         Department dept = departmentMapper.fromDepartmentRequest(deptRequest);
         dept.setCreatedAt(LocalDateTime.now());
         dept.setUpdatedAt(LocalDateTime.now());

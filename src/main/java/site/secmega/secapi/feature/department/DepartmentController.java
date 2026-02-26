@@ -15,7 +15,21 @@ public class DepartmentController {
 
     private final DepartmentService departmentService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_PRODUCTION_MANAGER')")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    void deleteDept(@PathVariable Long id){
+        departmentService.deleteDept(id);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @ResponseStatus(HttpStatus.CREATED)
+    @PutMapping("/{id}")
+    DepartmentResponse updateDept(@PathVariable Long id, @RequestBody DepartmentRequest deptRequest){
+        return departmentService.updateDept(id, deptRequest);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping
     DepartmentResponse createDept(@RequestBody DepartmentRequest deptRequest){

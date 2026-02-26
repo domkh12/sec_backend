@@ -8,4 +8,8 @@ public interface DepartmentService {
     DepartmentResponse createDept(DepartmentRequest deptRequest);
 
     Page<DepartmentResponse> findAllDept(Integer pageSize, Integer pageNo);
+
+    DepartmentResponse updateDept(Long id, DepartmentRequest deptRequest);
+
+    void deleteDept(Long id);
 }
