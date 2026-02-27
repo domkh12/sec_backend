@@ -18,6 +18,7 @@ bin/
 !**/src/test/**/bin/
 ### env
 .env
+postgresql_data
 
 ### IntelliJ IDEA ###
 .idea

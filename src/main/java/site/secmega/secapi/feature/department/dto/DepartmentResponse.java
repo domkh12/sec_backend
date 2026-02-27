@@ -8,6 +8,8 @@ public record DepartmentResponse(
         Long id,
         String name,
         @JsonFormat(pattern = "dd/MMM/yyyy hh:mma")
-        LocalDateTime createdAt
+        LocalDateTime createdAt,
+        @JsonFormat(pattern = "dd/MMM/yyyy hh:mma")
+        LocalDateTime updatedAt
 ) {
 }

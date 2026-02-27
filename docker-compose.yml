@@ -26,7 +26,7 @@ services:
     ports:
       - "${POSTGRES_PORT}:5432"
     volumes:
-      - C:\Users\eichanudom\Desktop\Project\sec_api\postgresql_data:/var/lib/postgresql/data
+      - ${POSTGRES_VOL}:/var/lib/postgresql/data
     networks:
       - sec_net
 
