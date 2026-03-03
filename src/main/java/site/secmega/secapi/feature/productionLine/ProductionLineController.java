@@ -1,0 +1,35 @@
+package site.secmega.secapi.feature.productionLine;
+
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+import site.secmega.secapi.feature.productionLine.dto.ProductionLineRequest;
+import site.secmega.secapi.feature.productionLine.dto.ProductionLineResponse;
+
+@RestController
+@RequestMapping("/api/v1/production-lines")
+@RequiredArgsConstructor
+public class ProductionLineController {
+
+    private final ProductionLineService productionLineService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    ProductionLineResponse createProductionLine(@RequestBody ProductionLineRequest productionLineRequest){
+        return productionLineService.createProductionLine(productionLineRequest);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    Page<ProductionLineResponse> getProductionLine(
+            @RequestParam(required = false, defaultValue = "1") Integer pageNo,
+            @RequestParam(required = false, defaultValue = "20") Integer pageSize
+    ){
+        return productionLineService.getProductionLine(pageNo, pageSize);
+    }
+
+}

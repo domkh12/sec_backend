@@ -285,11 +285,12 @@ public class TvServiceImpl implements TvService{
     @Override
     public List<TvResponse> findTv() {
         boolean isProdManager = authUtil.isManagerLoggedUser();
+        Sort sort = Sort.by(Sort.Direction.ASC, "name");
         List<Tv> tvs;
         if (isProdManager){
-            tvs = tvRepository.findAll().stream().filter(tv -> !Objects.equals(tv.getName(), "General")).toList();
+            tvs = tvRepository.findAll(sort).stream().filter(tv -> !Objects.equals(tv.getName(), "General")).toList();
         }else {
-            tvs = tvRepository.findAll();
+            tvs = tvRepository.findAll(sort);
         }
         return tvs.stream().map(tvMapper::toTvResponse).toList();
     }

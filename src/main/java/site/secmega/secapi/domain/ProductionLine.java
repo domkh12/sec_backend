@@ -21,11 +21,8 @@ public class ProductionLine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-    private String name;
     @Column(nullable = false, unique = true)
-    private String code;
-    private Integer capacityPerHour;
+    private String name;
     @Column(nullable = false)
     private ProductionLineStatus status;
     @Column(nullable = false)
