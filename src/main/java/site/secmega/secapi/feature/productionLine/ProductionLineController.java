@@ -5,6 +5,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import jakarta.validation.Valid;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineRequest;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineResponse;
 
@@ -18,7 +20,7 @@ public class ProductionLineController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    ProductionLineResponse createProductionLine(@RequestBody ProductionLineRequest productionLineRequest){
+    ProductionLineResponse createProductionLine(@Valid @RequestBody ProductionLineRequest productionLineRequest){
         return productionLineService.createProductionLine(productionLineRequest);
     }
 
