@@ -26,6 +26,31 @@ public class ProductionLineServiceImpl implements ProductionLineService{
     private final DepartmentRepository departmentRepository;
 
     @Override
+    public void deleteProductionLine(Long id) {
+        ProductionLine productionLine = productionLineRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Production line not found!")
+        );
+        productionLineRepository.delete(productionLine);
+    }
+
+    @Override
+    public ProductionLineResponse updateProductionLine(Long id, ProductionLineRequest productionLineRequest) {
+        ProductionLine productionLine = productionLineRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Production line not found!")
+        );
+        Department department = departmentRepository.findById(productionLineRequest.deptId()).orElseThrow(
+            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found!")
+        );
+        productionLineMapper.updateFromProductionLineRequest(productionLineRequest, productionLine);
+        productionLine.setUpdatedAt(LocalDateTime.now());
+        productionLine.setDepartment(department);
+
+        ProductionLine updatedProductionLine = productionLineRepository.save(productionLine);
+
+        return productionLineMapper.toProductionLineResponse(updatedProductionLine);    
+    }
+
+    @Override
     public ProductionLineResponse createProductionLine(ProductionLineRequest productionLineRequest) {
         Department dept = departmentRepository.findById(productionLineRequest.deptId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found!")
@@ -39,7 +64,12 @@ public class ProductionLineServiceImpl implements ProductionLineService{
 
         ProductionLine savedProductionLine = productionLineRepository.save(productionLine);
 
-        return productionLineMapper.toProductionLineResponse(savedProductionLine);
+        return ProductionLineResponse.builder()
+                                    .id(savedProductionLine.getId())
+                                    .line(savedProductionLine.getLine())
+                                    .dept(savedProductionLine.getDepartment().getDepartment())
+                                    .deptId(savedProductionLine.getDepartment().getId())
+                                    .build();
     }
 
     @Override
@@ -53,6 +83,13 @@ public class ProductionLineServiceImpl implements ProductionLineService{
         PageRequest pageRequest = PageRequest.of(pageNo - 1, pageSize, sort);
         Page<ProductionLine> productionLines = productionLineRepository.findAll(pageRequest);
 
-        return productionLines.map(productionLineMapper::toProductionLineResponse);
+        return productionLines.map(productionLine ->
+            ProductionLineResponse.builder()
+                .id(productionLine.getId())
+                .line(productionLine.getLine())
+                .dept(productionLine.getDepartment().getDepartment())
+                .deptId(productionLine.getDepartment().getId())
+                .build()
+        );
     }
 }

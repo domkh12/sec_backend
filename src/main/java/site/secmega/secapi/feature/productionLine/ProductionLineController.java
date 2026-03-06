@@ -18,6 +18,20 @@ public class ProductionLineController {
     private final ProductionLineService productionLineService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteProductionLine(@PathVariable Long id){
+        productionLineService.deleteProductionLine(id);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    ProductionLineResponse updateProductionLine(@PathVariable Long id, @Valid @RequestBody ProductionLineRequest productionLineRequest){
+        return productionLineService.updateProductionLine(id, productionLineRequest);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     ProductionLineResponse createProductionLine(@Valid @RequestBody ProductionLineRequest productionLineRequest){

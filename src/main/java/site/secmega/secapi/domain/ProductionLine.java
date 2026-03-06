@@ -22,7 +22,7 @@ public class ProductionLine {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
-    private String name;
+    private String line;
     @Column(nullable = false)
     private ProductionLineStatus status;
     @Column(nullable = false)

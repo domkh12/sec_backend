@@ -13,7 +13,6 @@ import site.secmega.secapi.feature.department.dto.DepartmentResponse;
 import site.secmega.secapi.mapper.DepartmentMapper;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -33,7 +32,7 @@ public class DepartmentServiceImpl implements DepartmentService{
     @Override
     public DepartmentResponse updateDept(Long id, DepartmentRequest deptRequest) {
 
-        if (departmentRepository.existsByNameIgnoreCaseAndIdNot(deptRequest.name(), id)){
+        if (departmentRepository.existsByDepartmentIgnoreCaseAndIdNot(deptRequest.department(), id)){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Department name already exist!");
         }
 
@@ -59,7 +58,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 
     @Override
     public DepartmentResponse createDept(DepartmentRequest deptRequest) {
-        if (departmentRepository.existsByNameIgnoreCase(deptRequest.name())){
+        if (departmentRepository.existsByDepartmentIgnoreCase(deptRequest.department())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Department name already exist!");
         }
         Department dept = departmentMapper.fromDepartmentRequest(deptRequest);

@@ -21,7 +21,7 @@ public class Department {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
-    private String name;
+    private String department;
     @Column(nullable = false)
     private Boolean isActive;
     @Column(nullable = false)

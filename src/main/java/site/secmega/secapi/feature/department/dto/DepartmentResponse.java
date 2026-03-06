@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 public record DepartmentResponse(
         Long id,
-        String name,
+        String department,
         @JsonFormat(pattern = "dd/MMM/yyyy hh:mma")
         LocalDateTime createdAt,
         @JsonFormat(pattern = "dd/MMM/yyyy hh:mma")
