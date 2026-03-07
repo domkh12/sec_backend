@@ -26,12 +26,15 @@ import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.User;
 import site.secmega.secapi.feature.auth.dto.JwtResponse;
 import site.secmega.secapi.feature.auth.dto.LoginRequest;
+import site.secmega.secapi.feature.auth.dto.ProfileRequest;
 import site.secmega.secapi.feature.auth.dto.ProfileResponse;
 import site.secmega.secapi.feature.user.UserRepository;
+import site.secmega.secapi.mapper.UserMapper;
 import site.secmega.secapi.util.AuthUtil;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
@@ -49,6 +52,7 @@ public class AuthServiceImpl implements AuthService{
     private final AuthUtil authUtil;
     private JwtEncoder jwtEncoderRefreshToken;
     private JwtAuthenticationProvider jwtAuthenticationProvider;
+    private UserMapper userMapper;
 
 
     @Autowired
@@ -58,10 +62,44 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
+    public ProfileResponse updateProfile(ProfileRequest profileRequest) {
+        Long id = authUtil.loggedUserId();
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+        );
+        userMapper.updateFromProfileRequest(profileRequest, user);
+        user.setUpdatedAt(LocalDateTime.now());
+        User updatedUser = userRepository.save(user);
+
+        return ProfileResponse.builder()
+                .id(updatedUser.getId())
+                .username(updatedUser.getUsername())
+                .firstName(updatedUser.getFirstName())
+                .lastName(updatedUser.getLastName())
+                .dateOfBirth(updatedUser.getDateOfBirth())
+                .phoneNumber(updatedUser.getPhoneNumber())
+                .avatar(updatedUser.getAvatar())
+                .role(updatedUser.getRoles().stream().findFirst().orElseThrow().getName())
+                .build();
+    }
+
+    @Override
     public ProfileResponse getProfile() {
         Long useId = authUtil.loggedUserId();
-        log.info("User ID: {}", useId);
-        return null;
+        User user = userRepository.findById(useId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+        );
+
+        return ProfileResponse.builder()
+                .id(user.getId())
+                .username(user.getUsername())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .dateOfBirth(user.getDateOfBirth())
+                .phoneNumber(user.getPhoneNumber())
+                .avatar(user.getAvatar())
+                .role(user.getRoles().stream().findFirst().orElseThrow().getName())
+                .build();
     }
 
     @Override
@@ -244,5 +282,10 @@ public class AuthServiceImpl implements AuthService{
     @Autowired
     public void setJwtAuthenticationProvider(JwtAuthenticationProvider jwtAuthenticationProvider) {
         this.jwtAuthenticationProvider = jwtAuthenticationProvider;
+    }
+
+    @Autowired
+    public void setUserMapper(UserMapper userMapper) {
+        this.userMapper = userMapper;
     }
 }

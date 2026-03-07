@@ -22,6 +22,14 @@ public class ProductServiceImpl implements ProductService {
     private final ProductMapper productMapper;
 
     @Override
+    public void deleteProduct(Long id) {
+        Product product = productRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found")
+        );
+        productRepository.delete(product);
+    }
+
+    @Override
     public ProductResponse updateProduct(Long id, ProductRequest productRequest) {
         if (productRepository.existsByCodeAndIdNot(productRequest.code(), id)){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Product code already exist");

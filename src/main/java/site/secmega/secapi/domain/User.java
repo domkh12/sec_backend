@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -23,6 +24,8 @@ public class User {
     private Long id;
     @Column(nullable = false, unique = true)
     private String employee_id;
+    private String firstName;
+    private String lastName;
     @Column(nullable = false, unique = true)
     private String username;
     @Column(nullable = false)
@@ -30,6 +33,8 @@ public class User {
     @Column(nullable = false, unique = true)
     private Integer phoneNumber;
     private LocalDateTime hireDate;
+    private String avatar;
+    private LocalDate dateOfBirth;
     @Column(nullable = false)
     private LocalDateTime createdAt;
     @Column(nullable = false)

@@ -4,7 +4,8 @@ public record ProductRequest(
     String name,
     String code,
     String size,
-    String color
+    String color,
+    String category
 ) {
     
 }

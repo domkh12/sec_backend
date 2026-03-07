@@ -9,6 +9,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import site.secmega.secapi.feature.auth.dto.JwtResponse;
 import site.secmega.secapi.feature.auth.dto.LoginRequest;
+import site.secmega.secapi.feature.auth.dto.ProfileRequest;
 import site.secmega.secapi.feature.auth.dto.ProfileResponse;
 
 @RestController
@@ -17,6 +18,13 @@ import site.secmega.secapi.feature.auth.dto.ProfileResponse;
 public class AuthController {
 
     private final AuthService authService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN', 'ROLE_TV_OPERATOR')")
+    @PutMapping("/me")
+    @ResponseStatus(HttpStatus.CREATED)
+    ProfileResponse updateProfile(@RequestBody ProfileRequest profileRequest){
+        return authService.updateProfile(profileRequest);
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN', 'ROLE_TV_OPERATOR')")
     @GetMapping("/me")

@@ -17,6 +17,13 @@ public class ProductController {
     private final ProductService productService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN')")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteProduct(@PathVariable Long id){
+        productService.deleteProduct(id);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN')")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     ProductResponse updateProduct(@PathVariable Long id, @RequestBody ProductRequest productRequest){
