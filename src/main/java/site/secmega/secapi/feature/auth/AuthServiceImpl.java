@@ -67,6 +67,9 @@ public class AuthServiceImpl implements AuthService{
         User user = userRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         );
+        if (userRepository.existsByPhoneNumberAndIdNot(profileRequest.phoneNumber(), user.getId())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already exist");
+        }
         userMapper.updateFromProfileRequest(profileRequest, user);
         user.setUpdatedAt(LocalDateTime.now());
         User updatedUser = userRepository.save(user);
@@ -86,6 +89,7 @@ public class AuthServiceImpl implements AuthService{
     @Override
     public ProfileResponse getProfile() {
         Long useId = authUtil.loggedUserId();
+
         User user = userRepository.findById(useId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         );

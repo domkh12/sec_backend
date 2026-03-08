@@ -36,7 +36,7 @@ public class initData {
     }
 
     private void initRole() {
-        List<String> roleNames = List.of("ADMIN", "TV_OPERATOR", "PRODUCTION_MANAGER");
+        List<String> roleNames = List.of("ADMIN", "VIEWER", "HR_MANAGER", "OPERATOR", "SUPERVISOR", "QC_INSPECTOR");
 
         roleNames.forEach(name -> {
             Role role = new Role();
@@ -47,16 +47,18 @@ public class initData {
     }
 
     private void initUser(){
-        Role role = roleRepository.findById(3L).orElseThrow();
+        Role roleAdmin = roleRepository.findById(1L).orElseThrow();
         Role roleTv = roleRepository.findById(2L).orElseThrow();
+        Role roleManager = roleRepository.findById(3L).orElseThrow();
         User user = new User();
-        user.setRoles(List.of(role));
+        user.setRoles(List.of(roleManager));
         user.setUsername("manager");
         user.setEmployee_id("0011");
         user.setPhoneNumber(987654321);
         user.setUpdatedAt(LocalDateTime.now());
         user.setCreatedAt(LocalDateTime.now());
         user.setPassword(passwordEncoder.encode("123"));
+        user.setIsAccountNonExpired(true);
         user.setIsCredentialsNonExpired(true);
         user.setIsAccountNonLocked(true);
         user.setIsEnabled(true);
@@ -69,10 +71,24 @@ public class initData {
         user1.setUpdatedAt(LocalDateTime.now());
         user1.setCreatedAt(LocalDateTime.now());
         user1.setPassword(passwordEncoder.encode("123"));
+        user.setIsAccountNonExpired(true);
         user1.setIsCredentialsNonExpired(true);
         user1.setIsAccountNonLocked(true);
         user1.setIsEnabled(true);
         userRepository.save(user1);
+        User user2 = new User();
+        user2.setRoles(List.of(roleAdmin));
+        user2.setUsername("admin");
+        user2.setEmployee_id("0013");
+        user2.setPhoneNumber(987654322);
+        user2.setUpdatedAt(LocalDateTime.now());
+        user2.setCreatedAt(LocalDateTime.now());
+        user2.setPassword(passwordEncoder.encode("123"));
+        user.setIsAccountNonExpired(true);
+        user2.setIsCredentialsNonExpired(true);
+        user2.setIsAccountNonLocked(true);
+        user2.setIsEnabled(true);
+        userRepository.save(user2);
     }
 
     private void initTv(){

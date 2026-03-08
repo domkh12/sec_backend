@@ -19,14 +19,14 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN', 'ROLE_TV_OPERATOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR_MANAGER', 'ROLE_ADMIN', 'ROLE_VIEWER')")
     @PutMapping("/me")
     @ResponseStatus(HttpStatus.CREATED)
     ProfileResponse updateProfile(@RequestBody ProfileRequest profileRequest){
         return authService.updateProfile(profileRequest);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_PRODUCTION_MANAGER', 'ROLE_ADMIN', 'ROLE_TV_OPERATOR')")
+    @PreAuthorize("hasAnyAuthority('ROLE_HR_MANAGER', 'ROLE_ADMIN', 'ROLE_VIEWER')")
     @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
     ProfileResponse getProfile(){
