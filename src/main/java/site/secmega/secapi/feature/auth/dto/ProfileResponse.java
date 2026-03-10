@@ -12,7 +12,7 @@ public record ProfileResponse(
         String username,
         String firstName,
         String lastName,
-        Integer phoneNumber,
+        String phoneNumber,
         @JsonFormat(pattern = "dd/MMM/yyyy")
         LocalDate dateOfBirth,
         String role,

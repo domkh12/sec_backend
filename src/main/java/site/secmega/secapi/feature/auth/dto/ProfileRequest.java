@@ -7,7 +7,7 @@ import java.time.LocalDate;
 public record ProfileRequest(
         String firstName,
         String lastName,
-        Integer phoneNumber,
+        String phoneNumber,
         LocalDate dateOfBirth,
         String avatar
 ) {

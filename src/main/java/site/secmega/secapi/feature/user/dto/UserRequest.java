@@ -4,7 +4,7 @@ public record UserRequest(
         String username,
         String password,
         String employee_id,
-        Integer phoneNumber,
+        String phoneNumber,
         Long roleId
 ) {
 }

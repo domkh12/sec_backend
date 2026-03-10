@@ -54,7 +54,7 @@ public class initData {
         user.setRoles(List.of(roleManager));
         user.setUsername("manager");
         user.setEmployee_id("0011");
-        user.setPhoneNumber(987654321);
+        user.setPhoneNumber("0987654321");
         user.setUpdatedAt(LocalDateTime.now());
         user.setCreatedAt(LocalDateTime.now());
         user.setPassword(passwordEncoder.encode("123"));
@@ -67,7 +67,7 @@ public class initData {
         user1.setRoles(List.of(roleTv));
         user1.setUsername("tv");
         user1.setEmployee_id("0012");
-        user1.setPhoneNumber(987654320);
+        user1.setPhoneNumber("0987654320");
         user1.setUpdatedAt(LocalDateTime.now());
         user1.setCreatedAt(LocalDateTime.now());
         user1.setPassword(passwordEncoder.encode("123"));
@@ -80,7 +80,7 @@ public class initData {
         user2.setRoles(List.of(roleAdmin));
         user2.setUsername("admin");
         user2.setEmployee_id("0013");
-        user2.setPhoneNumber(987654322);
+        user2.setPhoneNumber("0987654322");
         user2.setUpdatedAt(LocalDateTime.now());
         user2.setCreatedAt(LocalDateTime.now());
         user2.setPassword(passwordEncoder.encode("123"));

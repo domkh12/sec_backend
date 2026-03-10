@@ -31,7 +31,7 @@ public class User {
     @Column(nullable = false)
     private String password;
     @Column(nullable = false, unique = true)
-    private Integer phoneNumber;
+    private String phoneNumber;
     private LocalDateTime hireDate;
     private String avatar;
     private LocalDate dateOfBirth;
