@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import site.secmega.secapi.base.UserStatus;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,7 +24,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
-    private String employee_id;
+    private String employeeId;
+    private String email;
     private String firstName;
     private String lastName;
     @Column(nullable = false, unique = true)
@@ -34,7 +36,9 @@ public class User {
     private String phoneNumber;
     private LocalDateTime hireDate;
     private String avatar;
+    private LocalDateTime lastLogin;
     private LocalDate dateOfBirth;
+    private UserStatus status;
     @Column(nullable = false)
     private LocalDateTime createdAt;
     @Column(nullable = false)

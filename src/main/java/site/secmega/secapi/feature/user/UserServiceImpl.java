@@ -1,10 +1,14 @@
 package site.secmega.secapi.feature.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import site.secmega.secapi.base.UserStatus;
 import site.secmega.secapi.domain.Role;
 import site.secmega.secapi.domain.User;
 import site.secmega.secapi.feature.role.RoleRepository;
@@ -35,8 +39,12 @@ public class UserServiceImpl implements UserService{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already exist");
         }
 
-        if (userRepository.existsByEmployee_id(userRequest.employee_id())){
+        if (userRepository.existsByEmployee_id(userRequest.employeeId())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Employee ID already exist");
+        }
+
+        if (userRepository.existsByEmailIgnoreCase(userRequest.email())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exist");
         }
 
         User user = userMapper.fromUserRequest(userRequest);
@@ -47,11 +55,24 @@ public class UserServiceImpl implements UserService{
         user.setIsAccountNonLocked(true);
         user.setIsCredentialsNonExpired(true);
         user.setIsEnabled(true);
+        user.setStatus(UserStatus.inactive);
         Role role = roleRepository.findById(userRequest.roleId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found!")
         );
         user.setRoles(List.of(role));
         User savedUser = userRepository.save(user);
         return userMapper.toUserResponse(savedUser);
+    }
+
+    @Override
+    public Page<UserResponse> findAll(Integer pageNo, Integer pageSize) {
+        if (pageNo <= 0 || pageSize <= 0 ){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page no and Page size must be greater than 0");
+        }
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        PageRequest pageRequest = PageRequest.of(pageNo - 1, pageSize, sort);
+        Page<User> users = userRepository.findAll(pageRequest);
+
+        return users.map(userMapper::toUserResponse);
     }
 }

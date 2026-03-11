@@ -8,6 +8,8 @@ import site.secmega.secapi.feature.auth.dto.LoginRequest;
 import site.secmega.secapi.feature.auth.dto.ProfileRequest;
 import site.secmega.secapi.feature.auth.dto.ProfileResponse;
 
+import java.io.IOException;
+
 public interface AuthService {
     ResponseEntity<JwtResponse> login(LoginRequest loginRequest, HttpServletResponse httpServletResponse);
 
@@ -17,5 +19,5 @@ public interface AuthService {
 
     ProfileResponse getProfile();
 
-    ProfileResponse updateProfile(ProfileRequest profileRequest);
+    ProfileResponse updateProfile(ProfileRequest profileRequest) throws IOException;
 }

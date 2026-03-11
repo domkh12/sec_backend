@@ -12,6 +12,8 @@ import site.secmega.secapi.feature.auth.dto.LoginRequest;
 import site.secmega.secapi.feature.auth.dto.ProfileRequest;
 import site.secmega.secapi.feature.auth.dto.ProfileResponse;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
@@ -22,7 +24,7 @@ public class AuthController {
     @PreAuthorize("hasAnyAuthority('ROLE_HR_MANAGER', 'ROLE_ADMIN', 'ROLE_VIEWER')")
     @PutMapping("/me")
     @ResponseStatus(HttpStatus.CREATED)
-    ProfileResponse updateProfile(@RequestBody ProfileRequest profileRequest){
+    ProfileResponse updateProfile(@RequestBody ProfileRequest profileRequest) throws IOException {
         return authService.updateProfile(profileRequest);
     }
 

@@ -28,10 +28,12 @@ import site.secmega.secapi.feature.auth.dto.JwtResponse;
 import site.secmega.secapi.feature.auth.dto.LoginRequest;
 import site.secmega.secapi.feature.auth.dto.ProfileRequest;
 import site.secmega.secapi.feature.auth.dto.ProfileResponse;
+import site.secmega.secapi.feature.file.FileService;
 import site.secmega.secapi.feature.user.UserRepository;
 import site.secmega.secapi.mapper.UserMapper;
 import site.secmega.secapi.util.AuthUtil;
 
+import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -53,6 +55,7 @@ public class AuthServiceImpl implements AuthService{
     private JwtEncoder jwtEncoderRefreshToken;
     private JwtAuthenticationProvider jwtAuthenticationProvider;
     private UserMapper userMapper;
+    private FileService fileService;
 
 
     @Autowired
@@ -62,7 +65,7 @@ public class AuthServiceImpl implements AuthService{
     }
 
     @Override
-    public ProfileResponse updateProfile(ProfileRequest profileRequest) {
+    public ProfileResponse updateProfile(ProfileRequest profileRequest) throws IOException {
         Long id = authUtil.loggedUserId();
         User user = userRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
@@ -277,6 +280,9 @@ public class AuthServiceImpl implements AuthService{
 
         response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
+        user.setLastLogin(LocalDateTime.now());
+        userRepository.save(user);
+
         return ResponseEntity.ok(JwtResponse.builder()
                 .tokenType("Bearer")
                 .accessToken(accessToken)
@@ -291,5 +297,10 @@ public class AuthServiceImpl implements AuthService{
     @Autowired
     public void setUserMapper(UserMapper userMapper) {
         this.userMapper = userMapper;
+    }
+
+    @Autowired
+    public void setFileService(FileService fileService) {
+        this.fileService = fileService;
     }
 }
