@@ -58,7 +58,7 @@ public class initData {
         user.setPhoneNumber("0987654321");
         user.setUpdatedAt(LocalDateTime.now());
         user.setCreatedAt(LocalDateTime.now());
-        user.setStatus(UserStatus.inactive);
+        user.setStatus(UserStatus.Inactive);
         user.setPassword(passwordEncoder.encode("123"));
         user.setIsAccountNonExpired(true);
         user.setIsCredentialsNonExpired(true);
@@ -73,7 +73,7 @@ public class initData {
         user1.setUpdatedAt(LocalDateTime.now());
         user1.setCreatedAt(LocalDateTime.now());
         user1.setPassword(passwordEncoder.encode("123"));
-        user.setStatus(UserStatus.inactive);
+        user1.setStatus(UserStatus.Inactive);
         user1.setIsAccountNonExpired(true);
         user1.setIsCredentialsNonExpired(true);
         user1.setIsAccountNonLocked(true);
@@ -86,7 +86,7 @@ public class initData {
         user2.setPhoneNumber("0987654322");
         user2.setUpdatedAt(LocalDateTime.now());
         user2.setCreatedAt(LocalDateTime.now());
-        user2.setStatus(UserStatus.inactive);
+        user2.setStatus(UserStatus.Inactive);
         user2.setPassword(passwordEncoder.encode("123"));
         user.setIsAccountNonExpired(true);
         user2.setIsCredentialsNonExpired(true);

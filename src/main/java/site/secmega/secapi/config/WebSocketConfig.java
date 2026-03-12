@@ -97,6 +97,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                     SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthenticationToken);
 
                     accessor.setUser(usernamePasswordAuthenticationToken);
+                    // 👇 store userId in session so disconnect event can read it
+                    String userId = accessor.getFirstNativeHeader("userId");
+                    if (userId != null && accessor.getSessionAttributes() != null) {
+                        accessor.getSessionAttributes().put("userId", userId);
+                    }
                 }
                 return message;
             }

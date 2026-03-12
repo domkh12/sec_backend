@@ -3,9 +3,11 @@ package site.secmega.secapi.config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
+import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
+import site.secmega.secapi.feature.user.UserService;
 import site.secmega.secapi.feature.user.UserServiceImpl;
 
 @Component
@@ -13,27 +15,26 @@ import site.secmega.secapi.feature.user.UserServiceImpl;
 @Slf4j
 public class WebSocketEventListener {
 
-    private final UserServiceImpl userServiceImpl;
+    private final UserService userService;
 
     @EventListener
-    public void handleWebSocketConnectListener(SessionConnectEvent event) {
-//        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-//        // Assuming you have a way to get the uuid from the headers or the principal
-//        String uuid = headerAccessor.getNativeHeader("uuid").get(0); // Get uuid from headers
-//        headerAccessor.getSessionAttributes().put("uuid", uuid); // Store uuid in session attributes
-//        log.info("Received a new session connect event: {}", headerAccessor);
+    public void handleConnect(SessionConnectEvent event) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+        String userId = accessor.getFirstNativeHeader("userId");
+        log.info("Connected: {}", userId);
+        if (userId != null) {
+            accessor.getSessionAttributes().put("userId", userId);
+            userService.setActive(Long.parseLong(userId));
+        }
     }
 
     @EventListener
-    public void handleWebSocketDisconnectListener(SessionDisconnectEvent event) {
-//        StompHeaderAccessor headerAccessor = StompHeaderAccessor.wrap(event.getMessage());
-//        // Retrieve the session attributes
-//        String uuid = (String) headerAccessor.getSessionAttributes().get("uuid");
-//        // Now you can use the uuid for your logic
-//        log.info("Received a new session disconnect event: {}", headerAccessor);
-//
-//        userServiceImpl.connectedUsers(uuid, new IsOnlineRequest(false));
-
+    public void handleDisconnect(SessionDisconnectEvent event) {
+        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
+        String userId = (String) accessor.getSessionAttributes().get("userId");
+        log.info("Disconnected: {}", userId);
+        if (userId != null) {
+            userService.setInactive(Long.parseLong(userId));
+        }
     }
-
 }

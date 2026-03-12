@@ -1,5 +1,5 @@
 package site.secmega.secapi.base;
 
 public enum UserStatus {
-    active,inactive,blocked
+    Active,Inactive,Blocked
 }

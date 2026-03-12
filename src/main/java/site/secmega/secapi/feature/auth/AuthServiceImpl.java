@@ -70,7 +70,7 @@ public class AuthServiceImpl implements AuthService{
         User user = userRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
         );
-        if (userRepository.existsByPhoneNumberAndIdNot(profileRequest.phoneNumber(), user.getId())){
+        if (userRepository.existsByPhoneNumberAndIdNotAndDeletedAtIsNull(profileRequest.phoneNumber(), user.getId())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already exist");
         }
         userMapper.updateFromProfileRequest(profileRequest, user);

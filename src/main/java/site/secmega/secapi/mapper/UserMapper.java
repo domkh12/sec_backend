@@ -11,9 +11,14 @@ import site.secmega.secapi.feature.user.dto.UserResponse;
 public interface UserMapper {
     User fromUserRequest(UserRequest userRequest);
     @Mapping(target = "role", expression = "java(user.getRoles().stream().map(r -> r.getName()).findFirst().orElse(null))")
+    @Mapping(target = "roleId", expression = "java(user.getRoles().stream().map(r -> r.getId()).findFirst().orElse(null))")
+    @Mapping(target = "lineId", expression = "java(user.getProductionLine() != null ? user.getProductionLine().getId() : null)")
+    @Mapping(target = "department", expression = "java(user.getProductionLine() != null ? user.getProductionLine().getDepartment().getDepartment() : null)")
     UserResponse toUserResponse(User user);
     ProfileResponse toProfileResponse(User user);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromProfileRequest(ProfileRequest profileRequest, @MappingTarget User user);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateUserFromUserRequest(UserRequest userRequest, @MappingTarget User user);
 
 }

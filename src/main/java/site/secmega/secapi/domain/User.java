@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 import site.secmega.secapi.base.UserStatus;
 
 import java.time.LocalDate;
@@ -15,7 +16,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class User {
+@SQLRestriction("deleted_at IS NULL")
+public class User extends BaseEntity{
 
     /**
      * Core Identity Information
@@ -23,26 +25,22 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String employeeId;
     private String email;
     private String firstName;
     private String lastName;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String username;
     @Column(nullable = false)
     private String password;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String phoneNumber;
     private LocalDateTime hireDate;
     private String avatar;
     private LocalDateTime lastLogin;
     private LocalDate dateOfBirth;
     private UserStatus status;
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
 
     /**
      * Security
@@ -71,10 +69,5 @@ public class User {
     private List<HourlyProduction> hourlyProductions;
     @OneToMany(mappedBy = "user")
     private List<DowntimeRecord> downtimeRecords;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "dept_id", referencedColumnName = "id")
-    )
-    private List<Department> departments;
 
 }
