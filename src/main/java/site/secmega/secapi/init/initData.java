@@ -14,6 +14,7 @@ import site.secmega.secapi.feature.user.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -37,20 +38,28 @@ public class initData {
     }
 
     private void initRole() {
-        List<String> roleNames = List.of("ADMIN", "VIEWER", "HR_MANAGER", "OPERATOR", "SUPERVISOR", "QC_INSPECTOR");
+        Map<String, String> roles = Map.of(
+                "ADMIN",        "Full system access with user and configuration management privileges",
+                "VIEWER",       "Read-only access to display screens and dashboards (TV display role)",
+                "HR_MANAGER",   "Manages employee records, attendance, and HR-related operations",
+                "OPERATOR",     "Handles day-to-day production floor operations and task execution",
+                "SUPERVISOR",   "Oversees operators and monitors production progress and performance",
+                "QC_INSPECTOR", "Inspects and verifies product quality at various production stages"
+        );
 
-        roleNames.forEach(name -> {
+        roles.forEach((name, description) -> {
             Role role = new Role();
             role.setName(name);
+            role.setDescription(description);
             role.setCreatedAt(LocalDateTime.now());
             roleRepository.save(role);
         });
     }
 
     private void initUser(){
-        Role roleAdmin = roleRepository.findById(1L).orElseThrow();
-        Role roleTv = roleRepository.findById(2L).orElseThrow();
-        Role roleManager = roleRepository.findById(3L).orElseThrow();
+        Role roleAdmin = roleRepository.findByName("ADMIN").orElseThrow();
+        Role roleTv = roleRepository.findByName("VIEWER").orElseThrow();
+        Role roleManager = roleRepository.findByName("HR_MANAGER").orElseThrow();
         User user = new User();
         user.setRoles(List.of(roleManager));
         user.setUsername("manager");

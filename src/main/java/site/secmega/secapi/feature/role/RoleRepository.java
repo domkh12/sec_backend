@@ -5,7 +5,10 @@ import org.springframework.stereotype.Repository;
 import site.secmega.secapi.domain.Role;
 import site.secmega.secapi.feature.role.dto.RoleResponse;
 
+import java.util.Optional;
+
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {
+    Optional<Role> findByName(String name);
 
 }

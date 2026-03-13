@@ -1,9 +1,7 @@
 package site.secmega.secapi.domain;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -13,6 +11,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class FileMetadata {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,7 +24,7 @@ public class FileMetadata {
 
     // 👇 track who owns this file
     private String ownerType;   // "EMPLOYEE", "PRODUCT", "DOCUMENT"
-    private UUID ownerId;       // employee id, product id, etc.
+    private Long ownerId;       // employee id, product id, etc.
     private boolean current;    // is this the active file?
 
     private LocalDateTime uploadedAt;

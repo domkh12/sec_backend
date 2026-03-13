@@ -2,7 +2,7 @@ package site.secmega.secapi.feature.product.dto;
 
 public record ProductResponse(
     Long id,
-    String name,
+    String styleName,
     String category,
     String size,
     String color,

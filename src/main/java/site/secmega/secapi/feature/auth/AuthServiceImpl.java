@@ -3,6 +3,7 @@ package site.secmega.secapi.feature.auth;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,15 +24,18 @@ import org.springframework.security.oauth2.server.resource.authentication.Bearer
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import site.secmega.secapi.domain.FileMetadata;
 import site.secmega.secapi.domain.User;
 import site.secmega.secapi.feature.auth.dto.JwtResponse;
 import site.secmega.secapi.feature.auth.dto.LoginRequest;
 import site.secmega.secapi.feature.auth.dto.ProfileRequest;
 import site.secmega.secapi.feature.auth.dto.ProfileResponse;
+import site.secmega.secapi.feature.file.FileRepository;
 import site.secmega.secapi.feature.file.FileService;
 import site.secmega.secapi.feature.user.UserRepository;
 import site.secmega.secapi.mapper.UserMapper;
 import site.secmega.secapi.util.AuthUtil;
+import site.secmega.secapi.util.FileUtil;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -54,8 +58,10 @@ public class AuthServiceImpl implements AuthService{
     private final AuthUtil authUtil;
     private JwtEncoder jwtEncoderRefreshToken;
     private JwtAuthenticationProvider jwtAuthenticationProvider;
-    private UserMapper userMapper;
-    private FileService fileService;
+    private final UserMapper userMapper;
+    private final FileService fileService;
+    private final FileRepository fileRepository;
+    private final FileUtil fileUtil;
 
 
     @Autowired
@@ -75,6 +81,7 @@ public class AuthServiceImpl implements AuthService{
         }
         userMapper.updateFromProfileRequest(profileRequest, user);
         user.setUpdatedAt(LocalDateTime.now());
+        fileUtil.updateFile(id, "USER", profileRequest.avatar());
         User updatedUser = userRepository.save(user);
 
         return ProfileResponse.builder()
@@ -292,15 +299,5 @@ public class AuthServiceImpl implements AuthService{
     @Autowired
     public void setJwtAuthenticationProvider(JwtAuthenticationProvider jwtAuthenticationProvider) {
         this.jwtAuthenticationProvider = jwtAuthenticationProvider;
-    }
-
-    @Autowired
-    public void setUserMapper(UserMapper userMapper) {
-        this.userMapper = userMapper;
-    }
-
-    @Autowired
-    public void setFileService(FileService fileService) {
-        this.fileService = fileService;
     }
 }

@@ -1,11 +1,14 @@
 package site.secmega.secapi.feature.file;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import site.secmega.secapi.domain.FileMetadata;
 import site.secmega.secapi.feature.file.dto.FileResponse;
 import site.secmega.secapi.util.FileUtil;
 
@@ -20,14 +23,15 @@ import java.util.List;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class FileServiceImpl implements FileService{
+    private final FileRepository fileRepository;
 
     @Value("${file-server.base-uri}")
     private String baseUri;
 
     @Value("${file-server.server-path}")
     private String serverPath;
-
 
 
     @Override
@@ -72,5 +76,23 @@ public class FileServiceImpl implements FileService{
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
         }
         Files.deleteIfExists(path);
+    }
+
+//  @Scheduled(fixedRate = 4 * 60 * 60 * 1000) // every 4 hours
+    @Scheduled(fixedRate = 30000)
+    public void cleanupOldFiles() {
+
+        List<FileMetadata> oldFiles = fileRepository.findByCurrentFalseAndStoredNameNot();
+        List<FileMetadata> oldFiles2 = fileRepository.findByCurrentFalseAndStoredName();
+        fileRepository.deleteAll(oldFiles2);
+        oldFiles.forEach(file -> {
+            try {
+                deleteFile(file.getStoredName());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            fileRepository.delete(file);
+            log.info("Cleaned up old file: {}", file.getStoredName());
+        });
     }
 }

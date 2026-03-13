@@ -23,6 +23,7 @@ public class Role implements GrantedAuthority {
     private String name;
     @Column(nullable = false)
     private LocalDateTime createdAt;
+    String description;
     @ManyToMany(mappedBy = "roles")
     private List<User> users;
 

@@ -20,10 +20,10 @@ public class Product {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String code;
     @Column(nullable = false)
-    private String name;
+    private String styleName;
     private String category;
     private String size;
     private String color;
