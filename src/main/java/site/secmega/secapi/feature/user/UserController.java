@@ -8,8 +8,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
+import site.secmega.secapi.feature.user.dto.UserFilterRequest;
 import site.secmega.secapi.feature.user.dto.UserRequest;
 import site.secmega.secapi.feature.user.dto.UserResponse;
+import site.secmega.secapi.feature.user.dto.UserStatsResponse;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -17,6 +19,27 @@ import site.secmega.secapi.feature.user.dto.UserResponse;
 public class UserController {
 
     private final UserService userService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PostMapping("/{id}/unblock")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void unblockUser(@PathVariable Long id){
+        userService.unblockUser(id);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PostMapping("/{id}/block")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void blockUser(@PathVariable Long id){
+        userService.blockUser(id);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @GetMapping("/stats")
+    @ResponseStatus(HttpStatus.OK)
+    UserStatsResponse getUserStats(){
+        return userService.getUserStats();
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
@@ -35,11 +58,8 @@ public class UserController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    Page<UserResponse> findAll(
-            @RequestParam(required = false, defaultValue = "1") Integer pageNo,
-            @RequestParam(required = false, defaultValue = "20") Integer pageSize
-    ){
-        return userService.findAll(pageNo, pageSize);
+    Page<UserResponse> findAll(@ModelAttribute UserFilterRequest userFilterRequest){
+        return userService.findAll(userFilterRequest);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")

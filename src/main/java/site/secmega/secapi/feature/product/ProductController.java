@@ -1,5 +1,6 @@
 package site.secmega.secapi.feature.product;
 
+import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,14 +27,14 @@ public class ProductController {
     @PreAuthorize("hasAnyAuthority('ROLE_HR_MANAGER', 'ROLE_ADMIN')")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    ProductResponse updateProduct(@PathVariable Long id, @RequestBody ProductRequest productRequest){
+    ProductResponse updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequest productRequest){
         return productService.updateProduct(id, productRequest);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_HR_MANAGER', 'ROLE_ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    ProductResponse createProduct(@RequestBody ProductRequest productRequest){
+    ProductResponse createProduct(@Valid @RequestBody ProductRequest productRequest){
         return productService.createProduct(productRequest);
     }
 

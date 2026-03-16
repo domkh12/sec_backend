@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
+import site.secmega.secapi.base.ProductStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,7 +15,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Product {
+@SQLRestriction("deleted_at IS NULL")
+public class Product extends BaseEntity{
     /**
      * Field
      * */
@@ -24,16 +27,12 @@ public class Product {
     private String code;
     @Column(nullable = false)
     private String styleName;
-    private String category;
     private String size;
     private String color;
     private Integer targetProductionPerHour;
     private Double standardMinuteValue;
     private String description;
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    private ProductStatus status;
 
     /**
      * Relationship
@@ -42,4 +41,6 @@ public class Product {
     private List<HourlyProduction> hourlyProductions;
     @OneToMany(mappedBy = "product")
     private List<ProductionTarget> productionTargets;
+    @ManyToOne
+    private Category category;
 }

@@ -1,16 +1,20 @@
 package site.secmega.secapi.feature.product.dto;
 
+import site.secmega.secapi.base.ProductStatus;
+
 public record ProductResponse(
     Long id,
     String styleName,
-    String category,
     String size,
     String color,
     Integer targetProductionPerHour,
     Integer targetProductionPerDay,
     Double standardMinuteValue,
     String description,
-    String code
+    String code,
+    Long cateId,
+    String category,
+    ProductStatus status
 ) {
     
 }

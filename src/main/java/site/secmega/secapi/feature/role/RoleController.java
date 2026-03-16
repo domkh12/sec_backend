@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import site.secmega.secapi.feature.role.dto.RoleFilterRequest;
 import site.secmega.secapi.feature.role.dto.RoleResponse;
 
 import java.util.List;
@@ -19,11 +20,8 @@ public class RoleController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_HR_MANAGER')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    Page<RoleResponse> findAll(
-            @RequestParam(required = false, defaultValue = "1") Integer pageNo,
-            @RequestParam(required = false, defaultValue = "20") Integer pageSize
-    ){
-        return roleService.findAll(pageNo, pageSize);
+    Page<RoleResponse> findAll(@ModelAttribute RoleFilterRequest roleFilterRequest){
+        return roleService.findAll(roleFilterRequest);
     }
 
 }

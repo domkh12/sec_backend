@@ -4,8 +4,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import site.secmega.secapi.domain.Role;
+import site.secmega.secapi.feature.role.dto.RoleFilterRequest;
 import site.secmega.secapi.feature.role.dto.RoleResponse;
 import site.secmega.secapi.mapper.RoleMapper;
 
@@ -19,10 +21,27 @@ public class RoleServiceImpl implements RoleService{
     private final RoleMapper roleMapper;
 
     @Override
-    public Page<RoleResponse> findAll(Integer page, Integer size) {
+    public Page<RoleResponse> findAll(RoleFilterRequest roleFilterRequest) {
+
+        if (roleFilterRequest.pageNo() <= 0 || roleFilterRequest.pageSize() <= 0 ){
+            throw new IllegalArgumentException("Page no and Page size must be greater than 0");
+        }
+
+        Specification<Role> spec = Specification.where((root, query, cb) -> cb.conjunction());
+
+        if (roleFilterRequest.search() != null){
+            String searchTerm = "%" + roleFilterRequest.search().toLowerCase() + "%";
+            spec = spec.and((root, query, cb) ->
+                    cb.or(
+                            cb.like(cb.lower(root.get("name")), searchTerm),
+                            cb.like(cb.lower(root.get("description")), searchTerm)
+                    )
+            );
+        }
+
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        PageRequest pageRequest = PageRequest.of(page - 1, size, sort);
-        Page<Role> roles = roleRepository.findAll(pageRequest);
+        PageRequest pageRequest = PageRequest.of(roleFilterRequest.pageNo() - 1, roleFilterRequest.pageSize(), sort);
+        Page<Role> roles = roleRepository.findAll(spec, pageRequest);
         return roles.map(roleMapper::toRoleResponse);
     }
 }

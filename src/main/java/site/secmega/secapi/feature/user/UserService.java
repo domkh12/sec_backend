@@ -2,13 +2,15 @@ package site.secmega.secapi.feature.user;
 
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
+import site.secmega.secapi.feature.user.dto.UserFilterRequest;
 import site.secmega.secapi.feature.user.dto.UserRequest;
 import site.secmega.secapi.feature.user.dto.UserResponse;
+import site.secmega.secapi.feature.user.dto.UserStatsResponse;
 
 public interface UserService {
     UserResponse createUser(UserRequest userRequest);
 
-    Page<UserResponse> findAll(Integer pageNo, Integer pageSize);
+    Page<UserResponse> findAll(UserFilterRequest userFilterRequest);
 
     void setActive(Long id);
 
@@ -17,4 +19,10 @@ public interface UserService {
     UserResponse updateUser(Long id, @Valid UserRequest userRequest);
 
     void deleteUser(Long id);
+
+    UserStatsResponse getUserStats();
+
+    void blockUser(Long id);
+
+    void unblockUser(Long id);
 }

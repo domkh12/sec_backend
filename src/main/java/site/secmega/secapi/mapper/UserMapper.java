@@ -6,6 +6,7 @@ import site.secmega.secapi.feature.auth.dto.ProfileRequest;
 import site.secmega.secapi.feature.auth.dto.ProfileResponse;
 import site.secmega.secapi.feature.user.dto.UserRequest;
 import site.secmega.secapi.feature.user.dto.UserResponse;
+import site.secmega.secapi.feature.user.dto.UserStatsResponse;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
@@ -20,5 +21,4 @@ public interface UserMapper {
     void updateFromProfileRequest(ProfileRequest profileRequest, @MappingTarget User user);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateUserFromUserRequest(UserRequest userRequest, @MappingTarget User user);
-
 }

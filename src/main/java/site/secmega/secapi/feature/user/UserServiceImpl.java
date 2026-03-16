@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -17,8 +18,10 @@ import site.secmega.secapi.domain.User;
 import site.secmega.secapi.feature.message.dto.MessageRequest;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.role.RoleRepository;
+import site.secmega.secapi.feature.user.dto.UserFilterRequest;
 import site.secmega.secapi.feature.user.dto.UserRequest;
 import site.secmega.secapi.feature.user.dto.UserResponse;
+import site.secmega.secapi.feature.user.dto.UserStatsResponse;
 import site.secmega.secapi.mapper.UserMapper;
 import site.secmega.secapi.util.AuthUtil;
 
@@ -46,6 +49,59 @@ public class UserServiceImpl implements UserService{
         );
         user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
+    }
+
+    @Override
+    public UserStatsResponse getUserStats() {
+        Long userId = authUtil.loggedUserId();
+
+        Specification<User> spec = Specification.where((root, query, cb) -> cb.conjunction());
+
+        spec = spec.and((root, query, cb) -> cb.notEqual(root.get("id"), userId));
+
+        long totalUsers = userRepository.count(spec);
+        long activeUsers = userRepository.count(spec.and((root, query, cb) -> cb.equal(root.get("status"), UserStatus.Active)));
+        long inactiveUsers = userRepository.count(spec.and((root, query, cb) -> cb.equal(root.get("status"), UserStatus.Inactive)));
+        long blockedUsers = userRepository.count(spec.and((root, query, cb) -> cb.equal(root.get("status"), UserStatus.Blocked)));
+
+        return UserStatsResponse.builder()
+                .totalUsers(totalUsers)
+                .activeUsers(activeUsers)
+                .inactiveUsers(inactiveUsers)
+                .blockedUsers(blockedUsers)
+                .build();
+    }
+
+    @Override
+    public void blockUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+        );
+
+        user.setStatus(UserStatus.Blocked);
+        user.setIsAccountNonLocked(false);
+        user.setIsCredentialsNonExpired(false);
+        user.setIsAccountNonExpired(false);
+        user.setUpdatedAt(LocalDateTime.now());
+        user.setIsEnabled(false);
+        userRepository.save(user);
+        notifyUserUpdate();
+    }
+
+    @Override
+    public void unblockUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+        );
+
+        user.setStatus(UserStatus.Inactive);
+        user.setIsAccountNonLocked(true);
+        user.setIsCredentialsNonExpired(true);
+        user.setIsAccountNonExpired(true);
+        user.setUpdatedAt(LocalDateTime.now());
+        user.setIsEnabled(true);
+        userRepository.save(user);
+        notifyUserUpdate();
     }
 
     @Override
@@ -153,14 +209,47 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public Page<UserResponse> findAll(Integer pageNo, Integer pageSize) {
+    public Page<UserResponse> findAll(UserFilterRequest userFilterRequest) {
         Long userId = authUtil.loggedUserId();
-        if (pageNo <= 0 || pageSize <= 0 ){
+        Specification<User> spec = Specification.where((root, query, cb) -> cb.conjunction());
+        if (userFilterRequest.pageNo() <= 0 || userFilterRequest.pageSize() <= 0 ){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page no and Page size must be greater than 0");
         }
+
+        // Exclude the logged-in user
+        spec = spec.and((root, query, cb) -> cb.notEqual(root.get("id"), userId));
+        if (userFilterRequest.search() != null){
+            String searchTerm = "%" + userFilterRequest.search().toLowerCase() + "%";
+            spec = spec.and((root, query, cb) ->
+                    cb.or(
+                            cb.like(cb.lower(root.get("firstName")), searchTerm),
+                            cb.like(cb.lower(root.get("lastName")), searchTerm),
+                            cb.like(cb.lower(root.get("phoneNumber")), searchTerm)
+                        )
+                    );
+        }
+
+        if (userFilterRequest.roleId() != null){
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("roles").get("id"), userFilterRequest.roleId())
+            );
+        }
+
+        if (userFilterRequest.departmentId() != null){
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("productionLine").get("department").get("id"), userFilterRequest.departmentId())
+            );
+        }
+
+        if (userFilterRequest.status() != null){
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("status"), userFilterRequest.status())
+            );
+        }
+
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        PageRequest pageRequest = PageRequest.of(pageNo - 1, pageSize, sort);
-        Page<User> users = userRepository.findByIdNot(userId, pageRequest);
+        PageRequest pageRequest = PageRequest.of(userFilterRequest.pageNo() - 1, userFilterRequest.pageSize(), sort);
+        Page<User> users = userRepository.findAll(spec, pageRequest);
 
         return users.map(userMapper::toUserResponse);
     }
