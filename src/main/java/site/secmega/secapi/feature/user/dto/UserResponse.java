@@ -20,6 +20,8 @@ public record UserResponse(
         String line,
         Long lineId,
         String department,
+        Long departmentId,
+        String position,
         @JsonFormat(pattern = "dd/MMM/yyyy hh:mma")
         LocalDateTime lastLogin
 ) {

@@ -17,28 +17,28 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_HR_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteProduct(@PathVariable Long id){
         productService.deleteProduct(id);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_HR_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     ProductResponse updateProduct(@PathVariable Long id,@Valid @RequestBody ProductRequest productRequest){
         return productService.updateProduct(id, productRequest);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_HR_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     ProductResponse createProduct(@Valid @RequestBody ProductRequest productRequest){
         return productService.createProduct(productRequest);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_HR_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     Page<ProductResponse> getProducts(

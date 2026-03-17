@@ -73,7 +73,7 @@ public class AuthUtil {
     }
 
     public boolean isManagerLoggedUser() {
-        return loggedUserRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("HR_MANAGER"));
+        return loggedUserRoles().stream().anyMatch(role -> role.getName().equalsIgnoreCase("MANAGER"));
     }
 
     public boolean isUserLoggedUser() {

@@ -36,11 +36,13 @@ public class User extends BaseEntity{
     private String password;
     @Column(nullable = false)
     private String phoneNumber;
+    private String position;
     private LocalDateTime hireDate;
     private String avatar;
     private LocalDateTime lastLogin;
     private LocalDate dateOfBirth;
     private UserStatus status;
+    private Boolean isDepartmentHead = false;
 
     /**
      * Security
@@ -69,5 +71,7 @@ public class User extends BaseEntity{
     private List<HourlyProduction> hourlyProductions;
     @OneToMany(mappedBy = "user")
     private List<DowntimeRecord> downtimeRecords;
+    @ManyToOne
+    private Department department;
 
 }

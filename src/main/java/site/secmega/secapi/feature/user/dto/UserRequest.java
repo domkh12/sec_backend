@@ -8,12 +8,14 @@ public record UserRequest(
         String password,
         String employeeId,
         String phoneNumber,
-        @NotNull(message = "Role ID cannot be blank")
+        @NotNull(message = "Role ID cannot be null")
         Long roleId,
         @Email(message = "Invalid email format")
         String email,
+        Long departmentId,
         Long lineId,
         String firstName,
-        String lastName
+        String lastName,
+        String position
 ) {
 }

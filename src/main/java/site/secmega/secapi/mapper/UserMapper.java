@@ -14,7 +14,8 @@ public interface UserMapper {
     @Mapping(target = "role", expression = "java(user.getRoles().stream().map(r -> r.getName()).findFirst().orElse(null))")
     @Mapping(target = "roleId", expression = "java(user.getRoles().stream().map(r -> r.getId()).findFirst().orElse(null))")
     @Mapping(target = "lineId", expression = "java(user.getProductionLine() != null ? user.getProductionLine().getId() : null)")
-    @Mapping(target = "department", expression = "java(user.getProductionLine() != null ? user.getProductionLine().getDepartment().getDepartment() : null)")
+    @Mapping(target = "department", expression = "java(user.getDepartment() != null ? user.getDepartment().getDepartment() : null)")
+    @Mapping(target = "departmentId", expression = "java(user.getDepartment() != null ? user.getDepartment().getId() : null)")
     UserResponse toUserResponse(User user);
     ProfileResponse toProfileResponse(User user);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)

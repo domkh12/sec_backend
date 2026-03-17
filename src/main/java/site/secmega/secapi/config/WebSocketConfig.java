@@ -46,7 +46,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/api/v1/ws")
                 .setAllowedOrigins(
                         "http://localhost:3000",
-                        "https://sec-mega.site")
+                        "https://sec-mega.site",
+                        "https://sec.iot.npic.edu.kh"
+                )
                 .withSockJS();
     }
 
