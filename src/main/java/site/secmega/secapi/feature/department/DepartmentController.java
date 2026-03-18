@@ -5,10 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import site.secmega.secapi.feature.department.dto.DepartmentFilterRequest;
-import site.secmega.secapi.feature.department.dto.DepartmentLookupResponse;
-import site.secmega.secapi.feature.department.dto.DepartmentRequest;
-import site.secmega.secapi.feature.department.dto.DepartmentResponse;
+import site.secmega.secapi.feature.department.dto.*;
 
 import java.util.List;
 
@@ -18,6 +15,13 @@ import java.util.List;
 public class DepartmentController {
 
     private final DepartmentService departmentService;
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/stats")
+    @ResponseStatus(HttpStatus.OK)
+    DepartmentStatsResponse getDeptStats(){
+        return departmentService.getDeptStats();
+    }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/lookup")

@@ -4,7 +4,7 @@ services:
     build: .
     container_name: sec-api
     ports:
-      - "55555:8080"
+      - "55555:16800"
     volumes:
       - C:\Users\SECMEGA\Desktop\Project\sec_api\file-server:/file-server/
     networks:
@@ -26,7 +26,7 @@ services:
     ports:
       - "${POSTGRES_PORT}:5432"
     volumes:
-      - ${POSTGRES_VOL}:/var/lib/postgresql/data
+      - postgresql_data:/var/lib/postgresql/data
     networks:
       - sec_net
 

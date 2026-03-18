@@ -7,6 +7,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
+import site.secmega.secapi.feature.productionLine.dto.ProductionLineFilterRequest;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineRequest;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineResponse;
 
@@ -41,11 +42,8 @@ public class ProductionLineController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    Page<ProductionLineResponse> getProductionLine(
-            @RequestParam(required = false, defaultValue = "1") Integer pageNo,
-            @RequestParam(required = false, defaultValue = "20") Integer pageSize
-    ){
-        return productionLineService.getProductionLine(pageNo, pageSize);
+    Page<ProductionLineResponse> getProductionLine(@ModelAttribute ProductionLineFilterRequest productionLineFilterRequest){
+        return productionLineService.getProductionLine(productionLineFilterRequest);
     }
 
 }

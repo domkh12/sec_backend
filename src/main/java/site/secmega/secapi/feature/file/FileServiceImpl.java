@@ -78,8 +78,8 @@ public class FileServiceImpl implements FileService{
         Files.deleteIfExists(path);
     }
 
-//  @Scheduled(fixedRate = 4 * 60 * 60 * 1000) // every 4 hours
-    @Scheduled(fixedRate = 30000)
+  @Scheduled(fixedRate = 4 * 60 * 60 * 1000) // every 4 hours
+//    @Scheduled(fixedRate = 30000)
     public void cleanupOldFiles() {
 
         List<FileMetadata> oldFiles = fileRepository.findByCurrentFalseAndStoredNameNot();

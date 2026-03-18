@@ -10,11 +10,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.base.DepartmentStatus;
 import site.secmega.secapi.domain.Department;
-import site.secmega.secapi.feature.department.dto.DepartmentFilterRequest;
-import site.secmega.secapi.feature.department.dto.DepartmentLookupResponse;
-import site.secmega.secapi.feature.department.dto.DepartmentRequest;
-import site.secmega.secapi.feature.department.dto.DepartmentResponse;
+import site.secmega.secapi.feature.department.dto.*;
+import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineLookupResponse;
+import site.secmega.secapi.feature.user.UserRepository;
 import site.secmega.secapi.mapper.DepartmentMapper;
 
 import java.time.LocalDateTime;
@@ -26,6 +25,22 @@ public class DepartmentServiceImpl implements DepartmentService{
 
     private final DepartmentMapper departmentMapper;
     private final DepartmentRepository departmentRepository;
+    private final ProductionLineRepository productionLineRepository;
+    private final UserRepository userRepository;
+
+    @Override
+    public DepartmentStatsResponse getDeptStats() {
+        Integer totalDept = departmentRepository.countDepartment();
+        Integer totalLine = productionLineRepository.countLine();
+        Integer totalWorker = userRepository.countByProductionLineNotNull();
+        Integer totalActive = departmentRepository.countByStatus(DepartmentStatus.Active);
+        return DepartmentStatsResponse.builder()
+                .totalDept(totalDept)
+                .totalLine(totalLine)
+                .totalWorker(totalWorker)
+                .totalActive(totalActive)
+                .build();
+    }
 
     @Override
     public void deleteDept(Long id) {

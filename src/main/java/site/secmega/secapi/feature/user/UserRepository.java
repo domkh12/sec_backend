@@ -13,6 +13,11 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificationExecutor<User> {
 
+
+
+    @Query("select count(u) from User u where u.productionLine is not null")
+    Integer countByProductionLineNotNull();
+
     // Create checks
     boolean existsByUsernameIgnoreCaseAndDeletedAtIsNull(String username);
     boolean existsByPhoneNumberAndDeletedAtIsNull(String phoneNumber);

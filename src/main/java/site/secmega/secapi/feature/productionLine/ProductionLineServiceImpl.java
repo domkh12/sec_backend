@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -11,6 +12,7 @@ import site.secmega.secapi.base.ProductionLineStatus;
 import site.secmega.secapi.domain.Department;
 import site.secmega.secapi.domain.ProductionLine;
 import site.secmega.secapi.feature.department.DepartmentRepository;
+import site.secmega.secapi.feature.productionLine.dto.ProductionLineFilterRequest;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineRequest;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineResponse;
 import site.secmega.secapi.mapper.ProductionLineMapper;
@@ -73,20 +75,29 @@ public class ProductionLineServiceImpl implements ProductionLineService{
     }
 
     @Override
-    public Page<ProductionLineResponse> getProductionLine(Integer pageNo, Integer pageSize) {
+    public Page<ProductionLineResponse> getProductionLine(ProductionLineFilterRequest productionLineFilterRequest) {
 
-        if (pageNo <= 0 || pageSize <= 0 ){
+        if (productionLineFilterRequest.pageNo() <= 0 || productionLineFilterRequest.pageSize() <= 0 ){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page no or Page size must be bigger than 0");
         }
 
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        PageRequest pageRequest = PageRequest.of(pageNo - 1, pageSize, sort);
-        Page<ProductionLine> productionLines = productionLineRepository.findAll(pageRequest);
+        Specification<ProductionLine> spec = Specification.where((root, query, cb) -> cb.conjunction());
 
+        if (productionLineFilterRequest.search() != null){
+            String searchTerm = "%" + productionLineFilterRequest.search().toLowerCase() + "%";
+            spec = spec.and((root, query, cb) ->
+                    cb.like(cb.lower(root.get("line")), searchTerm)
+            );
+        }
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        PageRequest pageRequest = PageRequest.of(productionLineFilterRequest.pageNo() - 1, productionLineFilterRequest.pageSize(), sort);
+        Page<ProductionLine> productionLines = productionLineRepository.findAll(spec, pageRequest);
         return productionLines.map(productionLine ->
             ProductionLineResponse.builder()
                 .id(productionLine.getId())
                 .line(productionLine.getLine())
+                .workers(productionLine.getUsers().size())
                 .dept(productionLine.getDepartment().getDepartment())
                 .deptId(productionLine.getDepartment().getId())
                 .build()

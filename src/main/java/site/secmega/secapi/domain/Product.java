@@ -43,4 +43,6 @@ public class Product extends BaseEntity{
     private List<ProductionTarget> productionTargets;
     @ManyToOne
     private Category category;
+    @OneToMany(mappedBy = "product")
+    private List<Bundle> bundles;
 }
