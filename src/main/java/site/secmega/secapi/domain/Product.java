@@ -41,8 +41,8 @@ public class Product extends BaseEntity{
     private List<HourlyProduction> hourlyProductions;
     @OneToMany(mappedBy = "product")
     private List<ProductionTarget> productionTargets;
-    @ManyToOne
-    private Category category;
     @OneToMany(mappedBy = "product")
     private List<Bundle> bundles;
+    @ManyToOne
+    private SubCategory subCategory;
 }

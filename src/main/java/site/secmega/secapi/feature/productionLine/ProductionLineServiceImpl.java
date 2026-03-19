@@ -90,6 +90,12 @@ public class ProductionLineServiceImpl implements ProductionLineService{
             );
         }
 
+        if (productionLineFilterRequest.departmentId() != null){
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("department").get("id"), productionLineFilterRequest.departmentId())
+            );
+        }
+
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         PageRequest pageRequest = PageRequest.of(productionLineFilterRequest.pageNo() - 1, productionLineFilterRequest.pageSize(), sort);
         Page<ProductionLine> productionLines = productionLineRepository.findAll(spec, pageRequest);

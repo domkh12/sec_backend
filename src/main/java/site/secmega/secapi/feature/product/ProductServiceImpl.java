@@ -42,12 +42,7 @@ public class ProductServiceImpl implements ProductService {
         if (productRepository.existsByCodeAndDeletedAtNullAndIdNot(productRequest.code(), id)){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Product code already exist");
         }
-        if (productRequest.cateId() != null){
-            Category category = categoryRepository.findById(productRequest.cateId()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found!")
-            );
-            product.setCategory(category);
-        }
+
         productMapper.updateFromProductRequest(productRequest, product);
         product.setUpdatedAt(LocalDateTime.now());
         Product updatedProduct = productRepository.save(product);
@@ -60,13 +55,9 @@ public class ProductServiceImpl implements ProductService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Product code already exist");
         }
 
-        Category category = categoryRepository.findById(productRequest.cateId()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found!")
-        );
-
         Product product = productMapper.fromProductRequest(productRequest);
         product.setStatus(ProductStatus.Draft);
-        product.setCategory(category);
+
         Product savedProduct = productRepository.save(product);
         return productMapper.toProductResponse(savedProduct);
     }

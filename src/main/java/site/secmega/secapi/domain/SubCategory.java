@@ -8,11 +8,11 @@ import org.hibernate.annotations.SQLRestriction;
 import java.util.List;
 
 @Entity
-@Table(name = "categories")
+@Table(name = "sub_categories")
 @Getter
 @Setter
 @SQLRestriction("deleted_at IS NULL")
-public class Category extends BaseEntity{
+public class SubCategory extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -21,9 +21,9 @@ public class Category extends BaseEntity{
 
     /**
      * Relationship
-     */
-
-    @OneToMany(mappedBy = "category")
-    private List<SubCategory> subCategories;
-
+     * */
+    @ManyToOne
+    private Category category;
+    @OneToMany(mappedBy = "subCategory")
+    private List<Product> products;
 }

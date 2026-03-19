@@ -7,8 +7,8 @@ public record ProductRequest(
     String code,
     String size,
     String color,
-    @NotNull(message = "Category ID cannot be null")
-    Long cateId
+    @NotNull(message = "Sub Category ID cannot be null")
+    Long subCategoryId
 ) {
     
 }
