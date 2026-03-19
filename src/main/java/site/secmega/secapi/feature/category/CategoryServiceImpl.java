@@ -22,6 +22,26 @@ public class CategoryServiceImpl implements CategoryService{
     private final CategoryMapper categoryMapper;
 
     @Override
+    public void deleteCategory(Long id) {
+        Category category = categoryRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found")
+        );
+        category.setDeletedAt(LocalDateTime.now());
+        categoryRepository.save(category);
+    }
+
+    @Override
+    public CategoryResponse updateCategory(Long id, CategoryRequest categoryRequest) {
+        Category category = categoryRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Category not found")
+        );
+        categoryMapper.updateFromCategoryRequest(categoryRequest, category);
+        category.setUpdatedAt(LocalDateTime.now());
+        Category updatedCategory = categoryRepository.save(category);
+        return categoryMapper.toCategoryResponse(updatedCategory);
+    }
+
+    @Override
     public CategoryResponse createCategory(CategoryRequest categoryRequest) {
         Category category = categoryMapper.fromCategoryRequest(categoryRequest);
         category.setCreatedAt(LocalDateTime.now());

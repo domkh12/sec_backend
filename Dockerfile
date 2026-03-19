@@ -3,5 +3,5 @@
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR app
 ADD ./build/libs/secApi-1.0.jar /app/
-EXPOSE 8080
+EXPOSE 16800
 ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=prod", "/app/secApi-1.0.jar"]

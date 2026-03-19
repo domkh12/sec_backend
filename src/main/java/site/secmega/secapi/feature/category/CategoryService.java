@@ -9,4 +9,8 @@ public interface CategoryService {
     Page<CategoryResponse> findAll(Integer pageNo, Integer pageSize);
 
     CategoryResponse createCategory(@Valid CategoryRequest categoryRequest);
+
+    CategoryResponse updateCategory(Long id, @Valid CategoryRequest categoryRequest);
+
+    void deleteCategory(Long id);
 }

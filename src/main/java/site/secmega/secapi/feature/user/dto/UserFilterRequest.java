@@ -8,6 +8,7 @@ public record UserFilterRequest(
         String search,
         Integer roleId,
         Long departmentId,
+        String position,
         UserStatus status
 ) {
 }

@@ -12,9 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.base.UserStatus;
+import site.secmega.secapi.domain.Department;
 import site.secmega.secapi.domain.ProductionLine;
 import site.secmega.secapi.domain.Role;
 import site.secmega.secapi.domain.User;
+import site.secmega.secapi.feature.department.DepartmentRepository;
 import site.secmega.secapi.feature.message.dto.MessageRequest;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.role.RoleRepository;
@@ -39,6 +41,7 @@ public class UserServiceImpl implements UserService{
     private final RoleRepository roleRepository;
     private final ProductionLineRepository productionLineRepository;
     private final SimpMessagingTemplate messagingTemplate;
+    private final DepartmentRepository departmentRepository;
     private final AuthUtil authUtil;
 
     @Override
@@ -131,11 +134,25 @@ public class UserServiceImpl implements UserService{
         Role role = roleRepository.findById(userRequest.roleId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found")
         );
-        if (userRequest.lineId() != null){
-            ProductionLine productionLine = productionLineRepository.findById(userRequest.lineId()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Production line not found")
+        if (userRequest.departmentId() != null){
+            Department department = departmentRepository.findById(userRequest.departmentId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found!")
             );
-            user.setProductionLine(productionLine);
+            user.setDepartment(department);
+            if (userRequest.lineId() != null){
+                ProductionLine productionLine = productionLineRepository.findById(userRequest.lineId()).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Production line not found!")
+                );
+                if (!productionLine.getDepartment().getId().equals(department.getId())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "The selected production line does not belong to the " + department.getDepartment() + " department.");
+                }
+                user.setProductionLine(productionLine);
+                user.setIsDepartmentHead(false);
+            }else {
+                user.setIsDepartmentHead(true);
+                user.setProductionLine(null);
+            }
         }
 
         user.setRoles(new ArrayList<>(List.of(role)));
@@ -196,11 +213,25 @@ public class UserServiceImpl implements UserService{
         Role role = roleRepository.findById(userRequest.roleId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found!")
         );
-        if (userRequest.lineId() != null){
-            ProductionLine productionLine = productionLineRepository.findById(userRequest.lineId()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Production line not found!")
+        if (userRequest.departmentId() != null){
+            Department department = departmentRepository.findById(userRequest.departmentId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Department not found!")
             );
-            user.setProductionLine(productionLine);
+            user.setDepartment(department);
+            if (userRequest.lineId() != null){
+                ProductionLine productionLine = productionLineRepository.findById(userRequest.lineId()).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Production line not found!")
+                );
+                if (!productionLine.getDepartment().getId().equals(department.getId())) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "The selected production line does not belong to the " + department.getDepartment() + " department.");
+                }
+                user.setProductionLine(productionLine);
+                user.setIsDepartmentHead(false);
+            }else {
+                user.setIsDepartmentHead(true);
+                user.setProductionLine(null);
+            }
         }
         user.setRoles(new ArrayList<>(List.of(role)));
         User savedUser = userRepository.save(user);
@@ -224,7 +255,8 @@ public class UserServiceImpl implements UserService{
                     cb.or(
                             cb.like(cb.lower(root.get("firstName")), searchTerm),
                             cb.like(cb.lower(root.get("lastName")), searchTerm),
-                            cb.like(cb.lower(root.get("phoneNumber")), searchTerm)
+                            cb.like(cb.lower(root.get("phoneNumber")), searchTerm),
+                            cb.like(cb.lower(root.get("position")), searchTerm)
                         )
                     );
         }

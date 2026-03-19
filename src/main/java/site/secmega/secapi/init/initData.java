@@ -25,7 +25,7 @@ public class initData {
     private final UserRepository userRepository;
     private final TvRepository tvRepository;
 
-//    @PostConstruct
+    @PostConstruct
     public void init(){
         try {
             initRole();
@@ -41,10 +41,10 @@ public class initData {
         Map<String, String> roles = Map.of(
                 "ADMIN",        "Full system access with user and configuration management privileges",
                 "VIEWER",       "Read-only access to display screens and dashboards (TV display role)",
-                "HR_MANAGER",   "Manages employee records, attendance, and HR-related operations",
+                "MANAGER", "Head of a Department (Sewing/Cutting/etc)",
                 "OPERATOR",     "Handles day-to-day production floor operations and task execution",
                 "SUPERVISOR",   "Oversees operators and monitors production progress and performance",
-                "QC_INSPECTOR", "Inspects and verifies product quality at various production stages"
+                "INSPECTOR", "Inspects and verifies product quality at various production stages"
         );
 
         roles.forEach((name, description) -> {
@@ -59,7 +59,7 @@ public class initData {
     private void initUser(){
         Role roleAdmin = roleRepository.findByName("ADMIN").orElseThrow();
         Role roleTv = roleRepository.findByName("VIEWER").orElseThrow();
-        Role roleManager = roleRepository.findByName("HR_MANAGER").orElseThrow();
+        Role roleManager = roleRepository.findByName("MANAGER").orElseThrow();
         User user = new User();
         user.setRoles(List.of(roleManager));
         user.setUsername("manager");
