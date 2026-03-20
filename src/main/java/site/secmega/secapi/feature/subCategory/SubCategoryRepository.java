@@ -9,7 +9,8 @@ import site.secmega.secapi.domain.SubCategory;
 @Repository
 public interface SubCategoryRepository extends JpaRepository<SubCategory, Long>, JpaSpecificationExecutor<SubCategory> {
 
-    @Query("select (count(s) > 0) from SubCategory s where s.deletedAt is null")
-    boolean existsByDeletedAtNull();
+    @Query("select (count(s) > 0) from SubCategory s where upper(s.name) = upper(?1) and s.deletedAt is null")
+    boolean existsByNameIgnoreCaseAndDeletedAtNull(String name);
+
 
 }

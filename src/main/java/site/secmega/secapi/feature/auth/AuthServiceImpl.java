@@ -79,9 +79,11 @@ public class AuthServiceImpl implements AuthService{
         if (userRepository.existsByPhoneNumberAndIdNotAndDeletedAtIsNull(profileRequest.phoneNumber(), user.getId())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Phone number already exist");
         }
+        if (profileRequest.avatar() != null){
+            fileUtil.updateFile(id, "USER", profileRequest.avatar());
+        }
         userMapper.updateFromProfileRequest(profileRequest, user);
         user.setUpdatedAt(LocalDateTime.now());
-        fileUtil.updateFile(id, "USER", profileRequest.avatar());
         User updatedUser = userRepository.save(user);
 
         return ProfileResponse.builder()

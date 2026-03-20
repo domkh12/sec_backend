@@ -64,21 +64,4 @@ public class ApiException {
                 .build();
     }
 
-//    @ExceptionHandler(Exception.class)
-//    ResponseEntity<?> handleGenericException(Exception e) {
-//        Map<String, String> detail = new HashMap<>();
-//        detail.put("message", e.getMessage() != null ? e.getMessage() : "Unexpected error occurred");
-//        detail.put("type", e.getClass().getSimpleName());
-//        detail.put("cause", e.getCause() != null ? e.getCause().getMessage() : "Unknown");
-//
-//        ErrorDetailResponse<?> errorDetailResponse = ErrorDetailResponse.builder()
-//                .code(HttpStatus.INTERNAL_SERVER_ERROR.value())
-//                .description(detail)
-//                .build();
-//
-//        return new ResponseEntity<>(ErrorResponse.builder()
-//                .error(errorDetailResponse)
-//                .build(), HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
-
 }

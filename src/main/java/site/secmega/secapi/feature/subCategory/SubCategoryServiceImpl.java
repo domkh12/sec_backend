@@ -54,8 +54,8 @@ public class SubCategoryServiceImpl implements SubCategoryService{
 
     @Override
     public SubCategoryResponse createSubCategory(SubCategoryRequest subCategoryRequest) {
-        if (subCategoryRepository.existsByDeletedAtNull()){
-            throw new IllegalArgumentException("Sub category already exist");
+        if (subCategoryRepository.existsByNameIgnoreCaseAndDeletedAtNull(subCategoryRequest.name())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Sub category already exist");
         }
 
         SubCategory subCategory = subCategoryMapper.fromSubCategoryRequest(subCategoryRequest);

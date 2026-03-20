@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import site.secmega.secapi.feature.category.dto.CategoryFilterRequest;
 import site.secmega.secapi.feature.category.dto.CategoryRequest;
 import site.secmega.secapi.feature.category.dto.CategoryResponse;
 
@@ -40,11 +41,8 @@ public class CategoryController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    Page<CategoryResponse> findAll(
-            @RequestParam(required = false, defaultValue = "1") Integer pageNo,
-            @RequestParam(required = false, defaultValue = "20") Integer pageSize
-    ){
-        return categoryService.findAll(pageNo, pageSize);
+    Page<CategoryResponse> findAll(@ModelAttribute CategoryFilterRequest categoryFilterRequest){
+        return categoryService.findAll(categoryFilterRequest);
     }
 
 }

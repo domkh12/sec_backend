@@ -9,6 +9,7 @@ import site.secmega.secapi.feature.subCategory.dto.SubCategoryResponse;
 public interface SubCategoryMapper {
     @Mapping(target = "category", expression = "java(subCategory.getCategory() != null ? subCategory.getCategory().getName() : null)")
     SubCategoryResponse toSubCategoryResponse(SubCategory subCategory);
+
     SubCategory fromSubCategoryRequest(SubCategoryRequest subCategoryRequest);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromSubCategoryRequest(SubCategoryRequest subCategoryRequest, @MappingTarget SubCategory subCategory);
