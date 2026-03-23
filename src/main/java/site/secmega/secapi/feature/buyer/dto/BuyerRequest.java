@@ -1,4 +1,9 @@
 package site.secmega.secapi.feature.buyer.dto;
 
-public record BuyerRequest() {
+import jakarta.validation.constraints.NotNull;
+
+public record BuyerRequest(
+        @NotNull(message = "Name cannot be null")
+        String name
+) {
 }

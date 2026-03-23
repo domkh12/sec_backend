@@ -26,56 +26,42 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService{
     private final FileRepository fileRepository;
-
-    @Value("${file-server.base-uri}")
-    private String baseUri;
-
-    @Value("${file-server.server-path}")
-    private String serverPath;
-
+    private final BunnyStorageService bunnyStorageService;
 
     @Override
     public FileResponse uploadFile(MultipartFile file) throws IOException {
         String newFileName = FileUtil.generateNewFileName(file.getOriginalFilename());
         String extension = FileUtil.extractExtension(file.getOriginalFilename());
-        Path path = Path.of(serverPath, newFileName);
-        Files.copy(file.getInputStream(), path);
+
+        // Upload to Bunny CDN
+        String cdnUrl = bunnyStorageService.uploadFile(
+                newFileName,
+                file.getInputStream(),
+                file.getSize()
+        );
 
         return FileResponse.builder()
                 .name(newFileName)
                 .size(file.getSize())
                 .extension(extension)
-                .uri(baseUri + newFileName)
+                .uri(cdnUrl)
                 .build();
     }
 
     @Override
     public List<FileResponse> findAll() {
 
-        Path path = Path.of(serverPath);
-        File[] files = path.toFile().listFiles();
-        List<FileResponse> fileResponses = new ArrayList<>();
-        for (File file : files) {
-            fileResponses.add(
-                    FileResponse.builder()
-                            .name(file.getName())
-                            .size(file.length())
-                            .extension(FileUtil.extractExtension(file.getName()))
-                            .uri(baseUri + file.getName())
-                            .build()
-            );
-        }
-        return fileResponses;
+        return fileRepository.findAll().stream()
+                .map(f -> FileResponse.builder()
+                        .name(f.getStoredName())
+                        .uri(f.getUri()) // store CDN url in DB
+                        .build())
+                .toList();
     }
 
     @Override
     public void deleteFile(String fileName) throws IOException {
-        Path path = Paths.get(serverPath);
-        path = path.resolve(fileName);
-        if (!Files.exists(path)){
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "File not found");
-        }
-        Files.deleteIfExists(path);
+        bunnyStorageService.deleteFile(fileName);
     }
 
   @Scheduled(fixedRate = 4 * 60 * 60 * 1000) // every 4 hours

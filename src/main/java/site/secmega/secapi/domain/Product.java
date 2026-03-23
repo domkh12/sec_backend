@@ -45,4 +45,10 @@ public class Product extends BaseEntity{
     private List<Bundle> bundles;
     @ManyToOne
     private SubCategory subCategory;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "size_id", referencedColumnName = "id")
+    )
+    private List<Size> sizes;
 }

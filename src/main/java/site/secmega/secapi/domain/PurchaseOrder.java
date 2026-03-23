@@ -6,22 +6,21 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.util.List;
-
 @Entity
-@Table(name = "buyers")
+@Table(name = "purchase_orders")
 @Getter
 @Setter
 @NoArgsConstructor
 @SQLRestriction("deleted_at IS NULL")
-public class Buyer extends BaseEntity{
+public class PurchaseOrder extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private List<String> files;
+    private String poNumber;
+    private Integer orderQty;
+    private String orderDate;
+    private String status;
 
-    @OneToMany(mappedBy = "buyer")
-    private List<PurchaseOrder> purchaseOrders;
-
+    @ManyToOne
+    private Buyer buyer;
 }

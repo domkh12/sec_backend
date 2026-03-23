@@ -9,19 +9,18 @@ import org.hibernate.annotations.SQLRestriction;
 import java.util.List;
 
 @Entity
-@Table(name = "buyers")
+@Table(name = "sizes")
 @Getter
 @Setter
 @NoArgsConstructor
 @SQLRestriction("deleted_at IS NULL")
-public class Buyer extends BaseEntity{
+public class Size extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private List<String> files;
-
-    @OneToMany(mappedBy = "buyer")
-    private List<PurchaseOrder> purchaseOrders;
+    @Column(nullable = false)
+    private String size;
+    @ManyToMany(mappedBy = "sizes")
+    private List<Product> products;
 
 }
