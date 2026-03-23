@@ -17,6 +17,7 @@ public class FileMetadata {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+    String uri;
     String storedName;
     String originalName;
     String contentType;

@@ -37,6 +37,7 @@ public class FileUtil {
         FileMetadata newMeta = FileMetadata.builder()
                 .storedName(uri.substring(uri.lastIndexOf("/") + 1))
                 .ownerType(ownerType)
+                .uri(uri)
                 .ownerId(userId)
                 .current(true)          // 👈 this is the active one
                 .uploadedAt(LocalDateTime.now())
