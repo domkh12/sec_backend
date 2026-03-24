@@ -29,6 +29,21 @@ public class FileServiceImpl implements FileService{
     private final BunnyStorageService bunnyStorageService;
 
     @Override
+    public List<FileResponse> uploadMultipleFiles(List<MultipartFile> files) {
+        log.info("Received {} files for upload", files.size());
+        List<FileResponse> responses = new ArrayList<>();
+        for (MultipartFile file : files) {
+            try {
+                FileResponse response = uploadFile(file);
+                responses.add(response);
+            } catch (IOException e) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file");
+            }
+        }
+        return responses;
+    }
+
+    @Override
     public FileResponse uploadFile(MultipartFile file) throws IOException {
         String newFileName = FileUtil.generateNewFileName(file.getOriginalFilename());
         String extension = FileUtil.extractExtension(file.getOriginalFilename());
@@ -64,7 +79,7 @@ public class FileServiceImpl implements FileService{
         bunnyStorageService.deleteFile(fileName);
     }
 
-  @Scheduled(fixedRate = 4 * 60 * 60 * 1000) // every 4 hours
+    @Scheduled(fixedRate = 4 * 60 * 60 * 1000) // every 4 hours
 //    @Scheduled(fixedRate = 30000)
     public void cleanupOldFiles() {
 

@@ -18,6 +18,13 @@ public class BuyerController {
     private final BuyerService buyerService;
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PutMapping("/{id}/file-upload")
+    @ResponseStatus(HttpStatus.CREATED)
+    BuyerResponse uploadBuyerFile(@PathVariable Long id, @RequestBody BuyerRequest buyerRequest){
+        return buyerService.uploadBuyerFile(id, buyerRequest);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
     BuyerStatsResponse getBuyerStats(){

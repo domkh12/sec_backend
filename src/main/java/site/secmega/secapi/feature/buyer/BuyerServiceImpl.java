@@ -25,6 +25,18 @@ public class BuyerServiceImpl implements BuyerService{
     private final BuyerMapper buyerMapper;
 
     @Override
+    public BuyerResponse uploadBuyerFile(Long id, BuyerRequest buyerRequest) {
+        Buyer buyer = buyerRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Buyer not found")
+        );
+        buyerMapper.updateFromBuyerRequest(buyerRequest, buyer);
+        buyer.setUpdatedAt(LocalDateTime.now());
+        buyer.setFiles(buyerRequest.files());
+        Buyer updatedBuyer = buyerRepository.save(buyer);
+        return buyerMapper.toBuyerResponse(updatedBuyer);
+    }
+
+    @Override
     public void deleteBuyer(Long id) {
         Buyer buyer = buyerRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Buyer not found")

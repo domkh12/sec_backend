@@ -2,9 +2,8 @@ package site.secmega.secapi.feature.buyer.dto;
 
 import java.util.List;
 
-public record BuyerResponse(
+public record BuyerFileRequest(
         Long id,
-        String name,
         List<String> files
 ) {
 }

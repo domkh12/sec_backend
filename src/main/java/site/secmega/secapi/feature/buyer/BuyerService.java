@@ -17,4 +17,6 @@ public interface BuyerService {
     void deleteBuyer(Long id);
 
     BuyerStatsResponse getBuyerStats();
+
+    BuyerResponse uploadBuyerFile(Long id, BuyerRequest buyerRequest);
 }

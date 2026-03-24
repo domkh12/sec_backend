@@ -13,4 +13,5 @@ public interface FileService {
 
     void deleteFile(String fileName) throws IOException;
 
+    List<FileResponse> uploadMultipleFiles(List<MultipartFile> files);
 }

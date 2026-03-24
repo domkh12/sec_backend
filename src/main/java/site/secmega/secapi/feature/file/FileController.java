@@ -20,6 +20,13 @@ public class FileController {
     private final FileService fileService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PostMapping("/multiple")
+    @ResponseStatus(HttpStatus.CREATED)
+    List<FileResponse> uploadMultipleFiles(@RequestPart("files") List<MultipartFile> files) throws Exception{
+        return fileService.uploadMultipleFiles(files);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     FileResponse uploadFile(@RequestPart MultipartFile file) throws Exception{
