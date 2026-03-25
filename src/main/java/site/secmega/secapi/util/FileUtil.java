@@ -26,14 +26,6 @@ public class FileUtil {
 
     public void updateFile(Long userId, String ownerType, String uri) {
 
-        // 1. Mark old file as not current
-        fileRepository.findByOwnerIdAndOwnerTypeAndCurrentTrue(userId, ownerType)
-                .ifPresent(old -> {
-                    old.setCurrent(false);
-                    old.setReplacedAt(LocalDateTime.now()); // 👈 mark when it became old
-                    fileRepository.save(old);
-                });
-
         FileMetadata newMeta = FileMetadata.builder()
                 .storedName(uri.substring(uri.lastIndexOf("/") + 1))
                 .ownerType(ownerType)
@@ -44,5 +36,14 @@ public class FileUtil {
                 .build();
 
         fileRepository.save(newMeta);
+    }
+
+    public void deleteFile(Long userId, String ownerType, String uri) {
+        fileRepository.findByOwnerIdAndOwnerTypeAndCurrentTrueAndUri(userId, ownerType, uri)
+                .ifPresent(old -> {
+                    old.setCurrent(false);
+                    old.setReplacedAt(LocalDateTime.now()); // 👈 mark when it became old
+                    fileRepository.save(old);
+                });
     }
 }

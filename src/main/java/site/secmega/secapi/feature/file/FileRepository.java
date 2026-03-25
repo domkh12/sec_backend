@@ -24,5 +24,8 @@ public interface FileRepository extends JpaRepository<FileMetadata, Long> {
     @Query("select f from FileMetadata f where f.ownerId = ?1 and f.ownerType = ?2 and f.current = true")
     Optional<FileMetadata> findByOwnerIdAndOwnerTypeAndCurrentTrue(Long ownerId, String ownerType);
 
+    @Query("select f from FileMetadata f where f.ownerId = ?1 and f.ownerType = ?2 and f.current = true and f.uri = ?3")
+    Optional<FileMetadata> findByOwnerIdAndOwnerTypeAndCurrentTrueAndUri(Long ownerId, String ownerType, String uri);
+
 
 }

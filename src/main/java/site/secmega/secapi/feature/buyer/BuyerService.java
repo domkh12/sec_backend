@@ -2,10 +2,7 @@ package site.secmega.secapi.feature.buyer;
 
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
-import site.secmega.secapi.feature.buyer.dto.BuyerFilterRequest;
-import site.secmega.secapi.feature.buyer.dto.BuyerRequest;
-import site.secmega.secapi.feature.buyer.dto.BuyerResponse;
-import site.secmega.secapi.feature.buyer.dto.BuyerStatsResponse;
+import site.secmega.secapi.feature.buyer.dto.*;
 
 public interface BuyerService {
     BuyerResponse createBuyer(BuyerRequest buyerRequest);
@@ -19,4 +16,6 @@ public interface BuyerService {
     BuyerStatsResponse getBuyerStats();
 
     BuyerResponse uploadBuyerFile(Long id, BuyerRequest buyerRequest);
+
+    BuyerFileResponse getBuyerFile(Long id);
 }

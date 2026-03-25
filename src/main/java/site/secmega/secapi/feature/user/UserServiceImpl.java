@@ -253,6 +253,7 @@ public class UserServiceImpl implements UserService{
             String searchTerm = "%" + userFilterRequest.search().toLowerCase() + "%";
             spec = spec.and((root, query, cb) ->
                     cb.or(
+                            cb.like(cb.lower(root.get("employeeId")), searchTerm),
                             cb.like(cb.lower(root.get("firstName")), searchTerm),
                             cb.like(cb.lower(root.get("lastName")), searchTerm),
                             cb.like(cb.lower(root.get("phoneNumber")), searchTerm),

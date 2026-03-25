@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 
+import java.util.List;
+
 @Entity
 @Table(name = "colors")
 @Getter
@@ -18,4 +20,7 @@ public class Color extends BaseEntity {
     private Long id;
     @Column(nullable = false)
     private String color;
+
+    @ManyToMany(mappedBy = "colors")
+    private List<Product> products;
 }

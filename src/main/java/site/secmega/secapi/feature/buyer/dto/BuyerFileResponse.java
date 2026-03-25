@@ -1,9 +1,11 @@
 package site.secmega.secapi.feature.buyer.dto;
 
+import lombok.Builder;
+
 import java.util.List;
 
-public record BuyerFileRequest(
-        Long id,
+@Builder
+public record BuyerFileResponse(
         List<String> files
 ) {
 }

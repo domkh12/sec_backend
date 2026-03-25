@@ -2,7 +2,6 @@ package site.secmega.secapi.feature.file;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -12,13 +11,8 @@ import site.secmega.secapi.domain.FileMetadata;
 import site.secmega.secapi.feature.file.dto.FileResponse;
 import site.secmega.secapi.util.FileUtil;
 
-import java.io.File;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -26,7 +20,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService{
     private final FileRepository fileRepository;
-    private final BunnyStorageService bunnyStorageService;
+    private final CloudflareStorageService cloudflareStorageService;
 
     @Override
     public List<FileResponse> uploadMultipleFiles(List<MultipartFile> files) {
@@ -49,11 +43,7 @@ public class FileServiceImpl implements FileService{
         String extension = FileUtil.extractExtension(file.getOriginalFilename());
 
         // Upload to Bunny CDN
-        String cdnUrl = bunnyStorageService.uploadFile(
-                newFileName,
-                file.getInputStream(),
-                file.getSize()
-        );
+        String cdnUrl = cloudflareStorageService.uploadFile(file);
 
         return FileResponse.builder()
                 .name(newFileName)
@@ -76,7 +66,7 @@ public class FileServiceImpl implements FileService{
 
     @Override
     public void deleteFile(String fileName) throws IOException {
-        bunnyStorageService.deleteFile(fileName);
+        cloudflareStorageService.deleteFile(fileName);
     }
 
     @Scheduled(fixedRate = 4 * 60 * 60 * 1000) // every 4 hours

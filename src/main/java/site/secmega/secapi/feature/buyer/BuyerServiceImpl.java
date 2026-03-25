@@ -9,11 +9,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.Buyer;
-import site.secmega.secapi.feature.buyer.dto.BuyerFilterRequest;
-import site.secmega.secapi.feature.buyer.dto.BuyerRequest;
-import site.secmega.secapi.feature.buyer.dto.BuyerResponse;
-import site.secmega.secapi.feature.buyer.dto.BuyerStatsResponse;
+import site.secmega.secapi.feature.buyer.dto.*;
 import site.secmega.secapi.mapper.BuyerMapper;
+import site.secmega.secapi.util.FileUtil;
 
 import java.time.LocalDateTime;
 
@@ -23,12 +21,29 @@ public class BuyerServiceImpl implements BuyerService{
 
     private final BuyerRepository buyerRepository;
     private final BuyerMapper buyerMapper;
+    private final FileUtil fileUtil;
+
+    @Override
+    public BuyerFileResponse getBuyerFile(Long id) {
+        Buyer buyer = buyerRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Buyer not found")
+        );
+
+        return BuyerFileResponse.builder()
+                .files(buyer.getFiles())
+                .build();
+    }
 
     @Override
     public BuyerResponse uploadBuyerFile(Long id, BuyerRequest buyerRequest) {
         Buyer buyer = buyerRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Buyer not found")
         );
+        if (buyerRequest.files() != null){
+            for (String file : buyerRequest.files()){
+                fileUtil.updateFile(id, "BUYER", file);
+            }
+        }
         buyerMapper.updateFromBuyerRequest(buyerRequest, buyer);
         buyer.setUpdatedAt(LocalDateTime.now());
         buyer.setFiles(buyerRequest.files());

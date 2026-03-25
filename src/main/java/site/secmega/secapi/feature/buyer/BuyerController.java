@@ -6,16 +6,22 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import site.secmega.secapi.feature.buyer.dto.BuyerFilterRequest;
-import site.secmega.secapi.feature.buyer.dto.BuyerRequest;
-import site.secmega.secapi.feature.buyer.dto.BuyerResponse;
-import site.secmega.secapi.feature.buyer.dto.BuyerStatsResponse;
+import site.secmega.secapi.feature.buyer.dto.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/buyers")
 @RequiredArgsConstructor
 public class BuyerController {
     private final BuyerService buyerService;
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/{id}/files")
+    @ResponseStatus(HttpStatus.OK)
+    BuyerFileResponse getBuyerFile(@PathVariable Long id){
+        return buyerService.getBuyerFile(id);
+    }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PutMapping("/{id}/file-upload")
