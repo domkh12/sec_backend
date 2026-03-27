@@ -16,6 +16,7 @@ public class PurchaseOrder extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String jcNumber;
     private String poNumber;
     private Integer orderQty;
     private String orderDate;

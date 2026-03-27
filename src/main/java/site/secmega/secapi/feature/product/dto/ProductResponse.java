@@ -4,7 +4,7 @@ import site.secmega.secapi.base.ProductStatus;
 
 public record ProductResponse(
     Long id,
-    String styleName,
+    String styleNo,
     String size,
     String color,
     Integer targetProductionPerHour,
@@ -14,6 +14,8 @@ public record ProductResponse(
     String code,
     Long cateId,
     String category,
+    String subCategoryId,
+    String subCategory,
     ProductStatus status
 ) {
     

@@ -23,12 +23,9 @@ public class Product extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Integer code;
     @Column(nullable = false)
-    private String code;
-    @Column(nullable = false)
-    private String styleName;
-    private String size;
-    private String color;
+    private String styleNo;
     private Integer targetProductionPerHour;
     private Double standardMinuteValue;
     private String description;

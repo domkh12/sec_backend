@@ -1,6 +1,7 @@
 package site.secmega.secapi.feature.product;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -8,15 +9,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.base.ProductStatus;
-import site.secmega.secapi.domain.Category;
-import site.secmega.secapi.domain.Product;
+import site.secmega.secapi.domain.*;
 import site.secmega.secapi.feature.category.CategoryRepository;
+import site.secmega.secapi.feature.color.ColorRepository;
 import site.secmega.secapi.feature.product.dto.ProductRequest;
 import site.secmega.secapi.feature.product.dto.ProductResponse;
+import site.secmega.secapi.feature.size.SizeRepository;
+import site.secmega.secapi.feature.subCategory.SubCategoryRepository;
 import site.secmega.secapi.mapper.ProductMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
@@ -24,6 +30,9 @@ public class ProductServiceImpl implements ProductService {
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
     private final CategoryRepository categoryRepository;
+    private final SizeRepository sizeRepository;
+    private final ColorRepository colorRepository;
+    private final SubCategoryRepository subCategoryRepository;
 
     @Override
     public void deleteProduct(Long id) {
@@ -39,9 +48,6 @@ public class ProductServiceImpl implements ProductService {
         Product product = productRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Product not found")
         );
-        if (productRepository.existsByCodeAndDeletedAtNullAndIdNot(productRequest.code(), id)){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Product code already exist");
-        }
 
         productMapper.updateFromProductRequest(productRequest, product);
         product.setUpdatedAt(LocalDateTime.now());
@@ -51,11 +57,29 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductResponse createProduct(ProductRequest productRequest) {
-        if (productRepository.existsByCode(productRequest.code())){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Product code already exist");
+
+        if (productRepository.existsByStyleNoIgnoreCaseAndDeletedAtNull(productRequest.styleNo())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Style number already exist");
         }
 
         Product product = productMapper.fromProductRequest(productRequest);
+        if (productRequest.sizeId() != null){
+            List<Size> sizes = sizeRepository.findByIdIn(productRequest.sizeId());
+            product.setSizes(sizes);
+        }
+
+        if (productRequest.colorId() != null){
+            List<Color> colors = colorRepository.findByIdIn(productRequest.colorId());
+            product.setColors(colors);
+        }
+
+        if (productRequest.subCategoryId() != null){
+            SubCategory subCategory = subCategoryRepository.findById(productRequest.subCategoryId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Sub Category no found!")
+            );
+            product.setSubCategory(subCategory);
+        }
+
         product.setStatus(ProductStatus.Draft);
 
         Product savedProduct = productRepository.save(product);
