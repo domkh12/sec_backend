@@ -7,8 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import site.secmega.secapi.feature.category.dto.CategoryFilterRequest;
+import site.secmega.secapi.feature.category.dto.CategoryLookupResponse;
 import site.secmega.secapi.feature.category.dto.CategoryRequest;
 import site.secmega.secapi.feature.category.dto.CategoryResponse;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/categories")
@@ -16,6 +19,13 @@ import site.secmega.secapi.feature.category.dto.CategoryResponse;
 public class CategoryController {
 
     private final CategoryService categoryService;
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/lookup")
+    @ResponseStatus(HttpStatus.OK)
+    List<CategoryLookupResponse> getCategoryLookup(){
+        return categoryService.getCategoryLookup();
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")

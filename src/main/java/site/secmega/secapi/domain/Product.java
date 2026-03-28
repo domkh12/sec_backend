@@ -23,7 +23,6 @@ public class Product extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer code;
     @Column(nullable = false)
     private String styleNo;
     private Integer targetProductionPerHour;

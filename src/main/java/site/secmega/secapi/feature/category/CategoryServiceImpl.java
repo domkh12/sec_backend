@@ -11,8 +11,10 @@ import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.Category;
 import site.secmega.secapi.domain.SubCategory;
 import site.secmega.secapi.feature.category.dto.CategoryFilterRequest;
+import site.secmega.secapi.feature.category.dto.CategoryLookupResponse;
 import site.secmega.secapi.feature.category.dto.CategoryRequest;
 import site.secmega.secapi.feature.category.dto.CategoryResponse;
+import site.secmega.secapi.feature.subCategory.dto.SubCategoryLookupResponse;
 import site.secmega.secapi.mapper.CategoryMapper;
 
 import java.time.LocalDateTime;
@@ -24,6 +26,25 @@ public class CategoryServiceImpl implements CategoryService{
 
     private final CategoryRepository categoryRepository;
     private final CategoryMapper categoryMapper;
+
+    @Override
+    public List<CategoryLookupResponse> getCategoryLookup() {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        List<Category> categories = categoryRepository.findAll(sort);
+
+        return categories.stream().map(
+                category -> CategoryLookupResponse.builder()
+                        .id(category.getId())
+                        .name(category.getName())
+                        .subCategories(category.getSubCategories().stream().map(
+                                subCategory -> SubCategoryLookupResponse.builder()
+                                        .id(subCategory.getId())
+                                        .name(subCategory.getName())
+                                        .build()
+                        ).toList())
+                        .build()
+        ).toList();
+    }
 
     @Override
     public void deleteCategory(Long id) {
