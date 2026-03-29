@@ -9,6 +9,6 @@ import java.util.List;
 public record CategoryLookupResponse(
         Long id,
         String name,
-        List<SubCategoryLookupResponse> subCategories
+        List<SubCategoryLookupResponse> children
 ) {
 }

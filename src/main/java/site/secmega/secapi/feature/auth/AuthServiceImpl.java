@@ -63,7 +63,11 @@ public class AuthServiceImpl implements AuthService{
     private final FileRepository fileRepository;
     private final FileUtil fileUtil;
 
-
+//    @Autowired
+//    public void setJwtAuthenticationProvider(JwtAuthenticationProvider jwtAuthenticationProvider) {
+//        this.jwtAuthenticationProvider = jwtAuthenticationProvider;
+//    }
+//
     @Autowired
     @Qualifier("jwtEncoderRefreshToken")
     public void setJwtEnCoderRefreshToken(JwtEncoder jwtEnCoderRefreshToken){
@@ -296,10 +300,5 @@ public class AuthServiceImpl implements AuthService{
                 .tokenType("Bearer")
                 .accessToken(accessToken)
                 .build());
-    }
-
-    @Autowired
-    public void setJwtAuthenticationProvider(JwtAuthenticationProvider jwtAuthenticationProvider) {
-        this.jwtAuthenticationProvider = jwtAuthenticationProvider;
     }
 }

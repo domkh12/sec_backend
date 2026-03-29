@@ -2,43 +2,29 @@ package site.secmega.secapi.feature.file;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.util.FileUtil;
-import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
-import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.core.sync.RequestBody;
-import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class CloudflareStorageServiceImpl implements CloudflareStorageService {
 
-    private final S3Client s3Client;
-
-    @Value("${cloudflare.r2.access-key}")
-    private String accessKey;
-
-    @Value("${cloudflare.r2.secret-key}")
-    private String secretKey;
-
-    @Value("${cloudflare.r2.endpoint}")
-    private String endpoint;
+   private final S3Client s3Client;
 
     @Value("${cloudflare.r2.bucket}")
-    private String bucket;
+    private final String bucket;
 
     @Value("${cloudflare.r2.public-url}")
     private String publicUrl;

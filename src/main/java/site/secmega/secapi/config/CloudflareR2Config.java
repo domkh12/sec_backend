@@ -25,9 +25,6 @@ public class CloudflareR2Config {
     @Value("${cloudflare.r2.endpoint}")
     private String endpoint;
 
-    @Value("${cloudflare.r2.bucket}")
-    private String bucket;
-
     @Bean
     public S3Client s3Client() {
 

@@ -36,7 +36,7 @@ public class CategoryServiceImpl implements CategoryService{
                 category -> CategoryLookupResponse.builder()
                         .id(category.getId())
                         .name(category.getName())
-                        .subCategories(category.getSubCategories().stream().map(
+                        .children(category.getSubCategories().stream().map(
                                 subCategory -> SubCategoryLookupResponse.builder()
                                         .id(subCategory.getId())
                                         .name(subCategory.getName())
