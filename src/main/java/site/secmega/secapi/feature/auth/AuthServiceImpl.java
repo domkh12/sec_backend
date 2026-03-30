@@ -59,15 +59,12 @@ public class AuthServiceImpl implements AuthService{
     private JwtEncoder jwtEncoderRefreshToken;
     private JwtAuthenticationProvider jwtAuthenticationProvider;
     private final UserMapper userMapper;
-    private final FileService fileService;
-    private final FileRepository fileRepository;
     private final FileUtil fileUtil;
+    @Autowired
+    public void setJwtAuthenticationProvider(JwtAuthenticationProvider jwtAuthenticationProvider) {
+        this.jwtAuthenticationProvider = jwtAuthenticationProvider;
+    }
 
-//    @Autowired
-//    public void setJwtAuthenticationProvider(JwtAuthenticationProvider jwtAuthenticationProvider) {
-//        this.jwtAuthenticationProvider = jwtAuthenticationProvider;
-//    }
-//
     @Autowired
     @Qualifier("jwtEncoderRefreshToken")
     public void setJwtEnCoderRefreshToken(JwtEncoder jwtEnCoderRefreshToken){

@@ -25,7 +25,7 @@ public class initData {
     private final UserRepository userRepository;
     private final TvRepository tvRepository;
 
-    @PostConstruct
+//    @PostConstruct
     public void init(){
         try {
             initRole();

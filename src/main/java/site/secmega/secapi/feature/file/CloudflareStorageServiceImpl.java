@@ -24,7 +24,7 @@ public class CloudflareStorageServiceImpl implements CloudflareStorageService {
    private final S3Client s3Client;
 
     @Value("${cloudflare.r2.bucket}")
-    private final String bucket;
+    private String bucket;
 
     @Value("${cloudflare.r2.public-url}")
     private String publicUrl;

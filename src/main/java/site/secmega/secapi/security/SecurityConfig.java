@@ -38,20 +38,6 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
-//    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-    private static final String[] SWAGGER_WHITELIST = {
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/v1/api-docs/**",
-            "/v1/api-docs.yaml"
-    };
-    private static final String[] PUBLIC_ENDPOINTS = {
-            "/api/v1/auth/login",
-            "/api/v1/auth/refresh",
-            "/api/v1/auth/logout",
-            "/api/v1/ws/**",
-            "/files/**"
-    };
 
     @Bean
     public JwtAuthenticationConverter jwtAuthenticationConverter() {
@@ -90,11 +76,6 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain configFilterChain(HttpSecurity http, JwtDecoder jwtDecoder) throws Exception {
-
-        http.authorizeHttpRequests(auth -> auth
-                .requestMatchers(SWAGGER_WHITELIST).permitAll()
-                .requestMatchers(PUBLIC_ENDPOINTS).permitAll()
-                .anyRequest().authenticated());
 
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(
                 jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder)

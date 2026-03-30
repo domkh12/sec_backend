@@ -7,8 +7,10 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
+import site.secmega.secapi.feature.product.dto.ProductFilterRequest;
 import site.secmega.secapi.feature.product.dto.ProductRequest;
 import site.secmega.secapi.feature.product.dto.ProductResponse;
+import site.secmega.secapi.feature.product.dto.ProductStateResponse;
 
 @RestController
 @RequestMapping("/api/v1/products")
@@ -16,6 +18,13 @@ import site.secmega.secapi.feature.product.dto.ProductResponse;
 public class ProductController {
 
     private final ProductService productService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @GetMapping("/stats")
+    @ResponseStatus(HttpStatus.OK)
+    ProductStateResponse getProductState(){
+        return productService.getProductState();
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @DeleteMapping("/{id}")
@@ -41,10 +50,8 @@ public class ProductController {
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    Page<ProductResponse> getProducts(
-            @RequestParam(required = false, defaultValue = "1") Integer pageNo,
-            @RequestParam(required = false, defaultValue = "20")  Integer pageSize) {
-        return productService.getProducts(pageNo, pageSize);
+    Page<ProductResponse> getProducts(@ModelAttribute ProductFilterRequest productFilterRequest) {
+        return productService.getProducts(productFilterRequest);
     }
     
 }
