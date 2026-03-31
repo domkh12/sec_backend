@@ -2,6 +2,8 @@ package site.secmega.secapi.feature.product.dto;
 
 import site.secmega.secapi.base.ProductStatus;
 
+import java.util.List;
+
 public record ProductResponse(
     Long id,
     String styleNo,
@@ -12,11 +14,13 @@ public record ProductResponse(
     Double standardMinuteValue,
     String description,
     String code,
-    Long cateId,
+    Long categoryId,
     String category,
-    String subCategoryId,
+    Long subCategoryId,
     String subCategory,
-    ProductStatus status
+    ProductStatus status,
+    List<Long> colorId,
+    List<Long> sizeId
 ) {
     
 }
