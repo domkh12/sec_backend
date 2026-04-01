@@ -72,7 +72,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (productRequest.colorId() != null){
             List<Color> colors = colorRepository.findByIdIn(productRequest.colorId());
-            product.setColors(colors);
+//            product.setColors(colors);
         }
 
         if (productRequest.subCategoryId() != null){
@@ -101,7 +101,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (productRequest.colorId() != null){
             List<Color> colors = colorRepository.findByIdIn(productRequest.colorId());
-            product.setColors(colors);
+//            product.setColors(colors);
         }
 
         if (productRequest.subCategoryId() != null){
@@ -136,6 +136,24 @@ public class ProductServiceImpl implements ProductService {
         if (productFilterRequest.status() != null){
             spec = spec.and((root, query, cb) ->
                     cb.equal(root.get("status"), productFilterRequest.status())
+            );
+        }
+
+        if (productFilterRequest.sizeId() != null){
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("sizes").get("id"), productFilterRequest.sizeId())
+            );
+        }
+
+        if (productFilterRequest.colorId() != null){
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("colors").get("id"), productFilterRequest.colorId())
+            );
+        }
+
+        if (productFilterRequest.subCategoryId() != null){
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("subCategory").get("id"), productFilterRequest.subCategoryId())
             );
         }
 

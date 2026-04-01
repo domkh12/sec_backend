@@ -46,6 +46,9 @@ public class HourlyProduction {
     private Product product;
     @ManyToOne
     private User user;
-    @OneToMany(mappedBy = "hourlyProduction")
-    private List<DefectDetail> defectDetails;
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(joinColumns = @JoinColumn(name = "hourly_production_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "defect_type_id", referencedColumnName = "id")
+    )
+    private List<DefectType> defectTypes;
 }

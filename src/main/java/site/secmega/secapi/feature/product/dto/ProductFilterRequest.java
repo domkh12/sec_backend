@@ -10,7 +10,7 @@ public record ProductFilterRequest(
         String search,
         Long subCategoryId,
         Long colorId,
-        List<Long> sizeId,
+        Long sizeId,
         ProductStatus status
 ) {
     public ProductFilterRequest{

@@ -4,9 +4,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import site.secmega.secapi.base.Severity;
+import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -14,6 +13,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
+@SQLRestriction("deleted_at IS NULL")
 public class DefectType {
     /**
      * Field
@@ -21,23 +21,13 @@ public class DefectType {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, unique = true)
-    private String code;
     @Column(nullable = false)
     private String name;
-    private String category;
-    @Column(nullable = false)
-    private Severity severity;
-    private String description;
-    @Column(nullable = false)
-    private Boolean isActive;
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
 
     /**
      * Relationship
      * */
-    @OneToMany(mappedBy = "defectType")
-    private List <DefectDetail> defectDetails;
+    @ManyToMany(mappedBy = "defectTypes")
+    private List <HourlyProduction> hourlyProductions;
 
 }
