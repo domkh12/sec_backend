@@ -5,21 +5,19 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Entity
-@Table(name = "products_colors")
+@Table(name = "order_details")
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProductColor {
+public class OrderDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Integer quantity;
+
     @ManyToOne
-    private Product product;
+    private ProductColor productColor;
     @ManyToOne
-    private Color color;
-    @OneToMany(mappedBy = "productColor")
-    private List<OrderDetail> orderDetails;
+    private PurchaseOrder purchaseOrder;
 }

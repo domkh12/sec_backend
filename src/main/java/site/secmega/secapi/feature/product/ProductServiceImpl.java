@@ -17,6 +17,7 @@ import site.secmega.secapi.feature.product.dto.ProductFilterRequest;
 import site.secmega.secapi.feature.product.dto.ProductRequest;
 import site.secmega.secapi.feature.product.dto.ProductResponse;
 import site.secmega.secapi.feature.product.dto.ProductStateResponse;
+import site.secmega.secapi.feature.productColor.ProductColorRepository;
 import site.secmega.secapi.feature.size.SizeRepository;
 import site.secmega.secapi.feature.subCategory.SubCategoryRepository;
 import site.secmega.secapi.mapper.ProductMapper;
@@ -36,6 +37,7 @@ public class ProductServiceImpl implements ProductService {
     private final SizeRepository sizeRepository;
     private final ColorRepository colorRepository;
     private final SubCategoryRepository subCategoryRepository;
+    private final ProductColorRepository productColorRepository;
 
     @Override
     public void deleteProduct(Long id) {
@@ -71,8 +73,23 @@ public class ProductServiceImpl implements ProductService {
         }
 
         if (productRequest.colorId() != null){
-            List<Color> colors = colorRepository.findByIdIn(productRequest.colorId());
-//            product.setColors(colors);
+            List<ProductColor> productColors = productColorRepository.findByProductIdAndColorIds(id, productRequest.colorId());
+            if (productColors.isEmpty()){
+                productRequest.colorId().forEach(cid -> {
+                    Color color = colorRepository.findById(cid).orElseThrow(
+                            () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Color not found!")
+                    );
+                    ProductColor newProductColor = new ProductColor();
+                    newProductColor.setColor(color);
+                    newProductColor.setProduct(product);
+                    productColorRepository.save(newProductColor);
+                });
+            }else{
+                productColors.forEach(pc -> pc.setColor(colorRepository.findById(pc.getColor().getId()).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Color not found!")
+                )));
+                productColorRepository.saveAll(productColors);
+            }
         }
 
         if (productRequest.subCategoryId() != null){
@@ -147,7 +164,7 @@ public class ProductServiceImpl implements ProductService {
 
         if (productFilterRequest.colorId() != null){
             spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("colors").get("id"), productFilterRequest.colorId())
+                    cb.equal(root.get("productColors").get("color").get("id"), productFilterRequest.colorId())
             );
         }
 
@@ -157,10 +174,12 @@ public class ProductServiceImpl implements ProductService {
             );
         }
 
+//        Product product = new Product();
+//        product.getProductColors().forEach(pc -> log.info(String.valueOf(pc.getColor())));
+
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         PageRequest pageRequest = PageRequest.of(productFilterRequest.pageNo() - 1, productFilterRequest.pageSize(), sort);
         Page<Product> products = productRepository.findAll(spec, pageRequest);
-
         return products.map(productMapper::toProductResponse);
     }
 }

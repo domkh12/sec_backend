@@ -10,7 +10,6 @@ public record ProductRequest(
         List<Long> sizeId,
         @NotNull(message = "Color ID cannot be null")
         List<Long> colorId,
-        @NotNull(message = "Sub Category ID cannot be null")
         Long subCategoryId
 ) {
     

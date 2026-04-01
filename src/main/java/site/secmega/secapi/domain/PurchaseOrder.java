@@ -29,12 +29,7 @@ public class PurchaseOrder extends BaseEntity{
     @ManyToOne
     private Buyer buyer;
 
-    @ManyToMany
-    @JoinTable(
-            name = "purchase_order_product_colors",
-            joinColumns = @JoinColumn(name = "purchase_order_id"),
-            inverseJoinColumns = @JoinColumn(name = "product_color_id")
-    )
-    private List<ProductColor> productColors;
+    @OneToMany(mappedBy = "purchaseOrder")
+    private List<OrderDetail> orderDetail;
 
 }
