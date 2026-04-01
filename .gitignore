@@ -19,6 +19,8 @@ bin/
 ### env
 .env
 postgresql_data
+*.pem
+src/main/resources/keys/
 
 ### IntelliJ IDEA ###
 .idea

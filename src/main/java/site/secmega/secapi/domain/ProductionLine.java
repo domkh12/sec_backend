@@ -39,8 +39,4 @@ public class ProductionLine {
     private List<User> users;
     @OneToMany(mappedBy = "productionLines")
     private List<HourlyProduction> hourlyProduction;
-    @OneToMany(mappedBy = "productionLine")
-    private List<ProductionTarget> productionTargets;
-    @OneToMany(mappedBy = "productionLine")
-    private List<DowntimeRecord> downtimeRecords;
 }

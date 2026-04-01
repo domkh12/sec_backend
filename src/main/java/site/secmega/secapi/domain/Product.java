@@ -36,8 +36,6 @@ public class Product extends BaseEntity{
     @OneToMany(mappedBy = "product")
     private List<HourlyProduction> hourlyProductions;
     @OneToMany(mappedBy = "product")
-    private List<ProductionTarget> productionTargets;
-    @OneToMany(mappedBy = "product")
     private List<Bundle> bundles;
     @ManyToOne
     private SubCategory subCategory;
@@ -47,10 +45,6 @@ public class Product extends BaseEntity{
             inverseJoinColumns = @JoinColumn(name = "size_id", referencedColumnName = "id")
     )
     private List<Size> sizes;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "color_id", referencedColumnName = "id")
-    )
-    private List<Color> colors;
+    @OneToMany(mappedBy = "product")
+    private List<ProductColor> productColors;
 }

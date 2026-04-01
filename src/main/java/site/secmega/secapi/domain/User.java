@@ -37,7 +37,7 @@ public class User extends BaseEntity{
     @Column(nullable = false)
     private String phoneNumber;
     private String position;
-    private LocalDateTime hireDate;
+    private LocalDate hireDate;
     private String avatar;
     private LocalDateTime lastLogin;
     private LocalDate dateOfBirth;
@@ -69,8 +69,6 @@ public class User extends BaseEntity{
     private Shift shift;
     @OneToMany(mappedBy = "user")
     private List<HourlyProduction> hourlyProductions;
-    @OneToMany(mappedBy = "user")
-    private List<DowntimeRecord> downtimeRecords;
     @ManyToOne
     private Department department;
 

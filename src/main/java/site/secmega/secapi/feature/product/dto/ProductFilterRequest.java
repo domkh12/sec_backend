@@ -1,5 +1,7 @@
 package site.secmega.secapi.feature.product.dto;
 
+import site.secmega.secapi.base.ProductStatus;
+
 import java.util.List;
 
 public record ProductFilterRequest(
@@ -8,7 +10,8 @@ public record ProductFilterRequest(
         String search,
         Long subCategoryId,
         Long colorId,
-        List<Long> sizeId
+        Long sizeId,
+        ProductStatus status
 ) {
     public ProductFilterRequest{
         if (pageNo == null){

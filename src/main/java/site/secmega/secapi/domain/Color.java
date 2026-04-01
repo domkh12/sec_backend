@@ -21,6 +21,6 @@ public class Color extends BaseEntity {
     @Column(nullable = false)
     private String color;
 
-    @ManyToMany(mappedBy = "colors")
-    private List<Product> products;
+    @OneToMany(mappedBy = "color")
+    private List<ProductColor> productColors;
 }
