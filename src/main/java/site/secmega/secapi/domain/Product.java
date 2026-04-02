@@ -7,7 +7,6 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 import site.secmega.secapi.base.ProductStatus;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -46,5 +45,5 @@ public class Product extends BaseEntity{
     )
     private List<Size> sizes;
     @OneToMany(mappedBy = "product")
-    private List<ProductColor> productColors;
+    private List<ProductSku> productSkus;
 }

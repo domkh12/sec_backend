@@ -4,23 +4,22 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.SQLRestriction;
 
 import java.util.List;
 
 @Entity
-@Table(name = "colors")
+@Table(name = "products_skus")
 @Getter
 @Setter
 @NoArgsConstructor
-@SQLRestriction("deleted_at IS NULL")
-public class Color extends BaseEntity {
+public class ProductSku {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-    private String color;
-
-    @OneToMany(mappedBy = "color")
-    private List<WorkOrderColor> workOrderColors;
+    @ManyToOne
+    private Product product;
+    @ManyToOne
+    private Color color;
+    @OneToMany(mappedBy = "productSku")
+    private List<WorkOrderDetail> workOrderDetails;
 }

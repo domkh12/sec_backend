@@ -6,18 +6,18 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "order_details")
+@Table(name = "work_order_color_sizes")
 @Getter
 @Setter
 @NoArgsConstructor
-public class OrderDetail {
+public class WorkOrderColorSize extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Integer quantity;
+    private Integer qty;
 
     @ManyToOne
-    private ProductColor productColor;
+    private WorkOrderColor workOrderColor;
     @ManyToOne
-    private PurchaseOrder purchaseOrder;
+    private Size size;
 }

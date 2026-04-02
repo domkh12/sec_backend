@@ -24,7 +24,6 @@ import site.secmega.secapi.mapper.ProductMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -73,22 +72,22 @@ public class ProductServiceImpl implements ProductService {
         }
 
         if (productRequest.colorId() != null){
-            List<ProductColor> productColors = productColorRepository.findByProductIdAndColorIds(id, productRequest.colorId());
-            if (productColors.isEmpty()){
+            List<ProductSku> productSkus = productColorRepository.findByProductIdAndColorIds(id, productRequest.colorId());
+            if (productSkus.isEmpty()){
                 productRequest.colorId().forEach(cid -> {
                     Color color = colorRepository.findById(cid).orElseThrow(
                             () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Color not found!")
                     );
-                    ProductColor newProductColor = new ProductColor();
-                    newProductColor.setColor(color);
-                    newProductColor.setProduct(product);
-                    productColorRepository.save(newProductColor);
+                    ProductSku newProductSku = new ProductSku();
+                    newProductSku.setColor(color);
+                    newProductSku.setProduct(product);
+                    productColorRepository.save(newProductSku);
                 });
             }else{
-                productColors.forEach(pc -> pc.setColor(colorRepository.findById(pc.getColor().getId()).orElseThrow(
+                productSkus.forEach(pc -> pc.setColor(colorRepository.findById(pc.getColor().getId()).orElseThrow(
                         () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Color not found!")
                 )));
-                productColorRepository.saveAll(productColors);
+                productColorRepository.saveAll(productSkus);
             }
         }
 
@@ -111,15 +110,15 @@ public class ProductServiceImpl implements ProductService {
         }
 
         Product product = productMapper.fromProductRequest(productRequest);
-        if (productRequest.sizeId() != null){
-            List<Size> sizes = sizeRepository.findByIdIn(productRequest.sizeId());
-            product.setSizes(sizes);
-        }
-
-        if (productRequest.colorId() != null){
-            List<Color> colors = colorRepository.findByIdIn(productRequest.colorId());
-//            product.setColors(colors);
-        }
+//        if (productRequest.sizeId() != null){
+//            List<Size> sizes = sizeRepository.findByIdIn(productRequest.sizeId());
+//            product.setSizes(sizes);
+//        }
+//
+//        if (productRequest.colorId() != null){
+//            List<Color> colors = colorRepository.findByIdIn(productRequest.colorId());
+////            product.setColors(colors);
+//        }
 
         if (productRequest.subCategoryId() != null){
             SubCategory subCategory = subCategoryRepository.findById(productRequest.subCategoryId()).orElseThrow(
@@ -128,8 +127,12 @@ public class ProductServiceImpl implements ProductService {
             product.setSubCategory(subCategory);
         }
         product.setStatus(ProductStatus.Draft);
+        List<Color> colors = colorRepository.findByIdIn(productRequest.colorId());
+        List<Size> sizes = sizeRepository.findByIdIn(productRequest.sizeId());
+
 
         Product savedProduct = productRepository.save(product);
+
         return productMapper.toProductResponse(savedProduct);
     }
 

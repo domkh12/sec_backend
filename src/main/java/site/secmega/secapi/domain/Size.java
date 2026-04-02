@@ -22,5 +22,9 @@ public class Size extends BaseEntity{
     private String size;
     @ManyToMany(mappedBy = "sizes")
     private List<Product> products;
-
+    @ManyToMany
+    @JoinTable(name = "color_size", joinColumns = @JoinColumn(name = "size_id"), inverseJoinColumns = @JoinColumn(name = "color_id"))
+    private List<Color> colors;
+    @OneToMany(mappedBy = "size")
+    private List<WorkOrderColorSize> workOrderColorSizes;
 }
