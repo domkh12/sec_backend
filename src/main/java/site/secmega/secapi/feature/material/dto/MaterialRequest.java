@@ -7,10 +7,8 @@ public record MaterialRequest(
         String code,
         @NotBlank(message = "Name is required")
         String name,
-        String description,
         @NotBlank(message = "Unit is required")
         String unit,
-        String image,
-        Double pricePerUnit
+        String image
 ) {
 }

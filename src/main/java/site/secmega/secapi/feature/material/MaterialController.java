@@ -10,6 +10,8 @@ import site.secmega.secapi.feature.material.dto.MaterialFilterRequest;
 import site.secmega.secapi.feature.material.dto.MaterialRequest;
 import site.secmega.secapi.feature.material.dto.MaterialResponse;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/api/v1/materials")
 @RequiredArgsConstructor
@@ -27,7 +29,7 @@ public class MaterialController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    MaterialResponse createMaterial(@RequestBody @Valid MaterialRequest materialRequest){
+    MaterialResponse createMaterial(@RequestBody @Valid MaterialRequest materialRequest) throws IOException {
         return materialService.createMaterial(materialRequest);
     }
 

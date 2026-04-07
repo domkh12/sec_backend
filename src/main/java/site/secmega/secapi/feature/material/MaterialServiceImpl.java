@@ -10,10 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.base.MaterialStatus;
 import site.secmega.secapi.domain.Material;
+import site.secmega.secapi.feature.file.FileService;
 import site.secmega.secapi.feature.material.dto.MaterialFilterRequest;
 import site.secmega.secapi.feature.material.dto.MaterialRequest;
 import site.secmega.secapi.feature.material.dto.MaterialResponse;
 import site.secmega.secapi.mapper.MaterialMapper;
+
+import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class MaterialServiceImpl implements MaterialService{
 
     private final MaterialRepository materialRepository;
     private final MaterialMapper materialMapper;
+    private final FileService fileService;
 
     @Override
     public Page<MaterialResponse> findAll(MaterialFilterRequest materialFilterRequest) {
@@ -47,7 +51,7 @@ public class MaterialServiceImpl implements MaterialService{
     }
 
     @Override
-    public MaterialResponse createMaterial(MaterialRequest materialRequest) {
+    public MaterialResponse createMaterial(MaterialRequest materialRequest) throws IOException {
 
         if (materialRepository.existsByCodeAndDeletedAtNull(materialRequest.code())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Material code already exist");
@@ -58,7 +62,8 @@ public class MaterialServiceImpl implements MaterialService{
         }
 
         Material material = materialMapper.fromMaterialRequest(materialRequest);
-        material.setStatus(MaterialStatus.LOW_STOCK);
+        material.setStatus(MaterialStatus.OUT_OF_STOCK);
+        material.setBalance(0.0);
         Material savedMaterial = materialRepository.save(material);
 
         return materialMapper.toMaterialResponse(savedMaterial);

@@ -20,10 +20,8 @@ public class Material extends BaseEntity{
     private String code;
     private String name;
     private String unit;
-    private String description;
     private String image;
-    private String qty;
-    private Double pricePerUnit;
+    private Double balance;
     private MaterialStatus status;
 
 }
