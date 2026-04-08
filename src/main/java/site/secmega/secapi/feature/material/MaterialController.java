@@ -17,8 +17,15 @@ public class MaterialController {
 
     private final MaterialService materialService;
 
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+//    @GetMapping("/stats")
+//    @ResponseStatus(HttpStatus.OK)
+//    MaterialStatResponse getMaterialStat(){
+//        return materialService.getMaterialStat();
+//    }
+
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping("{id}/stock-in")
+    @GetMapping("/{id}/stock-in")
     @ResponseStatus(HttpStatus.OK)
     Page<StockInResponse> getStockIn(@PathVariable Long id, @ModelAttribute StockInFilterRequest stockInFilterRequest){
         return materialService.getStockIn(id, stockInFilterRequest);
