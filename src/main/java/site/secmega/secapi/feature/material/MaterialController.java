@@ -6,9 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import site.secmega.secapi.feature.material.dto.MaterialFilterRequest;
-import site.secmega.secapi.feature.material.dto.MaterialRequest;
-import site.secmega.secapi.feature.material.dto.MaterialResponse;
+import site.secmega.secapi.feature.material.dto.*;
 
 import java.io.IOException;
 
@@ -18,6 +16,20 @@ import java.io.IOException;
 public class MaterialController {
 
     private final MaterialService materialService;
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("{id}/stock-in")
+    @ResponseStatus(HttpStatus.OK)
+    Page<StockInResponse> getStockIn(@PathVariable Long id, @ModelAttribute StockInFilterRequest stockInFilterRequest){
+        return materialService.getStockIn(id, stockInFilterRequest);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping("/stock-in")
+    @ResponseStatus(HttpStatus.CREATED)
+    StockInResponse stockIn(@RequestBody @Valid StockInRequest stockInRequest) {
+        return materialService.stockIn(stockInRequest);
+    }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping

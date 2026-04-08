@@ -3,8 +3,10 @@ package site.secmega.secapi.mapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import site.secmega.secapi.domain.Material;
+import site.secmega.secapi.domain.MaterialDetail;
 import site.secmega.secapi.feature.material.dto.MaterialRequest;
 import site.secmega.secapi.feature.material.dto.MaterialResponse;
+import site.secmega.secapi.feature.material.dto.StockInResponse;
 
 @Mapper(componentModel = "spring")
 public interface MaterialMapper {

@@ -71,5 +71,7 @@ public class User extends BaseEntity{
     private List<HourlyProduction> hourlyProductions;
     @ManyToOne
     private Department department;
+    @OneToMany(mappedBy = "user")
+    private List<MaterialDetail> materialDetails;
 
 }

@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 import site.secmega.secapi.base.MaterialStatus;
 
+import java.util.List;
+
 @Entity
 @Table(name = "materials")
 @Getter
@@ -24,4 +26,24 @@ public class Material extends BaseEntity{
     private Double balance;
     private MaterialStatus status;
 
+    /**
+     * Relationship
+     * */
+    @OneToMany(mappedBy = "material")
+    private List<MaterialDetail> materialDetails;
+
+    public void setBalance(Double balance) {
+        this.balance = balance;
+        syncStatus();
+    }
+
+    private void syncStatus() {
+        if (balance == null || balance <= 0) {
+            this.status = MaterialStatus.OUT_OF_STOCK;
+        } else if (balance <= 10) {
+            this.status = MaterialStatus.LOW_STOCK;
+        } else {
+            this.status = MaterialStatus.AVAILABLE;
+        }
+    }
 }
