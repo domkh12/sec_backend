@@ -14,4 +14,12 @@ public interface MaterialService {
     StockInResponse stockIn(@Valid StockInRequest stockInRequest);
 
     Page<StockInResponse> getStockIn(Long id, StockInFilterRequest stockInFilterRequest);
+
+    MaterialStatResponse getMaterialStat();
+
+    StockOutResponse stockOut(@Valid StockOutRequest stockOutRequest);
+
+    Page<StockOutResponse> getStockOut(Long id, StockOutFilterRequest stockOutFilterRequest);
+
+    MaterialResponse updateMaterial(Long id, @Valid MaterialRequest materialRequest);
 }

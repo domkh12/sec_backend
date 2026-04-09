@@ -11,6 +11,8 @@ public record UserResponse(
         String employeeId,
         String firstName,
         String lastName,
+        String nameEn,
+        String nameKh,
         String phoneNumber,
         String email,
         Integer roleId,

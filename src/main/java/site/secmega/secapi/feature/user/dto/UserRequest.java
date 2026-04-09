@@ -16,6 +16,8 @@ public record UserRequest(
         Long lineId,
         String firstName,
         String lastName,
+        String nameEn,
+        String nameKh,
         String position
 ) {
 }

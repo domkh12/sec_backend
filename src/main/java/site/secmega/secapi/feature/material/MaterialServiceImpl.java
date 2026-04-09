@@ -33,6 +33,96 @@ public class MaterialServiceImpl implements MaterialService{
     private final AuthUtil authUtil;
 
     @Override
+    public MaterialResponse updateMaterial(Long id, MaterialRequest materialRequest) {
+        Material material = materialRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found")
+        );
+
+        if (materialRepository.existsByCodeAndIdNotAndDeletedAtNull(materialRequest.code(), id)){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Material code already exist");
+        }
+
+        return null;
+    }
+
+    @Override
+    public StockOutResponse stockOut(StockOutRequest stockOutRequest) {
+        User user = userRepository.findById(stockOutRequest.requesterId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found")
+        );
+        Material material = materialRepository.findById(stockOutRequest.materialId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found")
+        );
+        if (material.getBalance() < stockOutRequest.qtyOutput()){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Material balance is not enough");
+        }
+
+        MaterialDetail materialDetail = MaterialDetail.builder()
+                .quantity(stockOutRequest.qtyOutput())
+                .transactionDate(stockOutRequest.dateOutput())
+                .material(material)
+                .type(TransactionType.INVENTORY_OUT)
+                .qtyBalance(material.getBalance() - stockOutRequest.qtyOutput())
+                .user(user)
+                .build();
+        material.setBalance(material.getBalance() - stockOutRequest.qtyOutput());
+        materialDetailRepository.save(materialDetail);
+        materialRepository.save(material);
+
+        return StockOutResponse.builder()
+                .id(materialDetail.getId())
+                .materialName(material.getName())
+                .qtyBalance(materialDetail.getQtyBalance())
+                .qtyOutput(materialDetail.getQuantity())
+                .dateOutput(materialDetail.getTransactionDate())
+                .requester(user.getFirstName())
+                .build();
+    }
+
+    @Override
+    public Page<StockOutResponse> getStockOut(Long id, StockOutFilterRequest stockOutFilterRequest) {
+        if (stockOutFilterRequest.pageNo() <= 0 || stockOutFilterRequest.pageSize() <= 0 ){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page no and Page size must be greater than 0");
+        }
+
+        Specification<MaterialDetail> spec = Specification.where((root, query, cb) -> cb.conjunction());
+
+        spec = spec.and((root, query, cb) -> cb.equal(root.get("material").get("id"), id));
+        spec = spec.and((root, query, cb) -> cb.equal(root.get("type"), TransactionType.INVENTORY_OUT));
+        if (stockOutFilterRequest.search() != null){
+            spec = spec.and((root, query, cb) ->
+                    cb.like(cb.lower(root.get("material").get("name")), "%" + stockOutFilterRequest.search().toLowerCase() + "%")
+            );
+        }
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        PageRequest pageRequest = PageRequest.of(stockOutFilterRequest.pageNo() - 1, stockOutFilterRequest.pageSize(), sort);
+        Page<MaterialDetail> materialDetails = materialDetailRepository.findAll(spec, pageRequest);
+
+        return materialDetails.map(detail -> StockOutResponse.builder()
+                .id(detail.getId())
+                .requester(detail.getUser().getNameEn())
+                .materialName(detail.getMaterial().getName())
+                .qtyBalance(detail.getQtyBalance())
+                .qtyOutput(detail.getQuantity())
+                .dateOutput(detail.getTransactionDate())
+                .build());
+    }
+
+    @Override
+    public MaterialStatResponse getMaterialStat() {
+        long totalMaterial = materialRepository.count();
+        long totalStockIn = materialDetailRepository.countByType(TransactionType.INVENTORY_IN);
+        long totalStockOut = materialDetailRepository.countByType(TransactionType.INVENTORY_OUT);
+        long totalBalance = totalStockIn - totalStockOut;
+        return MaterialStatResponse.builder()
+                .totalMaterial(totalMaterial)
+                .totalStockIn(totalStockIn)
+                .totalStockOut(totalStockOut)
+                .totalBalance(totalBalance)
+                .build();
+    }
+
+    @Override
     public Page<StockInResponse> getStockIn(Long id, StockInFilterRequest stockInFilterRequest) {
         if (stockInFilterRequest.pageNo() <= 0 || stockInFilterRequest.pageSize() <= 0 ){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page no and Page size must be greater than 0");
@@ -55,7 +145,7 @@ public class MaterialServiceImpl implements MaterialService{
         return materialDetails.map(detail -> {
             return StockInResponse.builder()
                     .id(detail.getId())
-                    .user(detail.getUser().getFirstName())
+                    .user(detail.getUser().getNameEn())
                     .materialName(detail.getMaterial().getName())
                     .qtyBalance(detail.getQtyBalance())
                     .qtyInput(detail.getQuantity())
@@ -108,6 +198,10 @@ public class MaterialServiceImpl implements MaterialService{
                             cb.like(cb.lower(root.get("code")), "%" + materialFilterRequest.search().toLowerCase() + "%"),
                             cb.like(cb.lower(root.get("name")), "%" + materialFilterRequest.search().toLowerCase() + "%")
                     ));
+        }
+
+        if (materialFilterRequest.status() != null){
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), materialFilterRequest.status()));
         }
 
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");

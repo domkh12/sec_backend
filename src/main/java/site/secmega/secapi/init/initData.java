@@ -62,6 +62,8 @@ public class initData {
         Role roleManager = roleRepository.findByName("MANAGER").orElseThrow();
         User user = new User();
         user.setRoles(List.of(roleManager));
+        user.setNameEn("MR Ricky");
+        user.setNameKh("រីកគី");
         user.setUsername("manager");
         user.setEmployeeId("0011");
         user.setPhoneNumber("0987654321");
@@ -78,6 +80,8 @@ public class initData {
         user1.setRoles(List.of(roleTv));
         user1.setUsername("tv");
         user1.setEmployeeId("0012");
+        user1.setNameEn("TV");
+        user1.setNameKh("ទូរទស្សន៍");
         user1.setPhoneNumber("0987654320");
         user1.setUpdatedAt(LocalDateTime.now());
         user1.setCreatedAt(LocalDateTime.now());
@@ -92,6 +96,8 @@ public class initData {
         user2.setRoles(List.of(roleAdmin));
         user2.setUsername("admin");
         user2.setEmployeeId("0013");
+        user2.setNameEn("Udom");
+        user2.setNameKh("ឧត្តម");
         user2.setPhoneNumber("0987654322");
         user2.setUpdatedAt(LocalDateTime.now());
         user2.setCreatedAt(LocalDateTime.now());

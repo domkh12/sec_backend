@@ -14,5 +14,8 @@ public interface MaterialRepository extends JpaRepository<Material, Long>, JpaSp
     @Query("select (count(m) > 0) from Material m where m.name = ?1 and m.deletedAt is null")
     boolean existsByNameAndDeletedAtNull(String name);
 
+    @Query("select (count(m) > 0) from Material m where m.code = ?1 and m.id <> ?2 and m.deletedAt is null")
+    boolean existsByCodeAndIdNotAndDeletedAtNull(String code, Long id);
+
 
 }

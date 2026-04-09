@@ -1,14 +1,13 @@
 package site.secmega.secapi.feature.material.dto;
 
-import site.secmega.secapi.base.MaterialStatus;
 
-public record MaterialFilterRequest(
+public record StockOutFilterRequest(
         Integer pageNo,
         Integer pageSize,
-        String search,
-        MaterialStatus status
+        String search
+
 ) {
-    public MaterialFilterRequest{
+    public StockOutFilterRequest{
         if (pageNo == null){
             pageNo = 1;
         }

@@ -17,12 +17,26 @@ public class MaterialController {
 
     private final MaterialService materialService;
 
-//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-//    @GetMapping("/stats")
-//    @ResponseStatus(HttpStatus.OK)
-//    MaterialStatResponse getMaterialStat(){
-//        return materialService.getMaterialStat();
-//    }
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping("/stock-out")
+    @ResponseStatus(HttpStatus.CREATED)
+    StockOutResponse stockOut(@RequestBody @Valid StockOutRequest stockOutRequest) {
+        return materialService.stockOut(stockOutRequest);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/{id}/stock-out")
+    @ResponseStatus(HttpStatus.OK)
+    Page<StockOutResponse> getStockOut(@PathVariable Long id, @ModelAttribute StockOutFilterRequest stockOutFilterRequest){
+        return materialService.getStockOut(id, stockOutFilterRequest);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/stats")
+    @ResponseStatus(HttpStatus.OK)
+    MaterialStatResponse getMaterialStat(){
+        return materialService.getMaterialStat();
+    }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/{id}/stock-in")
@@ -52,4 +66,10 @@ public class MaterialController {
         return materialService.createMaterial(materialRequest);
     }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    MaterialResponse updateMaterial(@PathVariable Long id, @RequestBody @Valid MaterialRequest materialRequest){
+        return materialService.updateMaterial(id, materialRequest);
+    }
 }
