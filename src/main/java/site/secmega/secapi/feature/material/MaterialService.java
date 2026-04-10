@@ -22,4 +22,6 @@ public interface MaterialService {
     Page<StockOutResponse> getStockOut(Long id, StockOutFilterRequest stockOutFilterRequest);
 
     MaterialResponse updateMaterial(Long id, @Valid MaterialRequest materialRequest);
+
+    void deleteMaterial(Long id);
 }

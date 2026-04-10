@@ -43,7 +43,7 @@ public class Material extends BaseEntity{
         } else if (balance <= 10) {
             this.status = MaterialStatus.LOW_STOCK;
         } else {
-            this.status = MaterialStatus.AVAILABLE;
+            this.status = MaterialStatus.OK;
         }
     }
 }

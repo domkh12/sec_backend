@@ -5,8 +5,7 @@ import lombok.Builder;
 @Builder
 public record MaterialStatResponse(
         long totalMaterial,
-        long totalStockIn,
-        long totalStockOut,
-        long totalBalance
+        long totalLowStock,
+        long totalOutOfStock
 ) {
 }

@@ -18,7 +18,6 @@ public class Bundle {
     @Column(unique = true)
     private String qrCode;
 
-
     private Integer quantity; // Always 8 in your case
     private String size;      // e.g., "Large"
     private String color;     // e.g., "Navy Blue"

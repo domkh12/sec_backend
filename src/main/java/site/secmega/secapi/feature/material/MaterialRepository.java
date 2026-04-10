@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import site.secmega.secapi.base.MaterialStatus;
 import site.secmega.secapi.domain.Material;
 
 @Repository
@@ -16,6 +17,9 @@ public interface MaterialRepository extends JpaRepository<Material, Long>, JpaSp
 
     @Query("select (count(m) > 0) from Material m where m.code = ?1 and m.id <> ?2 and m.deletedAt is null")
     boolean existsByCodeAndIdNotAndDeletedAtNull(String code, Long id);
+
+    @Query("select count(m) from Material m where m.status = ?1")
+    long countByStatus(MaterialStatus status);
 
 
 }

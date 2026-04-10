@@ -72,4 +72,11 @@ public class MaterialController {
     MaterialResponse updateMaterial(@PathVariable Long id, @RequestBody @Valid MaterialRequest materialRequest){
         return materialService.updateMaterial(id, materialRequest);
     }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteMaterial(@PathVariable Long id){
+        materialService.deleteMaterial(id);
+    }
 }

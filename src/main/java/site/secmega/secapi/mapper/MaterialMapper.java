@@ -1,7 +1,6 @@
 package site.secmega.secapi.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
+import org.mapstruct.*;
 import site.secmega.secapi.domain.Material;
 import site.secmega.secapi.domain.MaterialDetail;
 import site.secmega.secapi.feature.material.dto.MaterialRequest;
@@ -12,4 +11,6 @@ import site.secmega.secapi.feature.material.dto.StockInResponse;
 public interface MaterialMapper {
     Material fromMaterialRequest(MaterialRequest materialRequest);
     MaterialResponse toMaterialResponse(Material material);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateFromMaterialRequest(MaterialRequest materialRequest, @MappingTarget Material material);
 }

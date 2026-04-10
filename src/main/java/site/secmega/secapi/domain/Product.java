@@ -46,4 +46,6 @@ public class Product extends BaseEntity{
     private List<Size> sizes;
     @OneToMany(mappedBy = "product")
     private List<ProductSku> productSkus;
+    @OneToMany(mappedBy = "product")
+    private List<WorkOrder> workOrders;
 }

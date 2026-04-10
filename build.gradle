@@ -25,6 +25,11 @@ repositories {
 }
 
 dependencies {
+
+    // report jaster
+    implementation"net.sf.jasperreports:jasperreports:7.0.3"
+    implementation 'net.sf.jasperreports:jasperreports-pdf:7.0.3'
+
     // qr
     implementation 'com.google.zxing:core:3.5.1'
     implementation 'com.google.zxing:javase:3.5.1'

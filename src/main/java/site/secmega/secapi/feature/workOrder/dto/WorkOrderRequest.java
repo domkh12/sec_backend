@@ -3,6 +3,7 @@ package site.secmega.secapi.feature.workOrder.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public record WorkOrderRequest(
@@ -12,7 +13,10 @@ public record WorkOrderRequest(
         Integer qty,
         @NotNull(message = "Buyer ID cannot be null")
         Long buyerId,
-
-        List<Integer> colorIds
+        Long colorId,
+        List<Long> sizeIds,
+        LocalDate startDate,
+        LocalDate endDate,
+        String image
 ) {
 }

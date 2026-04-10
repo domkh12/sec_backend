@@ -21,6 +21,7 @@ import site.secmega.secapi.mapper.MaterialMapper;
 import site.secmega.secapi.util.AuthUtil;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +43,19 @@ public class MaterialServiceImpl implements MaterialService{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Material code already exist");
         }
 
-        return null;
+        materialMapper.updateFromMaterialRequest(materialRequest, material);
+        material.setUpdatedAt(LocalDateTime.now());
+        Material updatedMaterial = materialRepository.save(material);
+        return materialMapper.toMaterialResponse(updatedMaterial);
+    }
+
+    @Override
+    public void deleteMaterial(Long id) {
+        Material material = materialRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found")
+        );
+        material.setDeletedAt(LocalDateTime.now());
+        materialRepository.save(material);
     }
 
     @Override
@@ -111,14 +124,12 @@ public class MaterialServiceImpl implements MaterialService{
     @Override
     public MaterialStatResponse getMaterialStat() {
         long totalMaterial = materialRepository.count();
-        long totalStockIn = materialDetailRepository.countByType(TransactionType.INVENTORY_IN);
-        long totalStockOut = materialDetailRepository.countByType(TransactionType.INVENTORY_OUT);
-        long totalBalance = totalStockIn - totalStockOut;
+        long totalLowStock = materialRepository.countByStatus(MaterialStatus.LOW_STOCK);
+        long totalOutOfStock = materialRepository.countByStatus(MaterialStatus.OUT_OF_STOCK);
         return MaterialStatResponse.builder()
                 .totalMaterial(totalMaterial)
-                .totalStockIn(totalStockIn)
-                .totalStockOut(totalStockOut)
-                .totalBalance(totalBalance)
+                .totalLowStock(totalLowStock)
+                .totalOutOfStock(totalOutOfStock)
                 .build();
     }
 

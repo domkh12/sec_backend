@@ -9,9 +9,9 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import site.secmega.secapi.base.WorkOrderStatus;
 import site.secmega.secapi.domain.Buyer;
 import site.secmega.secapi.domain.WorkOrder;
-import site.secmega.secapi.domain.WorkOrderColor;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
 import site.secmega.secapi.feature.workOrder.dto.WorkOrderFilterRequest;
 import site.secmega.secapi.feature.workOrder.dto.WorkOrderRequest;
@@ -44,6 +44,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
             );
             workOrder.setBuyer(buyer);
         }
+        workOrder.setStatus(WorkOrderStatus.NEW);
         WorkOrder savedWorkOrder = workOrderRepository.save(workOrder);
         return workOrderMapper.toWorkOrderResponse(savedWorkOrder);
     }
@@ -76,17 +77,6 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                         .mo(w.getMo())
                         .buyer(w.getBuyer().getName())
                         .qty(w.getQty())
-                        .colors(w.getWorkOrderColors().stream().map(
-                                wc -> WorkOrderColorResponse.builder()
-                                        .colorName(wc.getColor().getColor())
-                                        .sizes(wc.getWorkOrderColorSizes().stream().map(
-                                                wcs -> WorkOrderColorSizeResponse.builder()
-                                                        .sizeName(wcs.getSize().getSize())
-                                                        .qty(wcs.getQty())
-                                                        .build()
-                                        ).toList())
-                                        .build()
-                        ).toList())
                         .build())
                 .toList();
     }

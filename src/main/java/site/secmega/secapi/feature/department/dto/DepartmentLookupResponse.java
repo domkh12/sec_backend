@@ -9,6 +9,6 @@ import java.util.List;
 public record DepartmentLookupResponse(
         Long id,
         String name,
-        List<ProductionLineLookupResponse> lines
+        List<ProductionLineLookupResponse> children
 ) {
 }
