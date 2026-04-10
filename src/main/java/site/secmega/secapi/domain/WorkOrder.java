@@ -41,4 +41,10 @@ public class WorkOrder extends BaseEntity{
     @ManyToOne
     private Product product;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(joinColumns = @JoinColumn(name = "wo_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "size_id", referencedColumnName = "id")
+    )
+    private List<Size> sizes;
+
 }

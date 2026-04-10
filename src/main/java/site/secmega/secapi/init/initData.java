@@ -6,9 +6,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import site.secmega.secapi.base.UserStatus;
 import site.secmega.secapi.domain.Role;
+import site.secmega.secapi.domain.Size;
 import site.secmega.secapi.domain.Tv;
 import site.secmega.secapi.domain.User;
 import site.secmega.secapi.feature.role.RoleRepository;
+import site.secmega.secapi.feature.size.SizeRepository;
 import site.secmega.secapi.feature.tv.TvRepository;
 import site.secmega.secapi.feature.user.UserRepository;
 
@@ -24,6 +26,7 @@ public class initData {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final TvRepository tvRepository;
+    private final SizeRepository sizeRepository;
 
     @PostConstruct
     public void init(){
@@ -31,10 +34,32 @@ public class initData {
             initRole();
             initUser();
             initTv();
+            initSize();
         } catch (Exception e) {
             System.err.println("Error during initializations: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void initSize(){
+        Size l = new Size();
+        l.setSize("L");
+        sizeRepository.save(l);
+        Size m = new Size();
+        m.setSize("M");
+        sizeRepository.save(m);
+        Size s = new Size();
+        s.setSize("S");
+        sizeRepository.save(s);
+        Size xl = new Size();
+        xl.setSize("XL");
+        sizeRepository.save(xl);
+        Size xxl = new Size();
+        xxl.setSize("XXL");
+        sizeRepository.save(xxl);
+        Size xxs = new Size();
+        xxs.setSize("XXS");
+        sizeRepository.save(xxs);
     }
 
     private void initRole() {

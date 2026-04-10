@@ -11,8 +11,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.base.WorkOrderStatus;
 import site.secmega.secapi.domain.Buyer;
+import site.secmega.secapi.domain.Color;
+import site.secmega.secapi.domain.Size;
 import site.secmega.secapi.domain.WorkOrder;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
+import site.secmega.secapi.feature.color.ColorRepository;
+import site.secmega.secapi.feature.size.SizeRepository;
 import site.secmega.secapi.feature.workOrder.dto.WorkOrderFilterRequest;
 import site.secmega.secapi.feature.workOrder.dto.WorkOrderRequest;
 import site.secmega.secapi.feature.workOrder.dto.WorkOrderResponse;
@@ -29,6 +33,8 @@ public class WorkOrderServiceImpl implements WorkOrderService{
     private final WorkOrderRepository workOrderRepository;
     private final WorkOrderMapper workOrderMapper;
     private final BuyerRepository buyerRepository;
+    private final ColorRepository colorRepository;
+    private final SizeRepository sizeRepository;
 
     @Override
     public WorkOrderResponse createWorkOrder(WorkOrderRequest workOrderRequest) {
@@ -43,6 +49,18 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Buyer not found!")
             );
             workOrder.setBuyer(buyer);
+        }
+
+        if (workOrderRequest.colorId() != null){
+            Color color = colorRepository.findById(workOrderRequest.colorId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Color not found!")
+            );
+            workOrder.setColor(color);
+        }
+
+        if (!workOrderRequest.sizeIds().isEmpty()){
+           List<Size> sizes = sizeRepository.findByIdIn(workOrderRequest.sizeIds());
+           workOrder.setSizes(sizes);
         }
         workOrder.setStatus(WorkOrderStatus.NEW);
         WorkOrder savedWorkOrder = workOrderRepository.save(workOrder);
@@ -77,6 +95,8 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                         .mo(w.getMo())
                         .buyer(w.getBuyer().getName())
                         .qty(w.getQty())
+                        .startDate(w.getStartDate())
+                        .endDate(w.getEndDate())
                         .build())
                 .toList();
     }

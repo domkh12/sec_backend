@@ -22,4 +22,6 @@ public interface ColorRepository extends JpaRepository<Color, Long>, JpaSpecific
     List<Color> findByIdIn(Collection<Long> ids);
 
 
+
+
 }

@@ -27,4 +27,6 @@ public class Size extends BaseEntity{
     private List<Color> colors;
     @OneToMany(mappedBy = "size")
     private List<WorkOrderColorSize> workOrderColorSizes;
+    @ManyToMany(mappedBy = "sizes")
+    private List<WorkOrder> workOrders;
 }

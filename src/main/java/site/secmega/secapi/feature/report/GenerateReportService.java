@@ -1,6 +1,5 @@
 package site.secmega.secapi.feature.report;
 
-import edu.npic.sps.domain.User;
 
 import java.io.File;
 import java.io.IOException;
