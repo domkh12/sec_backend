@@ -97,6 +97,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                         .qty(w.getQty())
                         .startDate(w.getStartDate())
                         .endDate(w.getEndDate())
+                        .status(w.getStatus())
                         .build())
                 .toList();
     }

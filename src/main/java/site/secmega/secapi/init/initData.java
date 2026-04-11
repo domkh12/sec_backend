@@ -5,10 +5,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import site.secmega.secapi.base.UserStatus;
-import site.secmega.secapi.domain.Role;
-import site.secmega.secapi.domain.Size;
-import site.secmega.secapi.domain.Tv;
-import site.secmega.secapi.domain.User;
+import site.secmega.secapi.domain.*;
+import site.secmega.secapi.feature.color.ColorRepository;
 import site.secmega.secapi.feature.role.RoleRepository;
 import site.secmega.secapi.feature.size.SizeRepository;
 import site.secmega.secapi.feature.tv.TvRepository;
@@ -27,6 +25,7 @@ public class initData {
     private final UserRepository userRepository;
     private final TvRepository tvRepository;
     private final SizeRepository sizeRepository;
+    private final ColorRepository colorRepository;
 
     @PostConstruct
     public void init(){
@@ -35,10 +34,26 @@ public class initData {
             initUser();
             initTv();
             initSize();
+            initColor();
         } catch (Exception e) {
             System.err.println("Error during initializations: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void initColor(){
+        Color black = new Color();
+        black.setColor("Black");
+        colorRepository.save(black);
+        Color white = new Color();
+        white.setColor("White");
+        colorRepository.save(white);
+        Color blue = new Color();
+        blue.setColor("Blue");
+        colorRepository.save(blue);
+        Color pink = new Color();
+        pink.setColor("Pink");
+        colorRepository.save(pink);
     }
 
     private void initSize(){

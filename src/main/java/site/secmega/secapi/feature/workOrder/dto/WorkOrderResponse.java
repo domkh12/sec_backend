@@ -2,6 +2,7 @@ package site.secmega.secapi.feature.workOrder.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
+import site.secmega.secapi.base.WorkOrderStatus;
 import site.secmega.secapi.feature.workOrderColor.dto.WorkOrderColorResponse;
 
 import java.time.LocalDate;
@@ -12,7 +13,7 @@ public record WorkOrderResponse(
         String mo,
         Integer qty,
         String buyer,
-        String status,
+        WorkOrderStatus status,
         @JsonFormat(pattern = "dd-MM-yyyy")
         LocalDate startDate,
         @JsonFormat(pattern = "dd-MM-yyyy")
