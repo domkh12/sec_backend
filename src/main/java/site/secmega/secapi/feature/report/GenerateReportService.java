@@ -7,8 +7,6 @@ import java.util.List;
 
 public interface GenerateReportService {
 
-
-
     File generateExcelReport(List<?> objects, String template) throws IOException;
 
     File generatePDFReport(List<?> objects, String template) throws IOException;

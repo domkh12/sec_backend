@@ -2,12 +2,15 @@ package site.secmega.secapi.feature.material;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import site.secmega.secapi.feature.material.dto.*;
 
+import java.io.File;
 import java.io.IOException;
 
 @RestController
@@ -16,6 +19,13 @@ import java.io.IOException;
 public class MaterialController {
 
     private final MaterialService materialService;
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/report-excel")
+    @ResponseStatus(HttpStatus.OK)
+    ResponseEntity<InputStreamResource> getReportMaterial() throws IOException {
+        return materialService.getReportMaterial();
+    }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/stock-out")

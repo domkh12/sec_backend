@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 import site.secmega.secapi.base.ProductionLineStatus;
 
 import java.time.LocalDateTime;
@@ -14,7 +15,8 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ProductionLine {
+@SQLRestriction("deleted_at IS NULL")
+public class ProductionLine extends BaseEntity{
     /**
      * Information
      * */
@@ -25,18 +27,22 @@ public class ProductionLine {
     private String line;
     @Column(nullable = false)
     private ProductionLineStatus status;
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
 
     /**
      * Relationship
      * */
     @ManyToOne
     private Department department;
+
     @OneToMany(mappedBy = "productionLine")
     private List<User> users;
-    @OneToMany(mappedBy = "productionLines")
-    private List<HourlyProduction> hourlyProduction;
+
+    @OneToMany(mappedBy = "productionLine")
+    private List<CuttingDetail> cuttingDetails;
+
+    @OneToMany(mappedBy = "productionLine")
+    private List<OutputDetail> outputDetails;
+
+    @OneToMany(mappedBy = "productionLine")
+    private List<Bundle> bundles;
 }

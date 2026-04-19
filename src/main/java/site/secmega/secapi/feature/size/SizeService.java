@@ -3,8 +3,11 @@ package site.secmega.secapi.feature.size;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import site.secmega.secapi.feature.size.dto.SizeFilterRequest;
+import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
 import site.secmega.secapi.feature.size.dto.SizeRequest;
 import site.secmega.secapi.feature.size.dto.SizeResponse;
+
+import java.util.List;
 
 public interface SizeService {
     SizeResponse createService(@Valid SizeRequest sizeRequest);
@@ -14,4 +17,6 @@ public interface SizeService {
     SizeResponse updateSize(Long id, SizeRequest sizeRequest);
 
     void deleteSize(Long id);
+
+    List<SizeLookupResponse> getSizeLookup();
 }

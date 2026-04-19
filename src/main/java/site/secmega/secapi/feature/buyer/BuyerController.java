@@ -16,49 +16,49 @@ import java.util.List;
 public class BuyerController {
     private final BuyerService buyerService;
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @GetMapping("/{id}/files")
     @ResponseStatus(HttpStatus.OK)
     BuyerFileResponse getBuyerFile(@PathVariable Long id){
         return buyerService.getBuyerFile(id);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @PutMapping("/{id}/file-upload")
     @ResponseStatus(HttpStatus.CREATED)
     BuyerResponse uploadBuyerFile(@PathVariable Long id, @RequestBody BuyerRequest buyerRequest){
         return buyerService.uploadBuyerFile(id, buyerRequest);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
     BuyerStatsResponse getBuyerStats(){
         return buyerService.getBuyerStats();
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteBuyer(@PathVariable Long id){
         buyerService.deleteBuyer(id);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     BuyerResponse updateBuyer(@PathVariable Long id, @Valid @RequestBody BuyerRequest buyerRequest){
         return buyerService.updateBuyer(id, buyerRequest);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     Page<BuyerResponse> findAll(@ModelAttribute BuyerFilterRequest buyerFilterRequest){
         return buyerService.findAll(buyerFilterRequest);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     BuyerResponse createBuyer(@Valid @RequestBody BuyerRequest buyerRequest){

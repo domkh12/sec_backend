@@ -68,7 +68,7 @@ public class ProductServiceImpl implements ProductService {
         productMapper.updateFromProductRequest(productRequest, product);
         if (productRequest.sizeId() != null){
             List<Size> sizes = sizeRepository.findByIdIn(productRequest.sizeId());
-            product.setSizes(sizes);
+//            product.setSizes(sizes);
         }
 
         if (productRequest.colorId() != null){
@@ -99,7 +99,8 @@ public class ProductServiceImpl implements ProductService {
         }
         product.setUpdatedAt(LocalDateTime.now());
         Product updatedProduct = productRepository.save(product);
-        return productMapper.toProductResponse(updatedProduct);
+//        return productMapper.toProductResponse(updatedProduct);
+        return null;
     }
 
     @Override
@@ -133,7 +134,8 @@ public class ProductServiceImpl implements ProductService {
 
         Product savedProduct = productRepository.save(product);
 
-        return productMapper.toProductResponse(savedProduct);
+//        return productMapper.toProductResponse(savedProduct);
+        return null;
     }
 
     @Override
@@ -183,6 +185,7 @@ public class ProductServiceImpl implements ProductService {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         PageRequest pageRequest = PageRequest.of(productFilterRequest.pageNo() - 1, productFilterRequest.pageSize(), sort);
         Page<Product> products = productRepository.findAll(spec, pageRequest);
-        return products.map(productMapper::toProductResponse);
+//        return products.map(productMapper::toProductResponse);
+        return null;
     }
 }

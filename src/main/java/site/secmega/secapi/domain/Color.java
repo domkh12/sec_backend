@@ -20,7 +20,4 @@ public class Color extends BaseEntity {
     private Long id;
     @Column(nullable = false)
     private String color;
-
-    @OneToMany(mappedBy = "color")
-    private List<WorkOrderColor> workOrderColors;
 }

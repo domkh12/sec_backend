@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.Size;
 import site.secmega.secapi.feature.size.dto.SizeFilterRequest;
+import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
 import site.secmega.secapi.feature.size.dto.SizeRequest;
 import site.secmega.secapi.feature.size.dto.SizeResponse;
 import site.secmega.secapi.mapper.SizeMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,15 @@ public class SizeServiceImpl implements SizeService{
         );
         size.setDeletedAt(LocalDateTime.now());
         sizeRepository.save(size);
+    }
+
+    @Override
+    public List<SizeLookupResponse> getSizeLookup() {
+        List<Size> sizes = sizeRepository.findAll();
+        return sizes.stream().map(size -> SizeLookupResponse.builder()
+                .id(size.getId())
+                .size(size.getSize())
+                .build()).toList();
     }
 
     @Override

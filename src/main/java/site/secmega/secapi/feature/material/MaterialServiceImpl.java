@@ -2,11 +2,16 @@ package site.secmega.secapi.feature.material;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.base.MaterialStatus;
@@ -16,12 +21,17 @@ import site.secmega.secapi.domain.MaterialDetail;
 import site.secmega.secapi.domain.User;
 import site.secmega.secapi.feature.file.FileService;
 import site.secmega.secapi.feature.material.dto.*;
+import site.secmega.secapi.feature.report.GenerateReportService;
 import site.secmega.secapi.feature.user.UserRepository;
 import site.secmega.secapi.mapper.MaterialMapper;
 import site.secmega.secapi.util.AuthUtil;
+import site.secmega.secapi.util.Util;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -32,6 +42,23 @@ public class MaterialServiceImpl implements MaterialService{
     private final UserRepository userRepository;
     private final MaterialDetailRepository materialDetailRepository;
     private final AuthUtil authUtil;
+    private final GenerateReportService generateReportService;
+
+    @Value("${materialExcel.template.path}")
+    String excelTemplatePath;
+
+    @Override
+    public ResponseEntity<InputStreamResource> getReportMaterial() throws IOException {
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        List<Material> materials = materialRepository.findAll(sort);
+
+
+        File file = generateReportService.generateExcelReport(materials, excelTemplatePath);
+        HttpHeaders headers = Util.getHttpHeaders("Vehicle", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+
+        return new ResponseEntity<>(new InputStreamResource(new FileInputStream(file)), headers, HttpStatus.OK);
+    }
 
     @Override
     public MaterialResponse updateMaterial(Long id, MaterialRequest materialRequest) {

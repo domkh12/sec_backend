@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 import site.secmega.secapi.base.BundleStatus;
 
 @Entity
@@ -11,21 +12,28 @@ import site.secmega.secapi.base.BundleStatus;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Bundle {
+@SQLRestriction("deleted_at IS NULL")
+public class Bundle extends BaseEntity{
     @Id
     @GeneratedValue
     private Long id;
-    @Column(unique = true)
-    private String qrCode;
+    @Column(nullable = false, unique = true)
+    private String bundleCode;
 
-    private Integer quantity; // Always 8 in your case
-    private String size;      // e.g., "Large"
-    private String color;     // e.g., "Navy Blue"
+    private Integer bundleQty;
 
     @Enumerated(EnumType.STRING)
     private BundleStatus status;
 
-    // Relationship
+    /**
+     * Relationship
+     * */
     @ManyToOne
-    private Product product;
+    private WorkOrder workOrder;
+
+    @ManyToOne
+    private Size size;
+
+    @ManyToOne
+    private ProductionLine productionLine;
 }

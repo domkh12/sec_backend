@@ -20,13 +20,19 @@ public class Size extends BaseEntity{
     private Long id;
     @Column(nullable = false)
     private String size;
-    @ManyToMany(mappedBy = "sizes")
-    private List<Product> products;
-    @ManyToMany
-    @JoinTable(name = "color_size", joinColumns = @JoinColumn(name = "size_id"), inverseJoinColumns = @JoinColumn(name = "color_id"))
-    private List<Color> colors;
-    @OneToMany(mappedBy = "size")
-    private List<WorkOrderColorSize> workOrderColorSizes;
+
+    /**
+     * Relationship
+     * */
     @ManyToMany(mappedBy = "sizes")
     private List<WorkOrder> workOrders;
+
+    @OneToMany(mappedBy = "size")
+    private List<OutputDetail> outputDetails;
+
+    @OneToMany(mappedBy = "size")
+    private List<CuttingDetail> cuttingDetails;
+
+    @OneToMany(mappedBy = "size")
+    private List<Bundle> bundles;
 }

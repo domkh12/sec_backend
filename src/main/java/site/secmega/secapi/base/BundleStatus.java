@@ -1,5 +1,5 @@
 package site.secmega.secapi.base;
 
 public enum BundleStatus {
-    PENDING, IN_PROGRESS, COMPLETED
+    PENDING, DISPATCHED, RECEIVED
 }

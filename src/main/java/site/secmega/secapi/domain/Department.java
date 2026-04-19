@@ -26,10 +26,6 @@ public class Department extends BaseEntity{
     @Column(nullable = false)
     private String department;
     private DepartmentStatus status;
-    @Column(nullable = false)
-    private LocalDateTime createdAt;
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
 
     /**
      * Relationship

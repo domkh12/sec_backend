@@ -9,24 +9,21 @@ import org.hibernate.annotations.SQLRestriction;
 import java.util.List;
 
 @Entity
-@Table(name = "work_order_colors")
+@Table(name = "operations")
 @Getter
 @Setter
 @NoArgsConstructor
 @SQLRestriction("deleted_at IS NULL")
-public class WorkOrderColor extends BaseEntity{
+public class Operation extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
+    private String name;
     /**
      * Relationship
      * */
-    @ManyToOne
-    private WorkOrder workOrder;
-
-    @ManyToOne
-    private Color color;
-    @OneToMany(mappedBy = "workOrderColor")
-    private List<WorkOrderColorSize> workOrderColorSizes;
+//    @OneToMany(mappedBy = "operation")
+//    private List<ProcessingDetail> processingDetails;
+//    @ManyToOne
+//    private ProductionLine productionLine;
 }

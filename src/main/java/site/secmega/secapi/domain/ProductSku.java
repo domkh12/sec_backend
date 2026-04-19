@@ -20,6 +20,4 @@ public class ProductSku {
     private Product product;
     @ManyToOne
     private Color color;
-    @OneToMany(mappedBy = "productSku")
-    private List<WorkOrderDetail> workOrderDetails;
 }

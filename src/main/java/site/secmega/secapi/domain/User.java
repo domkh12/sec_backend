@@ -25,12 +25,16 @@ public class User extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(nullable = false, unique = true)
+    private String uuid;
     @Column(nullable = false)
     private String employeeId;
     private String email;
     private String firstName;
     private String lastName;
+    @Column(nullable = false)
     private String nameEn;
+    @Column(nullable = false)
     private String nameKh;
     @Column(nullable = false)
     private String username;
@@ -67,10 +71,6 @@ public class User extends BaseEntity{
 
     @ManyToOne
     private ProductionLine productionLine;
-    @ManyToOne
-    private Shift shift;
-    @OneToMany(mappedBy = "user")
-    private List<HourlyProduction> hourlyProductions;
     @ManyToOne
     private Department department;
     @OneToMany(mappedBy = "user")

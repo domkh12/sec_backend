@@ -37,8 +37,8 @@ public class Shift {
     /**
      * Relationship
      * */
-    @OneToMany(mappedBy = "shift")
-    private List<User> users;
-    @OneToMany(mappedBy = "shift")
-    private List<HourlyProduction> hourlyProductions;
+//    @OneToMany(mappedBy = "shift")
+//    private List<User> users;
+//    @OneToMany(mappedBy = "shift")
+//    private List<HourlyProduction> hourlyProductions;
 }

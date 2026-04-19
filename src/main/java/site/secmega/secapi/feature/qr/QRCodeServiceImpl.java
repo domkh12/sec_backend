@@ -1,5 +1,6 @@
 package site.secmega.secapi.feature.qr;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatReader;
 import com.google.zxing.Result;
@@ -8,10 +9,12 @@ import com.google.zxing.client.j2se.BufferedImageLuminanceSource;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.common.HybridBinarizer;
 import com.google.zxing.qrcode.QRCodeWriter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import site.secmega.secapi.feature.qr.dto.QrDataRequest;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -22,11 +25,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 @Service
+@RequiredArgsConstructor
 public class QRCodeServiceImpl implements QRCodeService{
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Override
-    public ResponseEntity<byte[]> generateQRCode(String data) throws WriterException, IOException {
+    public ResponseEntity<byte[]> generateQRCode(QrDataRequest data) throws WriterException, IOException {
+        String jsonData = objectMapper.writeValueAsString(data);
+
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        BitMatrix bitMatrix = qrCodeWriter.encode(data, BarcodeFormat.QR_CODE, 200, 200);
+        BitMatrix bitMatrix = qrCodeWriter.encode(jsonData, BarcodeFormat.QR_CODE, 200, 200);
 
         BufferedImage bufferedImage = new BufferedImage(200, 200, BufferedImage.TYPE_INT_RGB);
         bufferedImage.createGraphics().fillRect(0, 0, 200, 200);

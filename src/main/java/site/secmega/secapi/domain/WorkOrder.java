@@ -22,6 +22,7 @@ public class WorkOrder extends BaseEntity{
     private Long id;
     @Column(nullable = false)
     private String mo;
+    private String style;
     @Column(nullable = false)
     private Integer qty;
     @Column(nullable = false)
@@ -31,6 +32,7 @@ public class WorkOrder extends BaseEntity{
     @Column(nullable = false)
     private LocalDate endDate;
     private String image;
+    private String orderFollower;
 
     @ManyToOne
     private Buyer buyer;
@@ -46,5 +48,14 @@ public class WorkOrder extends BaseEntity{
             inverseJoinColumns = @JoinColumn(name = "size_id", referencedColumnName = "id")
     )
     private List<Size> sizes;
+
+    @OneToMany(mappedBy = "workOrder")
+    private List<OutputDetail> outputDetails;
+
+    @OneToMany(mappedBy = "workOrder")
+    private List<CuttingDetail> cuttingDetails;
+
+    @OneToMany(mappedBy = "workOrder")
+    private List<Bundle> bundles;
 
 }

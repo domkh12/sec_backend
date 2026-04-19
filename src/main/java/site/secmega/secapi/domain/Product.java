@@ -32,18 +32,10 @@ public class Product extends BaseEntity{
     /**
      * Relationship
      * */
-    @OneToMany(mappedBy = "product")
-    private List<HourlyProduction> hourlyProductions;
-    @OneToMany(mappedBy = "product")
-    private List<Bundle> bundles;
+//    @OneToMany(mappedBy = "product")
+//    private List<HourlyProduction> hourlyProductions;
     @ManyToOne
     private SubCategory subCategory;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            joinColumns = @JoinColumn(name = "product_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "size_id", referencedColumnName = "id")
-    )
-    private List<Size> sizes;
     @OneToMany(mappedBy = "product")
     private List<ProductSku> productSkus;
     @OneToMany(mappedBy = "product")

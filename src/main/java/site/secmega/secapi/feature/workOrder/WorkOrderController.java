@@ -4,11 +4,16 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import site.secmega.secapi.feature.workOrder.dto.WorkOrderFilterRequest;
+import site.secmega.secapi.feature.workOrder.dto.WorkOrderLookupResponse;
 import site.secmega.secapi.feature.workOrder.dto.WorkOrderRequest;
 import site.secmega.secapi.feature.workOrder.dto.WorkOrderResponse;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/work-orders")
@@ -16,6 +21,20 @@ import site.secmega.secapi.feature.workOrder.dto.WorkOrderResponse;
 public class WorkOrderController {
 
     private final WorkOrderService workOrderService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @GetMapping("/style/{mo}")
+    @ResponseStatus(HttpStatus.OK)
+    ResponseEntity<Map<String, String>> getStyleByMo(@PathVariable String mo){
+        return workOrderService.getStyleByMo(mo);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @GetMapping("/lookup")
+    @ResponseStatus(HttpStatus.OK)
+    List<WorkOrderLookupResponse> getWorkOrderLookup(){
+        return workOrderService.getWorkOrderLookup();
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @PostMapping

@@ -38,17 +38,17 @@ public class HourlyProduction {
     /**
      * Relationship
      * */
-    @ManyToOne
-    private ProductionLine productionLines;
-    @ManyToOne
-    private Shift shift;
-    @ManyToOne
-    private Product product;
-    @ManyToOne
-    private User user;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(joinColumns = @JoinColumn(name = "hourly_production_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "defect_type_id", referencedColumnName = "id")
-    )
-    private List<DefectType> defectTypes;
+//    @ManyToOne
+//    private ProductionLine productionLines;
+//    @ManyToOne
+//    private Shift shift;
+//    @ManyToOne
+//    private Product product;
+//    @ManyToOne
+//    private User user;
+//    @ManyToMany(fetch = FetchType.EAGER)
+//    @JoinTable(joinColumns = @JoinColumn(name = "hourly_production_id", referencedColumnName = "id"),
+//            inverseJoinColumns = @JoinColumn(name = "defect_type_id", referencedColumnName = "id")
+//    )
+//    private List<DefectType> defectTypes;
 }

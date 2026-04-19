@@ -4,6 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record SizeLookupResponse(
+        Long id,
         String size
 ) {
 }

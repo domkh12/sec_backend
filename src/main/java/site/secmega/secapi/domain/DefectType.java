@@ -14,7 +14,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @SQLRestriction("deleted_at IS NULL")
-public class DefectType {
+public class DefectType extends BaseEntity{
     /**
      * Field
      * */
@@ -28,6 +28,6 @@ public class DefectType {
      * Relationship
      * */
     @ManyToMany(mappedBy = "defectTypes")
-    private List <HourlyProduction> hourlyProductions;
+    private List<OutputDetail> outputDetails;
 
 }

@@ -1,9 +1,12 @@
 package site.secmega.secapi.feature.material;
 
 import jakarta.validation.Valid;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import site.secmega.secapi.feature.material.dto.*;
 
+import java.io.File;
 import java.io.IOException;
 
 public interface MaterialService {
@@ -24,4 +27,6 @@ public interface MaterialService {
     MaterialResponse updateMaterial(Long id, @Valid MaterialRequest materialRequest);
 
     void deleteMaterial(Long id);
+
+    ResponseEntity<InputStreamResource> getReportMaterial() throws IOException;
 }

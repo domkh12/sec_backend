@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Entity
 @Table(name = "work_order_details")
 @Getter
@@ -16,9 +18,11 @@ public class WorkOrderDetail {
     private Long id;
     private Integer quantity;
 
-
-    @ManyToOne
-    private ProductSku productSku;
-    @ManyToOne
-    private WorkOrder workOrder;
+    /**
+     * Relationship
+     * */
+//    @ManyToOne
+//    private ProcessingDetail processingDetail;
+//    @ManyToOne
+//    private WorkOrder workOrder;
 }

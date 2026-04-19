@@ -10,7 +10,9 @@ import java.util.List;
 
 @Builder
 public record WorkOrderResponse(
+        Long id,
         String mo,
+        String style,
         Integer qty,
         String buyer,
         WorkOrderStatus status,

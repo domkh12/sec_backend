@@ -17,28 +17,28 @@ public class ColorController {
 
     private final ColorService colorService;
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteColor(@PathVariable Long id){
         colorService.deleteColor(id);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     ColorResponse updateColor(@PathVariable Long id, @Valid @RequestBody ColorRequest colorRequest){
         return colorService.updateColor(id, colorRequest);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     ColorResponse createColor(@Valid @RequestBody ColorRequest colorRequest){
         return colorService.createColor(colorRequest);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     Page<ColorResponse> findAll(@ModelAttribute ColorFilterRequest colorFilterRequest){
