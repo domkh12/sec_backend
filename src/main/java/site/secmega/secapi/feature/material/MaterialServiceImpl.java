@@ -55,7 +55,7 @@ public class MaterialServiceImpl implements MaterialService{
 
 
         File file = generateReportService.generateExcelReport(materials, excelTemplatePath);
-        HttpHeaders headers = Util.getHttpHeaders("Vehicle", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+        HttpHeaders headers = Util.getHttpHeaders("Material", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
 
         return new ResponseEntity<>(new InputStreamResource(new FileInputStream(file)), headers, HttpStatus.OK);
     }
