@@ -21,14 +21,14 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_VIEWER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_VIEWER', 'ROLE_WAREHOUSE')")
     @PutMapping("/me")
     @ResponseStatus(HttpStatus.CREATED)
     ProfileResponse updateProfile(@RequestBody ProfileRequest profileRequest) throws IOException {
         return authService.updateProfile(profileRequest);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_VIEWER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_VIEWER', 'ROLE_WAREHOUSE')")
     @GetMapping("/me")
     @ResponseStatus(HttpStatus.OK)
     ProfileResponse getProfile(){

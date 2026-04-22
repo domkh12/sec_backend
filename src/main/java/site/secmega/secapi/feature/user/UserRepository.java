@@ -30,14 +30,6 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     boolean existsByEmployeeIdAndIdNotAndDeletedAtIsNull(String employeeId, Long id);
     boolean existsByEmailIgnoreCaseAndIdNotAndDeletedAtIsNull(String email, Long id);
 
-    @Query("select u from User u where u.id <> ?1")
-    Page<User> findByIdNot(Long id, Pageable pageable);
-
-    @Query("""
-            select u from User u
-            where u.id <> ?1 or upper(u.employeeId) like upper(concat('%', ?2, '%')) or upper(u.firstName) like upper(concat('%', ?2, '%')) or upper(u.lastName) like upper(concat('%', ?2, '%')) or upper(u.phoneNumber) like upper(concat('%', ?2, '%'))""")
-    Page<User> findAllAndFilterUser(Long id, String search, Pageable pageable);
-
 
     Optional<User> findByUsername(String username);
 

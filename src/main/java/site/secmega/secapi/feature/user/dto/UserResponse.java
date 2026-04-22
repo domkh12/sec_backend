@@ -9,8 +9,6 @@ public record UserResponse(
         Long id,
         String username,
         String employeeId,
-        String firstName,
-        String lastName,
         String nameEn,
         String nameKh,
         String phoneNumber,

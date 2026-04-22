@@ -13,6 +13,7 @@ public record StockInResponse(
         Double qtyInput,
         Double qtyBalance,
         String user,
+        String unit,
         @JsonFormat(pattern = "dd/MMM/yyy hh:mma")
         LocalDateTime dateInput
 ) {

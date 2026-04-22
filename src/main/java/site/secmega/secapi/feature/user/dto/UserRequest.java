@@ -14,8 +14,6 @@ public record UserRequest(
         String email,
         Long departmentId,
         Long lineId,
-        String firstName,
-        String lastName,
         String nameEn,
         String nameKh,
         String position

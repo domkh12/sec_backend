@@ -20,70 +20,77 @@ public class MaterialController {
 
     private final MaterialService materialService;
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
+    @GetMapping("/report-stock-in-excel")
+    @ResponseStatus(HttpStatus.OK)
+    ResponseEntity<InputStreamResource> getReportStockIn() throws IOException {
+        return materialService.getReportStockIn();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @GetMapping("/report-excel")
     @ResponseStatus(HttpStatus.OK)
     ResponseEntity<InputStreamResource> getReportMaterial() throws IOException {
         return materialService.getReportMaterial();
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @PostMapping("/stock-out")
     @ResponseStatus(HttpStatus.CREATED)
     StockOutResponse stockOut(@RequestBody @Valid StockOutRequest stockOutRequest) {
         return materialService.stockOut(stockOutRequest);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @GetMapping("/{id}/stock-out")
     @ResponseStatus(HttpStatus.OK)
     Page<StockOutResponse> getStockOut(@PathVariable Long id, @ModelAttribute StockOutFilterRequest stockOutFilterRequest){
         return materialService.getStockOut(id, stockOutFilterRequest);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @GetMapping("/stats")
     @ResponseStatus(HttpStatus.OK)
     MaterialStatResponse getMaterialStat(){
         return materialService.getMaterialStat();
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @GetMapping("/{id}/stock-in")
     @ResponseStatus(HttpStatus.OK)
     Page<StockInResponse> getStockIn(@PathVariable Long id, @ModelAttribute StockInFilterRequest stockInFilterRequest){
         return materialService.getStockIn(id, stockInFilterRequest);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @PostMapping("/stock-in")
     @ResponseStatus(HttpStatus.CREATED)
     StockInResponse stockIn(@RequestBody @Valid StockInRequest stockInRequest) {
         return materialService.stockIn(stockInRequest);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     Page<MaterialResponse> findAll(@ModelAttribute MaterialFilterRequest materialFilterRequest){
         return materialService.findAll(materialFilterRequest);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
     MaterialResponse createMaterial(@RequestBody @Valid MaterialRequest materialRequest) throws IOException {
         return materialService.createMaterial(materialRequest);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     MaterialResponse updateMaterial(@PathVariable Long id, @RequestBody @Valid MaterialRequest materialRequest){
         return materialService.updateMaterial(id, materialRequest);
     }
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteMaterial(@PathVariable Long id){

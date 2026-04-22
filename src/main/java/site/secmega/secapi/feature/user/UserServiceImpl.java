@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.base.UserStatus;
 import site.secmega.secapi.domain.Department;
@@ -27,9 +28,11 @@ import site.secmega.secapi.feature.user.dto.UserStatsResponse;
 import site.secmega.secapi.mapper.UserMapper;
 import site.secmega.secapi.util.AuthUtil;
 
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -105,6 +108,17 @@ public class UserServiceImpl implements UserService{
         user.setIsEnabled(true);
         userRepository.save(user);
         notifyUserUpdate();
+    }
+
+    @Override
+    public void importUsers(MultipartFile file) {
+        try (InputStream is = file.getInputStream();
+
+        ){
+
+        }catch (Exception e){
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to import users");
+        }
     }
 
     @Override
@@ -202,6 +216,7 @@ public class UserServiceImpl implements UserService{
         }
 
         User user = userMapper.fromUserRequest(userRequest);
+        user.setUuid(UUID.randomUUID().toString());
         user.setCreatedAt(LocalDateTime.now());
         user.setUpdatedAt(LocalDateTime.now());
         user.setPassword(passwordEncoder.encode(userRequest.password()));
@@ -254,8 +269,8 @@ public class UserServiceImpl implements UserService{
             spec = spec.and((root, query, cb) ->
                     cb.or(
                             cb.like(cb.lower(root.get("employeeId")), searchTerm),
-                            cb.like(cb.lower(root.get("firstName")), searchTerm),
-                            cb.like(cb.lower(root.get("lastName")), searchTerm),
+                            cb.like(cb.lower(root.get("nameEn")), searchTerm),
+                            cb.like(cb.lower(root.get("nameKh")), searchTerm),
                             cb.like(cb.lower(root.get("phoneNumber")), searchTerm),
                             cb.like(cb.lower(root.get("position")), searchTerm)
                         )

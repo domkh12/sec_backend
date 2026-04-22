@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import site.secmega.secapi.feature.user.dto.UserFilterRequest;
 import site.secmega.secapi.feature.user.dto.UserRequest;
 import site.secmega.secapi.feature.user.dto.UserResponse;
@@ -19,6 +21,13 @@ import site.secmega.secapi.feature.user.dto.UserStatsResponse;
 public class UserController {
 
     private final UserService userService;
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PostMapping("/import")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void importUsers(@RequestParam("file") MultipartFile file){
+        userService.importUsers(file);
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @PostMapping("/{id}/unblock")
