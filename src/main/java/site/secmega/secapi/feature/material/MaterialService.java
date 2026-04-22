@@ -28,5 +28,5 @@ public interface MaterialService {
 
     void deleteMaterial(Long id);
 
-    ResponseEntity<InputStreamResource> getReportMaterial() throws IOException;
+//    ResponseEntity<InputStreamResource> getReportMaterial() throws IOException;
 }

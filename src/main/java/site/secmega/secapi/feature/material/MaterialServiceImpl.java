@@ -47,18 +47,18 @@ public class MaterialServiceImpl implements MaterialService{
     @Value("${materialExcel.template.path}")
     String excelTemplatePath;
 
-    @Override
-    public ResponseEntity<InputStreamResource> getReportMaterial() throws IOException {
-
-        Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        List<Material> materials = materialRepository.findAll(sort);
-
-
-        File file = generateReportService.generateExcelReport(materials, excelTemplatePath);
-        HttpHeaders headers = Util.getHttpHeaders("Vehicle", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-
-        return new ResponseEntity<>(new InputStreamResource(new FileInputStream(file)), headers, HttpStatus.OK);
-    }
+//    @Override
+//    public ResponseEntity<InputStreamResource> getReportMaterial() throws IOException {
+//
+//        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+//        List<Material> materials = materialRepository.findAll(sort);
+//
+//
+//        File file = generateReportService.generateExcelReport(materials, excelTemplatePath);
+//        HttpHeaders headers = Util.getHttpHeaders("Vehicle", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+//
+//        return new ResponseEntity<>(new InputStreamResource(new FileInputStream(file)), headers, HttpStatus.OK);
+//    }
 
     @Override
     public MaterialResponse updateMaterial(Long id, MaterialRequest materialRequest) {

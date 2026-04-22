@@ -20,12 +20,12 @@ public class MaterialController {
 
     private final MaterialService materialService;
 
-    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping("/report-excel")
-    @ResponseStatus(HttpStatus.OK)
-    ResponseEntity<InputStreamResource> getReportMaterial() throws IOException {
-        return materialService.getReportMaterial();
-    }
+//    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+//    @GetMapping("/report-excel")
+//    @ResponseStatus(HttpStatus.OK)
+//    ResponseEntity<InputStreamResource> getReportMaterial() throws IOException {
+//        return materialService.getReportMaterial();
+//    }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/stock-out")
