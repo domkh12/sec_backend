@@ -11,6 +11,7 @@ public record StockOutResponse(
         String materialName,
         Double qtyOutput,
         Double qtyBalance,
+        String unit,
         String requester,
         @JsonFormat(pattern = "dd/MMM/yyy hh:mma")
         LocalDateTime dateOutput

@@ -186,9 +186,10 @@ public class initData {
                 "ADMIN",        "Full system access with user and configuration management privileges",
                 "VIEWER",       "Read-only access to display screens and dashboards (TV display role)",
                 "MANAGER", "Head of a Department (Sewing/Cutting/etc)",
-                "OPERATOR",     "Handles day-to-day production floor operations and task execution",
-                "SUPERVISOR",   "Oversees operators and monitors production progress and performance",
-                "INSPECTOR", "Inspects and verifies product quality at various production stages"
+//                "OPERATOR",     "Handles day-to-day production floor operations and task execution",
+//                "SUPERVISOR",   "Oversees operators and monitors production progress and performance",
+//                "INSPECTOR", "Inspects and verifies product quality at various production stages",
+                "WAREHOUSE", "Manages inventory, incoming materials, and outgoing finished goods in the warehouse"
         );
 
         roles.forEach((name, description) -> {

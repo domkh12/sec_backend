@@ -27,11 +27,8 @@ public class User extends BaseEntity{
     private Long id;
     @Column(nullable = false, unique = true)
     private String uuid;
-    @Column(nullable = false)
     private String employeeId;
     private String email;
-    private String firstName;
-    private String lastName;
     @Column(nullable = false)
     private String nameEn;
     @Column(nullable = false)
@@ -40,7 +37,6 @@ public class User extends BaseEntity{
     private String username;
     @Column(nullable = false)
     private String password;
-    @Column(nullable = false)
     private String phoneNumber;
     private String position;
     private LocalDate hireDate;

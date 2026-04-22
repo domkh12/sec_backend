@@ -10,10 +10,15 @@ import site.secmega.secapi.base.TransactionType;
 import site.secmega.secapi.domain.MaterialDetail;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface MaterialDetailRepository extends JpaRepository<MaterialDetail, Long>, JpaSpecificationExecutor<MaterialDetail> {
     @Query("select count(m.quantity) from MaterialDetail m where m.type = ?1")
     long countByType(TransactionType type);
+
+    @Query("select m from MaterialDetail m where m.type = ?1")
+    List<MaterialDetail> findByType(TransactionType type);
+
 
 }

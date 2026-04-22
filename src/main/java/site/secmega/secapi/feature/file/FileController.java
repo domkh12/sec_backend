@@ -19,14 +19,14 @@ import java.util.List;
 public class FileController {
     private final FileService fileService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_WAREHOUSE')")
     @PostMapping("/multiple")
     @ResponseStatus(HttpStatus.CREATED)
     List<FileResponse> uploadMultipleFiles(@RequestPart("files") List<MultipartFile> files) throws Exception{
         return fileService.uploadMultipleFiles(files);
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_WAREHOUSE')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     FileResponse uploadFile(@RequestPart MultipartFile file) throws Exception{
@@ -40,7 +40,7 @@ public class FileController {
         return fileService.findAll();
     }
 
-    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_WAREHOUSE')")
     @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteFile(@RequestParam String fileName) throws IOException {

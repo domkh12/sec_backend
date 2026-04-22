@@ -29,6 +29,7 @@ import site.secmega.secapi.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -47,18 +48,31 @@ public class MaterialServiceImpl implements MaterialService{
     @Value("${materialExcel.template.path}")
     String excelTemplatePath;
 
-//    @Override
-//    public ResponseEntity<InputStreamResource> getReportMaterial() throws IOException {
-//
-//        Sort sort = Sort.by(Sort.Direction.DESC, "id");
-//        List<Material> materials = materialRepository.findAll(sort);
-//
-//
-//        File file = generateReportService.generateExcelReport(materials, excelTemplatePath);
-//        HttpHeaders headers = Util.getHttpHeaders("Vehicle", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-//
-//        return new ResponseEntity<>(new InputStreamResource(new FileInputStream(file)), headers, HttpStatus.OK);
-//    }
+    @Value("${materialStockInExcel.template.path}")
+    String stockInExcelTemplatePath;
+
+    @Override
+    public ResponseEntity<InputStreamResource> getReportStockIn() throws IOException {
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        List<MaterialDetail> materialDetails = materialDetailRepository.findByType(TransactionType.INVENTORY_IN);
+
+        File file = generateReportService.generateExcelReport(materialDetails, stockInExcelTemplatePath);
+        HttpHeaders headers = Util.getHttpHeaders("MaterialDetail", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+
+        return new ResponseEntity<>(new InputStreamResource(new FileInputStream(file)), headers, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<InputStreamResource> getReportMaterial() throws IOException {
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        List<Material> materials = materialRepository.findAll(sort);
+
+        File file = generateReportService.generateExcelReport(materials, excelTemplatePath);
+        HttpHeaders headers = Util.getHttpHeaders("Material", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+
+        return new ResponseEntity<>(new InputStreamResource(new FileInputStream(file)), headers, HttpStatus.OK);
+    }
 
     @Override
     public MaterialResponse updateMaterial(Long id, MaterialRequest materialRequest) {
@@ -115,7 +129,7 @@ public class MaterialServiceImpl implements MaterialService{
                 .qtyBalance(materialDetail.getQtyBalance())
                 .qtyOutput(materialDetail.getQuantity())
                 .dateOutput(materialDetail.getTransactionDate())
-                .requester(user.getFirstName())
+                .requester(user.getNameEn())
                 .build();
     }
 
@@ -144,6 +158,7 @@ public class MaterialServiceImpl implements MaterialService{
                 .materialName(detail.getMaterial().getName())
                 .qtyBalance(detail.getQtyBalance())
                 .qtyOutput(detail.getQuantity())
+                .unit(detail.getMaterial().getUnit())
                 .dateOutput(detail.getTransactionDate())
                 .build());
     }
@@ -187,6 +202,7 @@ public class MaterialServiceImpl implements MaterialService{
                     .materialName(detail.getMaterial().getName())
                     .qtyBalance(detail.getQtyBalance())
                     .qtyInput(detail.getQuantity())
+                    .unit(detail.getMaterial().getUnit())
                     .dateInput(detail.getTransactionDate())
                     .build();
         });
