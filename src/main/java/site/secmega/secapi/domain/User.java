@@ -28,11 +28,12 @@ public class User extends BaseEntity{
     @Column(nullable = false, unique = true)
     private String uuid;
     private String employeeId;
-    private String email;
     @Column(nullable = false)
     private String nameEn;
     @Column(nullable = false)
     private String nameKh;
+    @Column(nullable = false)
+    private String gender;
     @Column(nullable = false)
     private String username;
     @Column(nullable = false)

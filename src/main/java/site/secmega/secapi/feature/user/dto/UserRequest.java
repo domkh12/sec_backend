@@ -10,12 +10,11 @@ public record UserRequest(
         String phoneNumber,
         @NotNull(message = "Role ID cannot be null")
         Long roleId,
-        @Email(message = "Invalid email format")
-        String email,
         Long departmentId,
         Long lineId,
         String nameEn,
         String nameKh,
-        String position
+        String position,
+        String gender
 ) {
 }

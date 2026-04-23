@@ -23,5 +23,4 @@ public class Buyer extends BaseEntity{
 
     @OneToMany(mappedBy = "buyer")
     private List<WorkOrder> workOrders;
-
 }

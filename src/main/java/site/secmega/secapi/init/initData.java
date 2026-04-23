@@ -210,8 +210,9 @@ public class initData {
         user.setUuid(UUID.randomUUID().toString());
         user.setNameEn("MR Ricky");
         user.setNameKh("រីកគី");
+        user.setGender("M");
         user.setUsername("manager");
-        user.setEmployeeId("0011");
+        user.setEmployeeId("0001");
         user.setPhoneNumber("0987654321");
         user.setUpdatedAt(LocalDateTime.now());
         user.setCreatedAt(LocalDateTime.now());
@@ -226,7 +227,8 @@ public class initData {
         user1.setRoles(List.of(roleTv));
         user1.setUuid(UUID.randomUUID().toString());
         user1.setUsername("tv");
-        user1.setEmployeeId("0012");
+        user1.setEmployeeId("0000");
+        user1.setGender("M");
         user1.setNameEn("TV");
         user1.setNameKh("ទូរទស្សន៍");
         user1.setPhoneNumber("0987654320");
@@ -243,9 +245,10 @@ public class initData {
         user2.setUuid(UUID.randomUUID().toString());
         user2.setRoles(List.of(roleAdmin));
         user2.setUsername("admin");
-        user2.setEmployeeId("0013");
+        user2.setEmployeeId("0695");
         user2.setNameEn("Udom");
         user2.setNameKh("ឧត្តម");
+        user2.setGender("M");
         user2.setPhoneNumber("0987654322");
         user2.setUpdatedAt(LocalDateTime.now());
         user2.setCreatedAt(LocalDateTime.now());

@@ -19,7 +19,6 @@ import site.secmega.secapi.base.TransactionType;
 import site.secmega.secapi.domain.Material;
 import site.secmega.secapi.domain.MaterialDetail;
 import site.secmega.secapi.domain.User;
-import site.secmega.secapi.feature.file.FileService;
 import site.secmega.secapi.feature.material.dto.*;
 import site.secmega.secapi.feature.report.GenerateReportService;
 import site.secmega.secapi.feature.user.UserRepository;
@@ -29,7 +28,6 @@ import site.secmega.secapi.util.Util;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -51,10 +49,24 @@ public class MaterialServiceImpl implements MaterialService{
     @Value("${materialStockInExcel.template.path}")
     String stockInExcelTemplatePath;
 
+    @Value("${materialStockOutExcel.template.path}")
+    String stockOutExcelTemplatePath;
+
+    @Override
+    public ResponseEntity<InputStreamResource> getReportStockOut() throws IOException {
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        List<MaterialDetail> materialDetails = materialDetailRepository.findByTypeOrderByIdDesc(TransactionType.INVENTORY_OUT, sort);
+
+        File file = generateReportService.generateExcelReport(materialDetails, stockOutExcelTemplatePath);
+        HttpHeaders headers = Util.getHttpHeaders("MaterialDetail", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+
+        return new ResponseEntity<>(new InputStreamResource(new FileInputStream(file)), headers, HttpStatus.OK);
+    }
+
     @Override
     public ResponseEntity<InputStreamResource> getReportStockIn() throws IOException {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        List<MaterialDetail> materialDetails = materialDetailRepository.findByType(TransactionType.INVENTORY_IN);
+        List<MaterialDetail> materialDetails = materialDetailRepository.findByTypeOrderByIdDesc(TransactionType.INVENTORY_IN, sort);
 
         File file = generateReportService.generateExcelReport(materialDetails, stockInExcelTemplatePath);
         HttpHeaders headers = Util.getHttpHeaders("MaterialDetail", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));

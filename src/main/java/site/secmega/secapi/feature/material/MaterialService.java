@@ -32,4 +32,6 @@ public interface MaterialService {
     ResponseEntity<InputStreamResource> getReportMaterial() throws IOException;
 
     ResponseEntity<InputStreamResource> getReportStockIn() throws IOException;
+
+    ResponseEntity<InputStreamResource> getReportStockOut() throws IOException;
 }

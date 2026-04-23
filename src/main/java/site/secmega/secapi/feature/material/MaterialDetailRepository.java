@@ -2,6 +2,7 @@ package site.secmega.secapi.feature.material;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,9 @@ public interface MaterialDetailRepository extends JpaRepository<MaterialDetail, 
 
     @Query("select m from MaterialDetail m where m.type = ?1")
     List<MaterialDetail> findByType(TransactionType type);
+
+    @Query("select m from MaterialDetail m where m.type = ?1 order by m.id DESC")
+    List<MaterialDetail> findByTypeOrderByIdDesc(TransactionType type, Sort sort);
 
 
 }

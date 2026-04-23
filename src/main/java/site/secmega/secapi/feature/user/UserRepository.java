@@ -22,13 +22,11 @@ public interface UserRepository extends JpaRepository<User, Long>, JpaSpecificat
     boolean existsByUsernameIgnoreCaseAndDeletedAtIsNull(String username);
     boolean existsByPhoneNumberAndDeletedAtIsNull(String phoneNumber);
     boolean existsByEmployeeIdAndDeletedAtIsNull(String employeeId);
-    boolean existsByEmailIgnoreCaseAndDeletedAtIsNull(String email);
 
     // Update checks (exclude self)
     boolean existsByUsernameIgnoreCaseAndIdNotAndDeletedAtIsNull(String username, Long id);
     boolean existsByPhoneNumberAndIdNotAndDeletedAtIsNull(String phoneNumber, Long id);
     boolean existsByEmployeeIdAndIdNotAndDeletedAtIsNull(String employeeId, Long id);
-    boolean existsByEmailIgnoreCaseAndIdNotAndDeletedAtIsNull(String email, Long id);
 
 
     Optional<User> findByUsername(String username);

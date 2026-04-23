@@ -2,6 +2,7 @@ package site.secmega.secapi.feature.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import net.sf.jasperreports.engine.export.ooxml.XlsxWorkbookHelper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -140,10 +141,6 @@ public class UserServiceImpl implements UserService{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Employee ID already exist");
         }
 
-        if (userRequest.email() != null && userRepository.existsByEmailIgnoreCaseAndIdNotAndDeletedAtIsNull(userRequest.email(), id)){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exist");
-        }
-
         userMapper.updateUserFromUserRequest(userRequest, user);
         Role role = roleRepository.findById(userRequest.roleId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Role not found")
@@ -209,10 +206,6 @@ public class UserServiceImpl implements UserService{
 
         if (userRepository.existsByEmployeeIdAndDeletedAtIsNull(userRequest.employeeId())){
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Employee ID already exist");
-        }
-
-        if (userRequest.email() != null && userRepository.existsByEmailIgnoreCaseAndDeletedAtIsNull(userRequest.email())){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Email already exist");
         }
 
         User user = userMapper.fromUserRequest(userRequest);
