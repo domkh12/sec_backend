@@ -10,10 +10,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import site.secmega.secapi.feature.user.dto.UserFilterRequest;
-import site.secmega.secapi.feature.user.dto.UserRequest;
-import site.secmega.secapi.feature.user.dto.UserResponse;
-import site.secmega.secapi.feature.user.dto.UserStatsResponse;
+import site.secmega.secapi.feature.user.dto.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -21,6 +20,13 @@ import site.secmega.secapi.feature.user.dto.UserStatsResponse;
 public class UserController {
 
     private final UserService userService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_WAREHOUSE')")
+    @GetMapping("/lookup")
+    @ResponseStatus(HttpStatus.OK)
+    List<UserLookupResponse> getUserLookup(){
+        return userService.getUserLookup();
+    }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PostMapping("/import")

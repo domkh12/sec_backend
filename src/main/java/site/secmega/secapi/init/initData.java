@@ -39,7 +39,7 @@ public class initData {
     private final OperationRepository operationRepository;
     private final BuyerRepository buyerRepository;
 
-    @PostConstruct
+//    @PostConstruct
     public void init(){
         try {
             initDepartment();

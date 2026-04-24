@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.Color;
 import site.secmega.secapi.feature.color.dto.ColorFilterRequest;
+import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
 import site.secmega.secapi.feature.color.dto.ColorRequest;
 import site.secmega.secapi.feature.color.dto.ColorResponse;
 import site.secmega.secapi.mapper.ColorMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +32,14 @@ public class ColorServiceImpl implements ColorService{
         );
         color.setDeletedAt(LocalDateTime.now());
         colorRepository.save(color);
+    }
+
+    @Override
+    public List<ColorLookupResponse> getColorLookup() {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        List<Color> colors = colorRepository.findAll(sort);
+
+        return colors.stream().map(colorMapper::toColorLookupResponse).toList();
     }
 
     @Override

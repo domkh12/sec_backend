@@ -53,9 +53,9 @@ public class MaterialServiceImpl implements MaterialService{
     String stockOutExcelTemplatePath;
 
     @Override
-    public ResponseEntity<InputStreamResource> getReportStockOut() throws IOException {
+    public ResponseEntity<InputStreamResource> getReportStockOut(Long id) throws IOException {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        List<MaterialDetail> materialDetails = materialDetailRepository.findByTypeOrderByIdDesc(TransactionType.INVENTORY_OUT, sort);
+        List<MaterialDetail> materialDetails = materialDetailRepository.findByTypeAndMaterial_IdOrderByIdDesc(TransactionType.INVENTORY_OUT, id, sort);
 
         File file = generateReportService.generateExcelReport(materialDetails, stockOutExcelTemplatePath);
         HttpHeaders headers = Util.getHttpHeaders("MaterialDetail", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
@@ -64,9 +64,9 @@ public class MaterialServiceImpl implements MaterialService{
     }
 
     @Override
-    public ResponseEntity<InputStreamResource> getReportStockIn() throws IOException {
+    public ResponseEntity<InputStreamResource> getReportStockIn(Long id) throws IOException {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
-        List<MaterialDetail> materialDetails = materialDetailRepository.findByTypeOrderByIdDesc(TransactionType.INVENTORY_IN, sort);
+        List<MaterialDetail> materialDetails = materialDetailRepository.findByTypeAndMaterial_IdOrderByIdDesc(TransactionType.INVENTORY_IN, id, sort);
 
         File file = generateReportService.generateExcelReport(materialDetails, stockInExcelTemplatePath);
         HttpHeaders headers = Util.getHttpHeaders("MaterialDetail", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
@@ -270,6 +270,18 @@ public class MaterialServiceImpl implements MaterialService{
             spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), materialFilterRequest.status()));
         }
 
+        if (!materialFilterRequest.unit().isBlank()){
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("unit"), materialFilterRequest.unit()));
+        }
+
+        if (!materialFilterRequest.size().isBlank()){
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("size"), materialFilterRequest.size()));
+        }
+
+        if (!materialFilterRequest.color().isBlank()){
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("color"), materialFilterRequest.color()));
+        }
+
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         PageRequest pageRequest = PageRequest.of(materialFilterRequest.pageNo() - 1, materialFilterRequest.pageSize(), sort);
         Page<Material> materials = materialRepository.findAll(spec, pageRequest);
@@ -282,6 +294,8 @@ public class MaterialServiceImpl implements MaterialService{
                 .status(material.getStatus())
                 .unit(material.getUnit())
                 .image(material.getImage())
+                .size(material.getSize())
+                .color(material.getColor())
                 .totalInput(material.getMaterialDetails().stream().filter(detail -> detail.getType() == TransactionType.INVENTORY_IN).mapToDouble(MaterialDetail::getQuantity).sum())
                 .totalOutput(material.getMaterialDetails().stream().filter(detail -> detail.getType() == TransactionType.INVENTORY_OUT).mapToDouble(MaterialDetail::getQuantity).sum())
                 .build());

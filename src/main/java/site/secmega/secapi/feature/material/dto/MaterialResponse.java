@@ -13,6 +13,8 @@ public record MaterialResponse(
         String image,
         Double totalInput,
         Double totalOutput,
-        MaterialStatus status
+        MaterialStatus status,
+        String color,
+        String size
 ) {
 }

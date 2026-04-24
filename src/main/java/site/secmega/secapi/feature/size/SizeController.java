@@ -20,7 +20,7 @@ public class SizeController {
 
     private final SizeService sizeService;
 
-    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @GetMapping("/lookup")
     @ResponseStatus(HttpStatus.OK)
     List<SizeLookupResponse> getSizeLookup(){

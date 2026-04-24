@@ -2,7 +2,6 @@ package site.secmega.secapi.feature.user;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import net.sf.jasperreports.engine.export.ooxml.XlsxWorkbookHelper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,10 +21,7 @@ import site.secmega.secapi.feature.department.DepartmentRepository;
 import site.secmega.secapi.feature.message.dto.MessageRequest;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.role.RoleRepository;
-import site.secmega.secapi.feature.user.dto.UserFilterRequest;
-import site.secmega.secapi.feature.user.dto.UserRequest;
-import site.secmega.secapi.feature.user.dto.UserResponse;
-import site.secmega.secapi.feature.user.dto.UserStatsResponse;
+import site.secmega.secapi.feature.user.dto.*;
 import site.secmega.secapi.mapper.UserMapper;
 import site.secmega.secapi.util.AuthUtil;
 
@@ -56,6 +52,15 @@ public class UserServiceImpl implements UserService{
         );
         user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
+    }
+
+    @Override
+    public List<UserLookupResponse> getUserLookup() {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        List<User> users = userRepository.findAll(sort);
+
+
+        return users.stream().map(userMapper::toUserLookupResponse).toList();
     }
 
     @Override

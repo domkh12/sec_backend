@@ -7,9 +7,7 @@ import java.util.List;
 
 @Builder
 public record ColorLookupResponse (
-        String colorName,
-        Integer totalInput,
-        Integer totalOutput,
-        List<SizeLookupResponse> sizes
+        Long id,
+        String color
 ) {
 }

@@ -24,5 +24,8 @@ public interface MaterialDetailRepository extends JpaRepository<MaterialDetail, 
     @Query("select m from MaterialDetail m where m.type = ?1 order by m.id DESC")
     List<MaterialDetail> findByTypeOrderByIdDesc(TransactionType type, Sort sort);
 
+    @Query("select m from MaterialDetail m where m.type = ?1 and m.material.id = ?2 order by m.id DESC")
+    List<MaterialDetail> findByTypeAndMaterial_IdOrderByIdDesc(TransactionType type, Long id, Sort sort);
+
 
 }

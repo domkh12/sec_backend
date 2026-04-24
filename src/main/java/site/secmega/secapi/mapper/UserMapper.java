@@ -4,6 +4,7 @@ import org.mapstruct.*;
 import site.secmega.secapi.domain.User;
 import site.secmega.secapi.feature.auth.dto.ProfileRequest;
 import site.secmega.secapi.feature.auth.dto.ProfileResponse;
+import site.secmega.secapi.feature.user.dto.UserLookupResponse;
 import site.secmega.secapi.feature.user.dto.UserRequest;
 import site.secmega.secapi.feature.user.dto.UserResponse;
 import site.secmega.secapi.feature.user.dto.UserStatsResponse;
@@ -23,4 +24,5 @@ public interface UserMapper {
     void updateFromProfileRequest(ProfileRequest profileRequest, @MappingTarget User user);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateUserFromUserRequest(UserRequest userRequest, @MappingTarget User user);
+    UserLookupResponse toUserLookupResponse(User user);
 }

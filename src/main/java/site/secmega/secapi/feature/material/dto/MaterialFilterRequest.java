@@ -6,7 +6,10 @@ public record MaterialFilterRequest(
         Integer pageNo,
         Integer pageSize,
         String search,
-        MaterialStatus status
+        MaterialStatus status,
+        String unit,
+        String size,
+        String color
 ) {
     public MaterialFilterRequest{
         if (pageNo == null){

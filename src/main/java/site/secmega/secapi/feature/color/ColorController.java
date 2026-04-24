@@ -7,8 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import site.secmega.secapi.feature.color.dto.ColorFilterRequest;
+import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
 import site.secmega.secapi.feature.color.dto.ColorRequest;
 import site.secmega.secapi.feature.color.dto.ColorResponse;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/colors")
@@ -16,6 +19,13 @@ import site.secmega.secapi.feature.color.dto.ColorResponse;
 public class ColorController {
 
     private final ColorService colorService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
+    @GetMapping("/lookup")
+    @ResponseStatus(HttpStatus.OK)
+    List<ColorLookupResponse> getColorLookup(){
+        return colorService.getColorLookup();
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @DeleteMapping("/{id}")

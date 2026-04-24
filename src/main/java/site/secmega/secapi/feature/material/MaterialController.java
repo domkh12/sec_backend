@@ -21,17 +21,17 @@ public class MaterialController {
     private final MaterialService materialService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
-    @GetMapping("/report-stock-out-excel")
+    @GetMapping("/{id}/report-stock-out-excel")
     @ResponseStatus(HttpStatus.OK)
-    ResponseEntity<InputStreamResource> getReportStockOut() throws IOException {
-        return materialService.getReportStockOut();
+    ResponseEntity<InputStreamResource> getReportStockOut(@PathVariable Long id) throws IOException {
+        return materialService.getReportStockOut(id);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
-    @GetMapping("/report-stock-in-excel")
+    @GetMapping("/{id}/report-stock-in-excel")
     @ResponseStatus(HttpStatus.OK)
-    ResponseEntity<InputStreamResource> getReportStockIn() throws IOException {
-        return materialService.getReportStockIn();
+    ResponseEntity<InputStreamResource> getReportStockIn(@PathVariable Long id) throws IOException {
+        return materialService.getReportStockIn(id);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")

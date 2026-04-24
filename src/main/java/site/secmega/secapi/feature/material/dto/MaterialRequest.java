@@ -9,6 +9,8 @@ public record MaterialRequest(
         String name,
         @NotBlank(message = "Unit is required")
         String unit,
-        String image
+        String image,
+        String size,
+        String color
 ) {
 }

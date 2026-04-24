@@ -1,5 +1,7 @@
 package site.secmega.secapi.feature.material.dto;
 
+import site.secmega.secapi.base.MaterialStatus;
+
 public record StockInFilterRequest(
         Integer pageNo,
         Integer pageSize,
