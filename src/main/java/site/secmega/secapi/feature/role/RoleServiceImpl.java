@@ -2,6 +2,7 @@ package site.secmega.secapi.feature.role;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import site.secmega.secapi.domain.Role;
 import site.secmega.secapi.feature.role.dto.RoleFilterRequest;
 import site.secmega.secapi.feature.role.dto.RoleResponse;
+import site.secmega.secapi.feature.user.UserRepository;
 import site.secmega.secapi.mapper.RoleMapper;
 
 import java.util.List;
@@ -18,7 +20,7 @@ import java.util.List;
 public class RoleServiceImpl implements RoleService{
 
     private final RoleRepository roleRepository;
-    private final RoleMapper roleMapper;
+    private final UserRepository userRepository;
 
     @Override
     public Page<RoleResponse> findAll(RoleFilterRequest roleFilterRequest) {
@@ -42,6 +44,11 @@ public class RoleServiceImpl implements RoleService{
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         PageRequest pageRequest = PageRequest.of(roleFilterRequest.pageNo() - 1, roleFilterRequest.pageSize(), sort);
         Page<Role> roles = roleRepository.findAll(spec, pageRequest);
-        return roles.map(roleMapper::toRoleResponse);
+        return roles.map(role -> RoleResponse.builder()
+                .id(role.getId())
+                .name(role.getName())
+                .description(role.getDescription())
+                .users(userRepository.countByRoles_Id(role.getId()))
+                .build());
     }
 }

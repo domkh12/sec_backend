@@ -7,6 +7,4 @@ import site.secmega.secapi.feature.role.dto.RoleResponse;
 
 @Mapper(componentModel = "spring")
 public interface RoleMapper {
-    @Mapping(target = "users", expression = "java(role.getUsers() != null ? role.getUsers().size() : 0)")
-    RoleResponse toRoleResponse(Role role);
 }

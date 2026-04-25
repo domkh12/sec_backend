@@ -63,7 +63,7 @@ public class DepartmentServiceImpl implements DepartmentService{
                     .children(department.getProductionLines().stream().map(line ->
                             ProductionLineLookupResponse.builder()
                                     .id(line.getId())
-                                    .name(line.getLine())
+                                    .line(line.getLine())
                                     .build()
                             ).toList())
                     .build();

@@ -6,6 +6,7 @@ import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 
 import site.secmega.secapi.domain.ProductionLine;
+import site.secmega.secapi.feature.productionLine.dto.ProductionLineLookupResponse;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineRequest;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineResponse;
 
@@ -16,4 +17,6 @@ public interface ProductionLineMapper {
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromProductionLineRequest(ProductionLineRequest productionLineRequest, @MappingTarget ProductionLine productionLine);
+
+    ProductionLineLookupResponse toProductionLineLookupResponse(ProductionLine productionLine);
 }

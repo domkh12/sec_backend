@@ -27,6 +27,7 @@ public class ProductionLine extends BaseEntity{
     private String line;
     @Column(nullable = false)
     private ProductionLineStatus status;
+    private String image;
 
     /**
      * Relationship
