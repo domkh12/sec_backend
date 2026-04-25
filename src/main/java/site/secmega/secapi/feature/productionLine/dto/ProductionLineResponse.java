@@ -11,6 +11,7 @@ public record ProductionLineResponse(
         Integer workers,
         Integer target,
         Integer actual,
-        Double efficiency
+        Double efficiency,
+        String image
 ) {
 }

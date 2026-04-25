@@ -5,6 +5,7 @@ import lombok.Builder;
 @Builder
 public record ProductionLineLookupResponse(
     Long id,
-    String name
+    String line,
+    String image
 ) {
 }

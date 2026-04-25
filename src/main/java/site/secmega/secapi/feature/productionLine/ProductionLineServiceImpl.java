@@ -13,11 +13,14 @@ import site.secmega.secapi.domain.Department;
 import site.secmega.secapi.domain.ProductionLine;
 import site.secmega.secapi.feature.department.DepartmentRepository;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineFilterRequest;
+import site.secmega.secapi.feature.productionLine.dto.ProductionLineLookupResponse;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineRequest;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineResponse;
 import site.secmega.secapi.mapper.ProductionLineMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,11 +31,20 @@ public class ProductionLineServiceImpl implements ProductionLineService{
     private final DepartmentRepository departmentRepository;
 
     @Override
+    public List<ProductionLineLookupResponse> getProductionLineLookup() {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        List<ProductionLine> productionLines = productionLineRepository.findAll(sort);
+
+        return productionLines.stream().map(productionLineMapper::toProductionLineLookupResponse).toList();
+    }
+
+    @Override
     public void deleteProductionLine(Long id) {
         ProductionLine productionLine = productionLineRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Production line not found!")
         );
-        productionLineRepository.delete(productionLine);
+        productionLine.setDeletedAt(LocalDateTime.now());
+        productionLineRepository.save(productionLine);
     }
 
     @Override
@@ -49,7 +61,7 @@ public class ProductionLineServiceImpl implements ProductionLineService{
 
         ProductionLine updatedProductionLine = productionLineRepository.save(productionLine);
 
-        return productionLineMapper.toProductionLineResponse(updatedProductionLine);    
+        return productionLineMapper.toProductionLineResponse(updatedProductionLine);
     }
 
     @Override
@@ -69,6 +81,7 @@ public class ProductionLineServiceImpl implements ProductionLineService{
         return ProductionLineResponse.builder()
                                     .id(savedProductionLine.getId())
                                     .line(savedProductionLine.getLine())
+                                    .image(savedProductionLine.getImage())
                                     .dept(savedProductionLine.getDepartment().getDepartment())
                                     .deptId(savedProductionLine.getDepartment().getId())
                                     .build();
@@ -103,6 +116,7 @@ public class ProductionLineServiceImpl implements ProductionLineService{
             ProductionLineResponse.builder()
                 .id(productionLine.getId())
                 .line(productionLine.getLine())
+                .image(productionLine.getImage())
                 .workers(productionLine.getUsers().size())
                 .dept(productionLine.getDepartment().getDepartment())
                 .deptId(productionLine.getDepartment().getId())

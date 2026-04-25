@@ -8,8 +8,11 @@ import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineFilterRequest;
+import site.secmega.secapi.feature.productionLine.dto.ProductionLineLookupResponse;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineRequest;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineResponse;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/production-lines")
@@ -17,6 +20,13 @@ import site.secmega.secapi.feature.productionLine.dto.ProductionLineResponse;
 public class ProductionLineController {
 
     private final ProductionLineService productionLineService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @GetMapping("/lookup")
+    @ResponseStatus(HttpStatus.OK)
+    List<ProductionLineLookupResponse> getProductionLineLookup(){
+        return productionLineService.getProductionLineLookup();
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
