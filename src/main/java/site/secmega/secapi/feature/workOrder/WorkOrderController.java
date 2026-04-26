@@ -7,10 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import site.secmega.secapi.feature.workOrder.dto.WorkOrderFilterRequest;
-import site.secmega.secapi.feature.workOrder.dto.WorkOrderLookupResponse;
-import site.secmega.secapi.feature.workOrder.dto.WorkOrderRequest;
-import site.secmega.secapi.feature.workOrder.dto.WorkOrderResponse;
+import site.secmega.secapi.feature.workOrder.dto.*;
 
 import java.util.List;
 import java.util.Map;
@@ -18,9 +15,16 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/v1/work-orders")
 @RequiredArgsConstructor
-public class WorkOrderController {
+public class  WorkOrderController {
 
     private final WorkOrderService workOrderService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @GetMapping("/stats")
+    @ResponseStatus(HttpStatus.OK)
+    WorkOrderStatResponse getWorkOrderStat(@ModelAttribute WorkOrderFilterRequest workOrderFilterRequest){
+        return workOrderService.getWorkOrderStat(workOrderFilterRequest);
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @GetMapping("/style/{mo}")
@@ -30,10 +34,24 @@ public class WorkOrderController {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteWorkOrder(@PathVariable Long id){
+        workOrderService.deleteWorkOrder(id);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @GetMapping("/lookup")
     @ResponseStatus(HttpStatus.OK)
     List<WorkOrderLookupResponse> getWorkOrderLookup(){
         return workOrderService.getWorkOrderLookup();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    WorkOrderResponse updateWorkOrder(@PathVariable Long id, @RequestBody WorkOrderRequest workOrderRequest){
+        return workOrderService.updateWorkOrder(id, workOrderRequest);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")

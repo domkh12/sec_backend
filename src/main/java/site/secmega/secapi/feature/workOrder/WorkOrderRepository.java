@@ -16,5 +16,12 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long>, Jpa
     @Query("select w from WorkOrder w where w.mo = ?1")
     Optional<WorkOrder> findByMo(String mo);
 
+    @Query("select count(w) from WorkOrder w")
+    long countFirstBy();
+
+    @Query("SELECT COALESCE(SUM(w.qty), 0) FROM WorkOrder w")
+    long sumWorkOrderQty();
+
+
 
 }

@@ -12,10 +12,7 @@ import site.secmega.secapi.base.ProductionLineStatus;
 import site.secmega.secapi.domain.Department;
 import site.secmega.secapi.domain.ProductionLine;
 import site.secmega.secapi.feature.department.DepartmentRepository;
-import site.secmega.secapi.feature.productionLine.dto.ProductionLineFilterRequest;
-import site.secmega.secapi.feature.productionLine.dto.ProductionLineLookupResponse;
-import site.secmega.secapi.feature.productionLine.dto.ProductionLineRequest;
-import site.secmega.secapi.feature.productionLine.dto.ProductionLineResponse;
+import site.secmega.secapi.feature.productionLine.dto.*;
 import site.secmega.secapi.mapper.ProductionLineMapper;
 
 import java.time.LocalDateTime;
@@ -30,9 +27,11 @@ public class ProductionLineServiceImpl implements ProductionLineService{
     private final ProductionLineMapper productionLineMapper;
     private final DepartmentRepository departmentRepository;
 
+
+
     @Override
     public List<ProductionLineLookupResponse> getProductionLineLookup() {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Sort sort = Sort.by(Sort.Direction.ASC, "line");
         List<ProductionLine> productionLines = productionLineRepository.findAll(sort);
 
         return productionLines.stream().map(productionLineMapper::toProductionLineLookupResponse).toList();

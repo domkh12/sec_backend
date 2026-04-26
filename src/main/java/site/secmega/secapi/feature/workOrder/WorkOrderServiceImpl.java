@@ -14,19 +14,14 @@ import site.secmega.secapi.base.WorkOrderStatus;
 import site.secmega.secapi.domain.*;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
 import site.secmega.secapi.feature.color.ColorRepository;
-import site.secmega.secapi.feature.processDetail.ProcessingDetailRepository;
+import site.secmega.secapi.feature.outputDetail.OutputDetailRepository;
 import site.secmega.secapi.feature.size.SizeRepository;
 import site.secmega.secapi.feature.user.UserRepository;
-import site.secmega.secapi.feature.workOrder.dto.WorkOrderFilterRequest;
-import site.secmega.secapi.feature.workOrder.dto.WorkOrderLookupResponse;
-import site.secmega.secapi.feature.workOrder.dto.WorkOrderRequest;
-import site.secmega.secapi.feature.workOrder.dto.WorkOrderResponse;
-import site.secmega.secapi.feature.workOrderColor.dto.WorkOrderColorResponse;
-import site.secmega.secapi.feature.workOrderColorSize.dto.WorkOrderColorSizeResponse;
-import site.secmega.secapi.feature.workOrderDetail.WorkOrderDetailRepository;
+import site.secmega.secapi.feature.workOrder.dto.*;
 import site.secmega.secapi.mapper.WorkOrderMapper;
 import site.secmega.secapi.util.AuthUtil;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +36,41 @@ public class WorkOrderServiceImpl implements WorkOrderService{
     private final SizeRepository sizeRepository;
     private final AuthUtil authUtil;
     private final UserRepository userRepository;
+    private final OutputDetailRepository outputDetailRepository;
+
+    @Override
+    public void deleteWorkOrder(Long id) {
+        WorkOrder workOrder = workOrderRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Work Order Not found!")
+        );
+        workOrder.setDeletedAt(LocalDateTime.now());
+        workOrderRepository.save(workOrder);
+    }
+
+    @Override
+    public WorkOrderResponse updateWorkOrder(Long id, WorkOrderRequest workOrderRequest) {
+        WorkOrder workOrder = workOrderRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Work Order Not found!")
+        );
+
+        return null;
+    }
+
+    @Override
+    public WorkOrderStatResponse getWorkOrderStat(WorkOrderFilterRequest workOrderFilterRequest) {
+
+        long totalMO = workOrderRepository.countFirstBy();
+        long totalWorkOrderQty = workOrderRepository.sumWorkOrderQty();
+        long totalOutput = outputDetailRepository.sumGoodOutputQty();
+
+        return WorkOrderStatResponse.builder()
+                .totalMO(totalMO)
+                .totalWorkOrderQty(totalWorkOrderQty)
+                .totalOutput(totalOutput)
+                .totalBalance(totalWorkOrderQty - totalOutput)
+                .build();
+
+    }
 
     @Override
     public WorkOrderResponse createWorkOrder(WorkOrderRequest workOrderRequest) {
@@ -131,6 +161,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                             .startDate(w.getStartDate())
                             .endDate(w.getEndDate())
                             .status(w.getStatus())
+                            .image(w.getImage())
                             .build() ;
                 })
                 .toList();
