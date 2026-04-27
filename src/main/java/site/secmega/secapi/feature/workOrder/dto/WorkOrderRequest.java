@@ -9,6 +9,8 @@ import java.util.List;
 public record WorkOrderRequest(
         @NotBlank(message = "MO is required")
         String mo,
+        @NotBlank(message = "PO is required")
+        String po,
         @NotNull(message = "Quantity cannot be null")
         Integer qty,
         @NotNull(message = "Buyer ID cannot be null")

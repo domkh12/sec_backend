@@ -13,9 +13,12 @@ import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.base.WorkOrderStatus;
 import site.secmega.secapi.domain.*;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
+import site.secmega.secapi.feature.buyer.dto.BuyerLookupResponse;
 import site.secmega.secapi.feature.color.ColorRepository;
+import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
 import site.secmega.secapi.feature.outputDetail.OutputDetailRepository;
 import site.secmega.secapi.feature.size.SizeRepository;
+import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
 import site.secmega.secapi.feature.user.UserRepository;
 import site.secmega.secapi.feature.workOrder.dto.*;
 import site.secmega.secapi.mapper.WorkOrderMapper;
@@ -53,7 +56,31 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Work Order Not found!")
         );
 
-        return null;
+        if (workOrderRepository.existsByMoIgnoreCaseAndDeletedAtNullAndIdNot(workOrder.getMo(), id)){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Work order already exist!");
+        }
+
+        workOrderMapper.updateWorkOrder(workOrderRequest, workOrder);
+        if (workOrderRequest.buyerId() != null){
+            Buyer buyer = buyerRepository.findById(workOrderRequest.buyerId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Buyer not found!")
+            );
+            workOrder.setBuyer(buyer);
+        }
+
+        if (workOrderRequest.colorId() != null){
+            Color color = colorRepository.findById(workOrderRequest.colorId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Color not found!")
+            );
+            workOrder.setColor(color);
+        }
+
+        if (!workOrderRequest.sizeIds().isEmpty()){
+            List<Size> sizes = sizeRepository.findByIdIn(workOrderRequest.sizeIds());
+            workOrder.setSizes(sizes);
+        }
+        WorkOrder savedWO = workOrderRepository.save(workOrder);
+        return workOrderMapper.toWorkOrderResponse(savedWO);
     }
 
     @Override
@@ -147,22 +174,44 @@ public class WorkOrderServiceImpl implements WorkOrderService{
         return new PageImpl<>(toWorkOrderResponse(workOrders), pageRequest, workOrders.getTotalElements());
     }
 
-    private List<WorkOrderResponse> toWorkOrderResponse(Page<WorkOrder> workOrders){
-
+    private List<WorkOrderResponse> toWorkOrderResponse(Page<WorkOrder> workOrders) {
         return workOrders.stream()
-                .map(w ->{
-//                    List<ProcessingDetail> processingDetails = processingDetailRepository.findByWorkOrderDetails_WorkOrder_Mo(w.getMo());
+                .map(w -> {
+                    // Safe mapping for Buyer
+                    BuyerLookupResponse buyerResp = (w.getBuyer() != null) ?
+                            BuyerLookupResponse.builder()
+                            .id(w.getBuyer().getId())
+                            .name(w.getBuyer().getName())
+                            .build() : null;
+
+                    // Safe mapping for Color (This is where your crash is)
+                    ColorLookupResponse colorResp = (w.getColor() != null) ?
+                            ColorLookupResponse.builder()
+                            .id(w.getColor().getId())
+                            .color(w.getColor().getColor())
+                            .build() : null;
+
+                    // Safe mapping for Sizes
+                    List<SizeLookupResponse> sizeResps = (w.getSizes() != null) ?
+                            w.getSizes().stream().map(size -> SizeLookupResponse.builder()
+                                                              .id(size.getId())
+                                                              .size(size.getSize())
+                                                              .build()).toList() : List.of();
+
                     return WorkOrderResponse.builder()
                             .id(w.getId())
                             .mo(w.getMo())
+                            .po(w.getPo())
                             .style(w.getStyle())
-                            .buyer(w.getBuyer().getName())
+                            .buyer(buyerResp)
+                            .color(colorResp)
+                            .sizes(sizeResps)
                             .qty(w.getQty())
                             .startDate(w.getStartDate())
                             .endDate(w.getEndDate())
                             .status(w.getStatus())
                             .image(w.getImage())
-                            .build() ;
+                            .build();
                 })
                 .toList();
     }

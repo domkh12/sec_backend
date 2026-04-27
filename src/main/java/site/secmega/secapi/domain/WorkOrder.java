@@ -22,6 +22,9 @@ public class WorkOrder extends BaseEntity{
     private Long id;
     @Column(nullable = false)
     private String mo;
+    @Column(nullable = false)
+    private String po;
+    @Column(nullable = false)
     private String style;
     @Column(nullable = false)
     private Integer qty;
