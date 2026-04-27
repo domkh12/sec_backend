@@ -16,6 +16,8 @@ public record ProfileResponse(
         @JsonFormat(pattern = "dd/MMM/yyyy")
         LocalDate dateOfBirth,
         String role,
-        String avatar
+        String avatar,
+        String nameEn,
+        String nameKh
 ) {
 }

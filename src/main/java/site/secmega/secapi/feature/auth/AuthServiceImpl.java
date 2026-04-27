@@ -112,6 +112,8 @@ public class AuthServiceImpl implements AuthService{
                 .phoneNumber(user.getPhoneNumber())
                 .avatar(user.getAvatar())
                 .role(user.getRoles().stream().findFirst().orElseThrow().getName())
+                .nameEn(user.getNameEn())
+                .nameKh(user.getNameKh())
                 .build();
     }
 
