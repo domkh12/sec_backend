@@ -4,5 +4,6 @@ public enum WorkOrderStatus {
     NEW,
     COMPELLED,
     DELAYED,
-    ACTIVE
+    ACTIVE,
+    PENDING
 }

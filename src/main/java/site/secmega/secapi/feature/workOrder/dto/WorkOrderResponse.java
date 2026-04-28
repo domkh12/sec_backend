@@ -18,6 +18,8 @@ public record WorkOrderResponse(
         String po,
         String style,
         Integer qty,
+        Integer output,
+        Integer balance,
         BuyerLookupResponse buyer,
         List<SizeLookupResponse> sizes,
         ColorLookupResponse color,

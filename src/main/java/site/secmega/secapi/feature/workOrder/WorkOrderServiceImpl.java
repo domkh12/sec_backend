@@ -127,7 +127,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
            workOrder.setSizes(sizes);
         }
 
-        workOrder.setStatus(WorkOrderStatus.NEW);
+        workOrder.setStatus(WorkOrderStatus.PENDING);
         workOrder.setOrderFollower(user.getNameEn());
         WorkOrder savedWorkOrder = workOrderRepository.save(workOrder);
 
@@ -197,6 +197,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                                                               .id(size.getId())
                                                               .size(size.getSize())
                                                               .build()).toList() : List.of();
+                    Integer output = outputDetailRepository.sumGoodQtyByWorkOrder_Id(w.getId());
 
                     return WorkOrderResponse.builder()
                             .id(w.getId())
@@ -211,6 +212,8 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                             .endDate(w.getEndDate())
                             .status(w.getStatus())
                             .image(w.getImage())
+                            .output(output)
+                            .balance(w.getQty() - output)
                             .build();
                 })
                 .toList();
