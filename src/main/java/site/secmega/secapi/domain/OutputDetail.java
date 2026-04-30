@@ -46,4 +46,7 @@ public class OutputDetail extends BaseEntity{
             inverseJoinColumns = @JoinColumn(name = "defect_type_id", referencedColumnName = "id")
     )
     private List<DefectType> defectTypes;
+
+    @ManyToOne
+    private Time time;
 }

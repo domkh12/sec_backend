@@ -24,6 +24,8 @@
 		<field name="code" class="java.lang.String"/>
 		<field name="name" class="java.lang.String"/>
 		<field name="unit" class="java.lang.String"/>
+		<field name="size" class="java.lang.String"/>
+		<field name="color" class="java.lang.String"/>
 		<field name="balance" class="java.lang.Double"/>
 	</dataset>
 	<parameter name="CollectionBeanParam" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
@@ -42,7 +44,7 @@
 							</element>
 						</columnHeader>
 						<detailCell height="35" style="Table_TD">
-							<element kind="textField" uuid="a1b2c3d4-0000-0000-0000-000000000012" x="0" y="0" width="80" height="35" hTextAlign="Center" vTextAlign="Middle">
+							<element kind="textField" uuid="a1b2c3d4-0000-0000-0000-000000000012" x="0" y="0" width="80" height="35" linkType="None" linkTarget="Self" hTextAlign="Center" vTextAlign="Middle">
 								<expression><![CDATA[$F{id}]]></expression>
 							</element>
 						</detailCell>
@@ -80,6 +82,30 @@
 						<detailCell height="35" style="Table_TD">
 							<element kind="textField" uuid="a1b2c3d4-0000-0000-0000-000000000042" x="0" y="0" width="150" height="35" hTextAlign="Center" vTextAlign="Middle">
 								<expression><![CDATA[$F{unit}]]></expression>
+							</element>
+						</detailCell>
+					</column>
+					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000040" width="150">
+						<columnHeader height="35" rowSpan="1" style="Table_CH">
+							<element kind="staticText" uuid="a1b2c3d4-0000-0000-0000-000000000041" x="0" y="0" width="150" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<text><![CDATA[Size]]></text>
+							</element>
+						</columnHeader>
+						<detailCell height="35" style="Table_TD">
+							<element kind="textField" uuid="a1b2c3d4-0000-0000-0000-000000000042" x="0" y="0" width="150" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<expression><![CDATA[$F{size}]]></expression>
+							</element>
+						</detailCell>
+					</column>
+					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000040" width="150">
+						<columnHeader height="35" rowSpan="1" style="Table_CH">
+							<element kind="staticText" uuid="a1b2c3d4-0000-0000-0000-000000000041" x="0" y="0" width="150" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<text><![CDATA[Color]]></text>
+							</element>
+						</columnHeader>
+						<detailCell height="35" style="Table_TD">
+							<element kind="textField" uuid="a1b2c3d4-0000-0000-0000-000000000042" x="0" y="0" width="150" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<expression><![CDATA[$F{color}]]></expression>
 							</element>
 						</detailCell>
 					</column>
