@@ -25,6 +25,8 @@ public class Department extends BaseEntity{
     private Long id;
     @Column(nullable = false)
     private String department;
+    @Column(nullable = false)
+    private Integer processNo;
     private DepartmentStatus status;
 
     /**

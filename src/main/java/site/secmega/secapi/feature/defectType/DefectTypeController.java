@@ -7,8 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import site.secmega.secapi.feature.defectType.dto.DefectTypeFilterRequest;
+import site.secmega.secapi.feature.defectType.dto.DefectTypeLookupResponse;
 import site.secmega.secapi.feature.defectType.dto.DefectTypeRequest;
 import site.secmega.secapi.feature.defectType.dto.DefectTypeResponse;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/defect-types")
@@ -16,6 +19,13 @@ import site.secmega.secapi.feature.defectType.dto.DefectTypeResponse;
 public class DefectTypeController {
 
     private final DefectTypeService defectTypeService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @GetMapping("/lookup")
+    @ResponseStatus(HttpStatus.OK)
+    List<DefectTypeLookupResponse> getDefectTypeLookup(){
+        return defectTypeService.getDefectTypeLookup();
+    }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")

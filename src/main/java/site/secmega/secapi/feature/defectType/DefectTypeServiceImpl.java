@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.DefectType;
 import site.secmega.secapi.feature.defectType.dto.DefectTypeFilterRequest;
+import site.secmega.secapi.feature.defectType.dto.DefectTypeLookupResponse;
 import site.secmega.secapi.feature.defectType.dto.DefectTypeRequest;
 import site.secmega.secapi.feature.defectType.dto.DefectTypeResponse;
 import site.secmega.secapi.mapper.DefectTypeMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +24,13 @@ public class DefectTypeServiceImpl implements DefectTypeService{
 
     private final DefectTypeRepository defectTypeRepository;
     private final DefectTypeMapper defectTypeMapper;
+
+    @Override
+    public List<DefectTypeLookupResponse> getDefectTypeLookup() {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        List<DefectType> defectTypes = defectTypeRepository.findAll(sort);
+        return defectTypes.stream().map(defectTypeMapper::toDefectTypeLookupResponse).toList();
+    }
 
     @Override
     public Page<DefectTypeResponse> findAll(DefectTypeFilterRequest defectTypeFilterRequest) {

@@ -19,6 +19,20 @@ public class ProductionLineController {
     private final ProductionLineService productionLineService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @GetMapping("/department")
+    @ResponseStatus(HttpStatus.OK)
+    List<ProductionLineLookupResponse> getProductionLineByDeptNo(@RequestParam Integer processNo){
+        return productionLineService.getProductionLineByDeptNo(processNo);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @GetMapping("/department/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    List<ProductionLineLookupResponse> getProductionLineByDept(@PathVariable Long id){
+        return productionLineService.getProductionLineByDept(id);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @GetMapping("/lookup")
     @ResponseStatus(HttpStatus.OK)
     List<ProductionLineLookupResponse> getProductionLineLookup(){

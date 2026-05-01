@@ -21,9 +21,10 @@ public class TimeServiceImpl implements TimeService{
     public TimeResponse createTime(TimeRequest timeRequest) {
 
         Time time = timeMapper.fromTimeRequest(timeRequest);
-        timeRepository.save(time);
-//        return timeMapper.t;
-        return null;
+        Time savedTime = timeRepository.save(time);
+
+        return timeMapper.toTimeResponse(savedTime);
+
     }
 
     @Override

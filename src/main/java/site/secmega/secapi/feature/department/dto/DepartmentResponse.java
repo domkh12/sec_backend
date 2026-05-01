@@ -15,6 +15,7 @@ public record DepartmentResponse(
         @JsonFormat(pattern = "dd/MMM/yyyy hh:mma")
         LocalDateTime createdAt,
         @JsonFormat(pattern = "dd/MMM/yyyy hh:mma")
-        LocalDateTime updatedAt
+        LocalDateTime updatedAt,
+        Integer processNo
 ) {
 }

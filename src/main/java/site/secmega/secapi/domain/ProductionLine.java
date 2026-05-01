@@ -26,6 +26,8 @@ public class ProductionLine extends BaseEntity{
     @Column(nullable = false)
     private String line;
     @Column(nullable = false)
+    private Boolean isInput;
+    @Column(nullable = false)
     private ProductionLineStatus status;
     private String image;
 

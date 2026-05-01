@@ -6,6 +6,10 @@ import site.secmega.secapi.feature.productionLine.dto.*;
 import java.util.List;
 
 public interface ProductionLineService {
+    List<ProductionLineLookupResponse> getProductionLineByDeptNo(Integer processNo);
+
+    List<ProductionLineLookupResponse> getProductionLineByDept(Long id);
+
     void deleteProductionLine(Long id);
 
     ProductionLineResponse updateProductionLine(Long id, ProductionLineRequest productionLineRequest);

@@ -10,16 +10,16 @@ import site.secmega.secapi.base.UserStatus;
 import site.secmega.secapi.domain.*;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
 import site.secmega.secapi.feature.color.ColorRepository;
+import site.secmega.secapi.feature.defectType.DefectTypeRepository;
 import site.secmega.secapi.feature.department.DepartmentRepository;
-import site.secmega.secapi.feature.operation.OperationRepository;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.role.RoleRepository;
 import site.secmega.secapi.feature.size.SizeRepository;
+import site.secmega.secapi.feature.time.TimeRepository;
 import site.secmega.secapi.feature.tv.TvRepository;
 import site.secmega.secapi.feature.user.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -36,12 +36,14 @@ public class initData {
     private final ColorRepository colorRepository;
     private final DepartmentRepository departmentRepository;
     private final ProductionLineRepository productionLineRepository;
-    private final OperationRepository operationRepository;
+    private final DefectTypeRepository defectTypeRepository;
     private final BuyerRepository buyerRepository;
+    private final TimeRepository timeRepository;
 
     @PostConstruct
     public void init(){
         try {
+            initDefectTypeData();
             initDepartment();
             initProductionLine();
             initBuyer();
@@ -50,9 +52,80 @@ public class initData {
             initTv();
             initSize();
             initColor();
+            initTimeData();
         } catch (Exception e) {
             System.err.println("Error during initializations: " + e.getMessage());
             e.printStackTrace();
+        }
+    }
+
+    private void initDefectTypeData(){
+        DefectType defectType1 = new DefectType();
+        defectType1.setName("ថ្នេរធ្លាក់ទឹក/ 1/6 Drop Stitches");
+        defectTypeRepository.save(defectType1);
+        DefectType defectType2 = new DefectType();
+        defectType2.setName("ថ្នេរជ្រួញ/ Puckering");
+        defectTypeRepository.save(defectType2);
+        DefectType defectType3 = new DefectType();
+        defectType3.setName("រមូល/ Twisted");
+        defectTypeRepository.save(defectType3);
+        DefectType defectType4 = new DefectType();
+        defectType4.setName("លោតអំបោះ/ Skip Stitches");
+        defectTypeRepository.save(defectType4);
+        DefectType defectType5 = new DefectType();
+        defectType5.setName("ដាច់ថ្នេរ/ Broken");
+        defectTypeRepository.save(defectType5);
+        DefectType defectType6 = new DefectType();
+        defectType6.setName("ថ្នេរបើក/ Open Seam");
+        defectTypeRepository.save(defectType6);
+        DefectType defectType7 = new DefectType();
+        defectType7.setName("ដេរគៀប/ Pleated");
+        defectTypeRepository.save(defectType7);
+        DefectType defectType8 = new DefectType();
+        defectType8.setName("ខ្ពស់ ទាប/ High/Low");
+        defectTypeRepository.save(defectType8);
+        DefectType defectType9 = new DefectType();
+        defectType9.setName("រលក/ Wavy");
+        defectTypeRepository.save(defectType9);
+        DefectType defectType10 = new DefectType();
+        defectType10.setName("ថ្នេរតឹង/ Tight Tension");
+        defectTypeRepository.save(defectType10);
+        DefectType defectType11 = new DefectType();
+        defectType11.setName("អត់ជាប់/ Unsecured");
+        defectTypeRepository.save(defectType11);
+        DefectType defectType12 = new DefectType();
+        defectType12.setName("ខុសសេរី/ Wrong Size Label");
+        defectTypeRepository.save(defectType12);
+        DefectType defectType13 = new DefectType();
+        defectType13.setName("ដេរផ្លាកវៀច/ Att. label slanted");
+        defectTypeRepository.save(defectType13);
+        DefectType defectType14 = new DefectType();
+        defectType14.setName("សល់ជាយក្រណាត់/ Raw Edge Bottom Hem");
+        defectTypeRepository.save(defectType14);
+        DefectType defectType15 = new DefectType();
+        defectType15.setName("ធ្លុះ/ Hole Damage");
+        defectTypeRepository.save(defectType15);
+        DefectType defectType16 = new DefectType();
+        defectType16.setName("ប្រឡាក់ដី ប្រេង/ Dirt Stain / Oil Stain");
+        defectTypeRepository.save(defectType16);
+        DefectType defectType17 = new DefectType();
+        defectType17.setName("ខុសពណ៌/ Off Shade");
+        defectTypeRepository.save(defectType17);
+        DefectType defectType18 = new DefectType();
+        defectType18.setName("អត់កាត់អំបោះ/ Untrimmnd Thread");
+        defectTypeRepository.save(defectType18);
+        DefectType defectType19 = new DefectType();
+        defectType19.setName("កំហុសផ្សេងៗ/ Other");
+        defectTypeRepository.save(defectType19);
+    }
+
+    private void initTimeData() {
+        for (int i = 7; i <= 18; i++) {
+            if (i == 12) continue; // skip 12:00
+
+            Time time = new Time();
+            time.setName(String.format("%02d:00", i));
+            timeRepository.save(time);
         }
     }
 
@@ -65,22 +138,27 @@ public class initData {
     private void initDepartment(){
         Department cutting = new Department();
         cutting.setDepartment("Cutting");
+        cutting.setProcessNo(1);
         cutting.setStatus(DepartmentStatus.Inactive);
         departmentRepository.save(cutting);
         Department sewing = new Department();
         sewing.setDepartment("Sewing");
+        sewing.setProcessNo(2);
         sewing.setStatus(DepartmentStatus.Inactive);
         departmentRepository.save(sewing);
         Department ironing = new Department();
         ironing.setDepartment("Ironing");
+        ironing.setProcessNo(3);
         ironing.setStatus(DepartmentStatus.Inactive);
         departmentRepository.save(ironing);
         Department qc = new Department();
         qc.setDepartment("QC");
+        qc.setProcessNo(4);
         qc.setStatus(DepartmentStatus.Inactive);
         departmentRepository.save(qc);
         Department packing = new Department();
         packing.setDepartment("Packing");
+        packing.setProcessNo(5);
         packing.setStatus(DepartmentStatus.Inactive);
         departmentRepository.save(packing);
     }
@@ -88,61 +166,73 @@ public class initData {
     private void initProductionLine(){
         ProductionLine cutting = new ProductionLine();
         cutting.setLine("Cutting-L");
+        cutting.setIsInput(true);
         cutting.setStatus(ProductionLineStatus.inactive);
         cutting.setDepartment(departmentRepository.findById(1L).orElseThrow());
         productionLineRepository.save(cutting);
         ProductionLine sewingL1 = new ProductionLine();
         sewingL1.setLine("Sewing-L1");
         sewingL1.setStatus(ProductionLineStatus.inactive);
+        sewingL1.setIsInput(false);
         sewingL1.setDepartment(departmentRepository.findById(2L).orElseThrow());
         productionLineRepository.save(sewingL1);
         ProductionLine sewingL2 = new ProductionLine();
         sewingL2.setLine("Sewing-L2");
+        sewingL2.setIsInput(false);
         sewingL2.setStatus(ProductionLineStatus.inactive);
         sewingL2.setDepartment(departmentRepository.findById(2L).orElseThrow());
         productionLineRepository.save(sewingL2);
         ProductionLine sewingL3 = new ProductionLine();
         sewingL3.setLine("Sewing-L3");
+        sewingL3.setIsInput(false);
         sewingL3.setStatus(ProductionLineStatus.inactive);
         sewingL3.setDepartment(departmentRepository.findById(2L).orElseThrow());
         productionLineRepository.save(sewingL3);
         ProductionLine sewingL4 = new ProductionLine();
         sewingL4.setLine("Sewing-L4");
+        sewingL4.setIsInput(false);
         sewingL4.setStatus(ProductionLineStatus.inactive);
         sewingL4.setDepartment(departmentRepository.findById(2L).orElseThrow());
         productionLineRepository.save(sewingL4);
         ProductionLine sewingL5 = new ProductionLine();
         sewingL5.setLine("Sewing-L5");
+        sewingL5.setIsInput(false);
         sewingL5.setStatus(ProductionLineStatus.inactive);
         sewingL5.setDepartment(departmentRepository.findById(2L).orElseThrow());
         productionLineRepository.save(sewingL5);
         ProductionLine sewingL6 = new ProductionLine();
         sewingL6.setLine("Sewing-L6");
+        sewingL6.setIsInput(false);
         sewingL6.setStatus(ProductionLineStatus.inactive);
         sewingL6.setDepartment(departmentRepository.findById(2L).orElseThrow());
         productionLineRepository.save(sewingL6);
         ProductionLine sewingL7 = new ProductionLine();
         sewingL7.setLine("Sewing-L7");
+        sewingL7.setIsInput(false);
         sewingL7.setStatus(ProductionLineStatus.inactive);
         sewingL7.setDepartment(departmentRepository.findById(2L).orElseThrow());
         productionLineRepository.save(sewingL7);
         ProductionLine sewingL8 = new ProductionLine();
         sewingL8.setLine("Sewing-L8");
+        sewingL8.setIsInput(false);
         sewingL8.setStatus(ProductionLineStatus.inactive);
         sewingL8.setDepartment(departmentRepository.findById(2L).orElseThrow());
         productionLineRepository.save(sewingL8);
         ProductionLine ironing = new ProductionLine();
         ironing.setLine("Ironing");
+        ironing.setIsInput(false);
         ironing.setStatus(ProductionLineStatus.inactive);
         ironing.setDepartment(departmentRepository.findById(3L).orElseThrow());
         productionLineRepository.save(ironing);
         ProductionLine qc = new ProductionLine();
         qc.setLine("QC");
+        qc.setIsInput(false);
         qc.setStatus(ProductionLineStatus.inactive);
         qc.setDepartment(departmentRepository.findById(4L).orElseThrow());
         productionLineRepository.save(qc);
         ProductionLine packing = new ProductionLine();
         packing.setLine("Packing");
+        packing.setIsInput(false);
         packing.setStatus(ProductionLineStatus.inactive);
         packing.setDepartment(departmentRepository.findById(5L).orElseThrow());
         productionLineRepository.save(packing);
