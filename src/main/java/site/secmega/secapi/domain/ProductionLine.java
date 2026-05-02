@@ -26,8 +26,6 @@ public class ProductionLine extends BaseEntity{
     @Column(nullable = false)
     private String line;
     @Column(nullable = false)
-    private Boolean isInput;
-    @Column(nullable = false)
     private ProductionLineStatus status;
     private String image;
 
@@ -43,9 +41,15 @@ public class ProductionLine extends BaseEntity{
     @OneToMany(mappedBy = "productionLine")
     private List<CuttingDetail> cuttingDetails;
 
-    @OneToMany(mappedBy = "productionLine")
+    @OneToMany(mappedBy = "fromLine")
     private List<OutputDetail> outputDetails;
+
+    @OneToMany(mappedBy = "toLine")
+    private List<OutputDetail> receivedDetails;
 
     @OneToMany(mappedBy = "productionLine")
     private List<Bundle> bundles;
+
+    @OneToMany(mappedBy = "productionLine")
+    private List<DefectDetail> defectDetails;
 }

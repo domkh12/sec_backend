@@ -61,4 +61,7 @@ public class WorkOrder extends BaseEntity{
     @OneToMany(mappedBy = "workOrder")
     private List<Bundle> bundles;
 
+    @OneToMany(mappedBy = "workOrder")
+    private List<DefectDetail> defectDetails;
+
 }

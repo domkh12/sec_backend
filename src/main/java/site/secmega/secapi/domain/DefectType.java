@@ -27,7 +27,8 @@ public class DefectType extends BaseEntity{
     /**
      * Relationship
      * */
-    @ManyToMany(mappedBy = "defectTypes")
-    private List<OutputDetail> outputDetails;
+
+    @OneToMany(mappedBy = "defectType")
+    private List<DefectDetail> defectDetails;
 
 }

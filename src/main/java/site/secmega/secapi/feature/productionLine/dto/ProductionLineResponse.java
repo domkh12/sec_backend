@@ -12,7 +12,6 @@ public record ProductionLineResponse(
         Integer target,
         Integer actual,
         Double efficiency,
-        String image,
-        Boolean isInput
+        String image
 ) {
 }

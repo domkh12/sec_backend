@@ -6,41 +6,30 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDate;
-
 @Entity
-@Table(name = "output_details")
+@Table(name = "defect_details")
 @Getter
 @Setter
 @NoArgsConstructor
 @SQLRestriction("deleted_at IS NULL")
-public class OutputDetail extends BaseEntity{
+public class DefectDetail extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-    private Integer goodQty;
-    @Column(nullable = false)
-    private LocalDate outputDate;
+    private Integer defectQty;
 
     /**
      * Relationship
      * */
     @ManyToOne
-    private Bundle bundle;
+    private Time time;
 
     @ManyToOne
-    private Size size;
+    private DefectType defectType;
 
     @ManyToOne
     private WorkOrder workOrder;
 
     @ManyToOne
-    private ProductionLine fromLine;
-
-    @ManyToOne
-    private Time time;
-
-    @ManyToOne
-    private ProductionLine toLine;
+    private ProductionLine productionLine;
 }

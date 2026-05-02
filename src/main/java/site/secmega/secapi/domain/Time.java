@@ -25,4 +25,7 @@ public class Time extends BaseEntity{
      * */
     @OneToMany(mappedBy = "time")
     List<OutputDetail> outputDetails;
+
+    @OneToMany(mappedBy = "time")
+    List<DefectDetail> defectDetails;
 }

@@ -6,7 +6,6 @@ public record ProductionLineRequest(
         String line,
         @NotNull(message = "Department ID cannot be null")
         Long deptId,
-        String image,
-        Boolean isInput
+        String image
 ) {
 }

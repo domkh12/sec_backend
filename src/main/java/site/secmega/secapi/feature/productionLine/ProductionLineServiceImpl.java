@@ -84,7 +84,6 @@ public class ProductionLineServiceImpl implements ProductionLineService{
 
         ProductionLine productionLine = productionLineMapper.fromProductionLineRequest(productionLineRequest);
         productionLine.setDepartment(dept);
-        productionLine.setIsInput(productionLineRequest.isInput());
         productionLine.setCreatedAt(LocalDateTime.now());
         productionLine.setUpdatedAt(LocalDateTime.now());
         productionLine.setStatus(ProductionLineStatus.inactive);
@@ -97,7 +96,6 @@ public class ProductionLineServiceImpl implements ProductionLineService{
                                     .image(savedProductionLine.getImage())
                                     .dept(savedProductionLine.getDepartment().getDepartment())
                                     .deptId(savedProductionLine.getDepartment().getId())
-                                    .isInput(savedProductionLine.getIsInput())
                                     .build();
     }
 
@@ -134,7 +132,6 @@ public class ProductionLineServiceImpl implements ProductionLineService{
                 .workers(productionLine.getUsers().size())
                 .dept(productionLine.getDepartment().getDepartment())
                 .deptId(productionLine.getDepartment().getId())
-                .isInput(productionLine.getIsInput())
                 .build()
         );
     }
