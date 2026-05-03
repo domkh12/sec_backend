@@ -120,11 +120,14 @@ public class initData {
     }
 
     private void initTimeData() {
-        for (int i = 7; i <= 18; i++) {
-            if (i == 12) continue; // skip 12:00
+        for (int i = 7; i < 18; i++) {
+            if (i == 11) continue;
 
             Time time = new Time();
-            time.setName(String.format("%02d:00", i));
+            String from = String.format("%02d:00", i);
+            String to = String.format("%02d:00", i + 1);
+
+            time.setName(from + "-" + to);
             timeRepository.save(time);
         }
     }
