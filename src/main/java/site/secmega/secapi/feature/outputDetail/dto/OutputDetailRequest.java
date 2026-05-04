@@ -7,8 +7,10 @@ public record OutputDetailRequest(
         Long timeId,
         @NotNull(message = "Size cannot be null")
         Long sizeId,
-        @NotNull(message = "Line cannot be null")
-        Long lineId,
+        @NotNull(message = "From Line cannot be null")
+        Long fromLineId,
+        @NotNull(message = "To Line cannot be null")
+        Long toLineId,
         String mo,
         Integer goodQty
 

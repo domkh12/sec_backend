@@ -43,10 +43,15 @@ public class OutputDetailServiceImpl implements OutputDetailService{
             );
             outputDetail.setWorkOrder(workOrder);
 
-            ProductionLine productionLine = productionLineRepository.findById(od.lineId()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Production line not found!")
+            ProductionLine fromLine = productionLineRepository.findById(od.fromLineId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "From Line not found!")
             );
-//            outputDetail.setProductionLine(productionLine);
+            outputDetail.setFromLine(fromLine);
+
+            ProductionLine toLine = productionLineRepository.findById(od.toLineId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "To Line not found!")
+            );
+            outputDetail.setToLine(toLine);
 
             Size size = sizeRepository.findById(od.sizeId()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Size not found")
