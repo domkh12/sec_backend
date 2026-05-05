@@ -80,7 +80,8 @@ public class WorkOrderServiceImpl implements WorkOrderService{
             workOrder.setSizes(sizes);
         }
         WorkOrder savedWO = workOrderRepository.save(workOrder);
-        return workOrderMapper.toWorkOrderResponse(savedWO);
+//        return workOrderMapper.toWorkOrderResponse(savedWO);
+        return null;
     }
 
     @Override
@@ -131,7 +132,8 @@ public class WorkOrderServiceImpl implements WorkOrderService{
         workOrder.setOrderFollower(user.getNameEn());
         WorkOrder savedWorkOrder = workOrderRepository.save(workOrder);
 
-        return workOrderMapper.toWorkOrderResponse(savedWorkOrder);
+//        return toWorkOrderResponse(savedWorkOrder);
+        return null;
     }
 
     @Override
@@ -149,7 +151,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
         WorkOrder workOrder = workOrderRepository.findByMo(mo).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Work order not found!")
         );
-        return ResponseEntity.ok(Map.of("style", workOrder.getStyle()));
+        return ResponseEntity.ok(Map.of("style", workOrder.getStyle().getStyleNo()));
     }
 
     @Override
@@ -203,7 +205,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                             .id(w.getId())
                             .mo(w.getMo())
                             .po(w.getPo())
-                            .style(w.getStyle())
+                            .style(w.getStyle().getStyleNo())
                             .buyer(buyerResp)
                             .color(colorResp)
                             .sizes(sizeResps)

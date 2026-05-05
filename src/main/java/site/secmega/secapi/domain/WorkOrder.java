@@ -25,8 +25,6 @@ public class WorkOrder extends BaseEntity{
     @Column(nullable = false)
     private String po;
     @Column(nullable = false)
-    private String style;
-    @Column(nullable = false)
     private Integer qty;
     @Column(nullable = false)
     private WorkOrderStatus status;
@@ -44,7 +42,7 @@ public class WorkOrder extends BaseEntity{
     private Color color;
 
     @ManyToOne
-    private Product product;
+    private Style style;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(joinColumns = @JoinColumn(name = "wo_id", referencedColumnName = "id"),
@@ -54,9 +52,6 @@ public class WorkOrder extends BaseEntity{
 
     @OneToMany(mappedBy = "workOrder")
     private List<OutputDetail> outputDetails;
-
-    @OneToMany(mappedBy = "workOrder")
-    private List<CuttingDetail> cuttingDetails;
 
     @OneToMany(mappedBy = "workOrder")
     private List<Bundle> bundles;

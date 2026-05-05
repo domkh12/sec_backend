@@ -16,7 +16,7 @@ public record WorkOrderRequest(
         @NotNull(message = "Buyer ID cannot be null")
         Long buyerId,
         @NotBlank(message = "Style is required")
-        String style,
+        String styleId,
         @NotNull(message = "Product ID cannot be null")
         Long colorId,
         @NotNull(message = "Size ID cannot be null")

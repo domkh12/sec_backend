@@ -5,31 +5,33 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
+import site.secmega.secapi.base.StyleStatus;
 
 import java.util.List;
 
 @Entity
-@Table(name = "sizes")
+@Table(name = "styles")
 @Getter
 @Setter
 @NoArgsConstructor
 @SQLRestriction("deleted_at IS NULL")
-public class Size extends BaseEntity{
+public class Style extends BaseEntity{
+    /**
+     * Field
+     * */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false)
-    private String size;
+    private String styleNo;
+    private String description;
+    private StyleStatus status;
 
     /**
      * Relationship
      * */
-    @ManyToMany(mappedBy = "sizes")
+    @OneToMany(mappedBy = "style")
+    private List<PurchaseOrder> purchaseOrders;
+    @OneToMany(mappedBy = "style")
     private List<WorkOrder> workOrders;
-
-    @OneToMany(mappedBy = "size")
-    private List<OutputDetail> outputDetails;
-
-    @OneToMany(mappedBy = "size")
-    private List<Bundle> bundles;
 }

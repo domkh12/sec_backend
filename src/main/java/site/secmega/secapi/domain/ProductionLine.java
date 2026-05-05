@@ -38,9 +38,6 @@ public class ProductionLine extends BaseEntity{
     @OneToMany(mappedBy = "productionLine")
     private List<User> users;
 
-    @OneToMany(mappedBy = "productionLine")
-    private List<CuttingDetail> cuttingDetails;
-
     @OneToMany(mappedBy = "fromLine")
     private List<OutputDetail> outputDetails;
 
