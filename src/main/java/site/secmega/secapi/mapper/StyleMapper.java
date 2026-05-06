@@ -2,6 +2,7 @@ package site.secmega.secapi.mapper;
 
 import org.mapstruct.*;
 import site.secmega.secapi.domain.Style;
+import site.secmega.secapi.feature.style.dto.StyleLookupResponse;
 import site.secmega.secapi.feature.style.dto.StyleRequest;
 import site.secmega.secapi.feature.style.dto.StyleResponse;
 
@@ -10,5 +11,8 @@ public interface StyleMapper {
 
     Style formStyleRequest(StyleRequest styleRequest);
     StyleResponse toStyleResponse(Style style);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
+    void updateFromStyleRequest(StyleRequest styleRequest,@MappingTarget Style style);
+    StyleLookupResponse toStyleLookupResponse(Style style);
 
 }

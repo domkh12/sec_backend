@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
+import site.secmega.secapi.base.POStatus;
+
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "purchase_orders")
@@ -16,8 +19,14 @@ public class PurchaseOrder extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
+    @Column(nullable = false, unique = true)
+    private String po;
+    @Column(nullable = false)
     private Integer qty;
+    @Column(nullable = false)
+    private LocalDate shipmentDate;
+    @Column(nullable = false)
+    private POStatus status;
 
     /**
      * Relationship

@@ -7,10 +7,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.RequiredArgsConstructor;
-import site.secmega.secapi.feature.style.dto.StyleFilterRequest;
-import site.secmega.secapi.feature.style.dto.StyleRequest;
-import site.secmega.secapi.feature.style.dto.StyleResponse;
-import site.secmega.secapi.feature.style.dto.StyleStateResponse;
+import site.secmega.secapi.feature.style.dto.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/styles")
@@ -18,6 +17,14 @@ import site.secmega.secapi.feature.style.dto.StyleStateResponse;
 public class StyleController {
 
     private final StyleService styleService;
+
+
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @GetMapping("/lookup")
+    @ResponseStatus(HttpStatus.OK)
+    List<StyleLookupResponse> getStyleLookup(){
+        return styleService.getStyleLookup();
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @GetMapping("/stats")

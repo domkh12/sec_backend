@@ -12,10 +12,7 @@ import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.base.StyleStatus;
 import site.secmega.secapi.domain.*;
 import site.secmega.secapi.feature.color.ColorRepository;
-import site.secmega.secapi.feature.style.dto.StyleFilterRequest;
-import site.secmega.secapi.feature.style.dto.StyleRequest;
-import site.secmega.secapi.feature.style.dto.StyleResponse;
-import site.secmega.secapi.feature.style.dto.StyleStateResponse;
+import site.secmega.secapi.feature.style.dto.*;
 import site.secmega.secapi.feature.size.SizeRepository;
 import site.secmega.secapi.mapper.StyleMapper;
 
@@ -29,6 +26,14 @@ public class StyleServiceImpl implements StyleService {
 
     private final StyleRepository styleRepository;
     private final StyleMapper styleMapper;
+
+    @Override
+    public List<StyleLookupResponse> getStyleLookup() {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        List<Style> styles = styleRepository.findAll(sort);
+
+        return styles.stream().map(styleMapper::toStyleLookupResponse).toList();
+    }
 
     @Override
     public void deleteStyle(Long id) {
@@ -57,10 +62,10 @@ public class StyleServiceImpl implements StyleService {
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Style not found")
         );
 
+        styleMapper.updateFromStyleRequest(styleRequest, style);
         style.setUpdatedAt(LocalDateTime.now());
         Style updatedStyle = styleRepository.save(style);
-//        return styleMapper.toStyleResponse(updatedStyle);
-        return null;
+        return styleMapper.toStyleResponse(updatedStyle);
     }
 
     @Override
@@ -71,6 +76,7 @@ public class StyleServiceImpl implements StyleService {
         }
 
         Style style = styleMapper.formStyleRequest(styleRequest);
+        style.setStatus(StyleStatus.Draft);
         Style savedStyle = styleRepository.save(style);
 
         return styleMapper.toStyleResponse(savedStyle);
@@ -99,31 +105,9 @@ public class StyleServiceImpl implements StyleService {
             );
         }
 
-        if (styleFilterRequest.sizeId() != null){
-            spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("sizes").get("id"), styleFilterRequest.sizeId())
-            );
-        }
-
-        if (styleFilterRequest.colorId() != null){
-            spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("styleColors").get("color").get("id"), styleFilterRequest.colorId())
-            );
-        }
-
-        if (styleFilterRequest.subCategoryId() != null){
-            spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("subCategory").get("id"), styleFilterRequest.subCategoryId())
-            );
-        }
-
-//        Style style = new Style();
-//        style.getStyleColors().forEach(pc -> log.info(String.valueOf(pc.getColor())));
-
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         PageRequest pageRequest = PageRequest.of(styleFilterRequest.pageNo() - 1, styleFilterRequest.pageSize(), sort);
         Page<Style> styles = styleRepository.findAll(spec, pageRequest);
-//        return styles.map(styleMapper::toStyleResponse);
-        return null;
+        return styles.map(styleMapper::toStyleResponse);
     }
 }
