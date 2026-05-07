@@ -61,12 +61,6 @@ public class WorkOrderServiceImpl implements WorkOrderService{
         }
 
         workOrderMapper.updateWorkOrder(workOrderRequest, workOrder);
-        if (workOrderRequest.buyerId() != null){
-            Buyer buyer = buyerRepository.findById(workOrderRequest.buyerId()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Buyer not found!")
-            );
-            workOrder.setBuyer(buyer);
-        }
 
         if (workOrderRequest.colorId() != null){
             Color color = colorRepository.findById(workOrderRequest.colorId()).orElseThrow(
@@ -109,12 +103,6 @@ public class WorkOrderServiceImpl implements WorkOrderService{
         }
 
         WorkOrder workOrder = workOrderMapper.fromWorkOrderRequest(workOrderRequest);
-        if (workOrderRequest.buyerId() != null){
-            Buyer buyer = buyerRepository.findById(workOrderRequest.buyerId()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Buyer not found!")
-            );
-            workOrder.setBuyer(buyer);
-        }
 
         if (workOrderRequest.colorId() != null){
             Color color = colorRepository.findById(workOrderRequest.colorId()).orElseThrow(
@@ -179,12 +167,6 @@ public class WorkOrderServiceImpl implements WorkOrderService{
     private List<WorkOrderResponse> toWorkOrderResponse(Page<WorkOrder> workOrders) {
         return workOrders.stream()
                 .map(w -> {
-                    // Safe mapping for Buyer
-                    BuyerLookupResponse buyerResp = (w.getBuyer() != null) ?
-                            BuyerLookupResponse.builder()
-                            .id(w.getBuyer().getId())
-                            .name(w.getBuyer().getName())
-                            .build() : null;
 
                     // Safe mapping for Color (This is where your crash is)
                     ColorLookupResponse colorResp = (w.getColor() != null) ?
@@ -204,9 +186,8 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                     return WorkOrderResponse.builder()
                             .id(w.getId())
                             .mo(w.getMo())
-                            .po(w.getPo())
+                            .po(w.getPurchaseOrder().getPo())
                             .style(w.getStyle().getStyleNo())
-                            .buyer(buyerResp)
                             .color(colorResp)
                             .sizes(sizeResps)
                             .qty(w.getQty())

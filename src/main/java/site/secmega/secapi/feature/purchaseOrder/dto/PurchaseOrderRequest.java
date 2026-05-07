@@ -12,6 +12,8 @@ public record PurchaseOrderRequest(
         String po,
         @NotNull(message = "Style is required!")
         Long styleId,
+        @NotNull(message = "Buyer is required!")
+        Long buyerId,
         @NotNull(message = "Qty is required!")
         @Positive(message = "Qty must be greater than 0!")
         Integer qty,

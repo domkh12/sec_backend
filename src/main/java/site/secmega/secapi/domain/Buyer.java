@@ -22,5 +22,5 @@ public class Buyer extends BaseEntity{
     private List<String> files;
 
     @OneToMany(mappedBy = "buyer")
-    private List<WorkOrder> workOrders;
+    private List<PurchaseOrder> purchaseOrders;
 }

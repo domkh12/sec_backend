@@ -18,6 +18,20 @@ public class PurchaseOrderController {
     private final PurchaseOrderService purchaseOrderService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deletePO(@PathVariable Long id){
+        purchaseOrderService.deletePO(id);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @PutMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    PurchaseOrderResponse updatePO(@PathVariable Long id, @RequestBody @Valid PurchaseOrderRequest purchaseOrderRequest){
+        return purchaseOrderService.updatePO(id, purchaseOrderRequest);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     Page<PurchaseOrderResponse> getPO(@ModelAttribute PurchaseOrderFilterRequest purchaseOrderFilterRequest){

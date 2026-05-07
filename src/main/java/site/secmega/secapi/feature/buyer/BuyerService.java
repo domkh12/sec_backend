@@ -4,7 +4,11 @@ import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
 import site.secmega.secapi.feature.buyer.dto.*;
 
+import java.util.List;
+
 public interface BuyerService {
+    List<BuyerLookupResponse> getBuyerLookup();
+
     BuyerResponse createBuyer(BuyerRequest buyerRequest);
 
     Page<BuyerResponse> findAll(BuyerFilterRequest buyerFilterRequest);

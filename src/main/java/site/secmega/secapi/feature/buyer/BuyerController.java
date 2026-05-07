@@ -17,6 +17,13 @@ public class BuyerController {
     private final BuyerService buyerService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @GetMapping("/lookup")
+    @ResponseStatus(HttpStatus.OK)
+    List<BuyerLookupResponse> getBuyerLookup(){
+        return buyerService.getBuyerLookup();
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @GetMapping("/{id}/files")
     @ResponseStatus(HttpStatus.OK)
     BuyerFileResponse getBuyerFile(@PathVariable Long id){

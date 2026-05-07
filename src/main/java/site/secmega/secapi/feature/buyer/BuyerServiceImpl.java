@@ -14,6 +14,7 @@ import site.secmega.secapi.mapper.BuyerMapper;
 import site.secmega.secapi.util.FileUtil;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -22,6 +23,13 @@ public class BuyerServiceImpl implements BuyerService{
     private final BuyerRepository buyerRepository;
     private final BuyerMapper buyerMapper;
     private final FileUtil fileUtil;
+
+    @Override
+    public List<BuyerLookupResponse> getBuyerLookup() {
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        List<Buyer> buyers = buyerRepository.findAll(sort);
+        return buyers.stream().map(buyerMapper::toBuyerLookupResponse).toList();
+    }
 
     @Override
     public BuyerFileResponse getBuyerFile(Long id) {

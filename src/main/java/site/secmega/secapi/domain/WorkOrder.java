@@ -23,8 +23,6 @@ public class WorkOrder extends BaseEntity{
     @Column(nullable = false)
     private String mo;
     @Column(nullable = false)
-    private String po;
-    @Column(nullable = false)
     private Integer qty;
     @Column(nullable = false)
     private WorkOrderStatus status;
@@ -34,9 +32,6 @@ public class WorkOrder extends BaseEntity{
     private LocalDate endDate;
     private String image;
     private String orderFollower;
-
-    @ManyToOne
-    private Buyer buyer;
 
     @ManyToOne
     private Color color;
@@ -58,5 +53,8 @@ public class WorkOrder extends BaseEntity{
 
     @OneToMany(mappedBy = "workOrder")
     private List<DefectDetail> defectDetails;
+
+    @ManyToOne
+    private PurchaseOrder purchaseOrder;
 
 }

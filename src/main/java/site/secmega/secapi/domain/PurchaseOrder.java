@@ -8,6 +8,7 @@ import org.hibernate.annotations.SQLRestriction;
 import site.secmega.secapi.base.POStatus;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "purchase_orders")
@@ -33,4 +34,17 @@ public class PurchaseOrder extends BaseEntity{
      * */
     @ManyToOne
     private Style style;
+
+    @OneToMany(mappedBy = "purchaseOrder")
+    private List<WorkOrder> workOrders;
+
+    @ManyToOne
+    private Buyer buyer;
+
+    public POStatus getStatus() {
+        if (this.shipmentDate != null && this.shipmentDate.isBefore(LocalDate.now())) {
+            return POStatus.DELAYED; // Assuming DELAYED exists in your POStatus enum
+        }
+        return this.status;
+    }
 }
