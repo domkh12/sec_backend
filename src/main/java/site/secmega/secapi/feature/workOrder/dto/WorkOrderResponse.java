@@ -20,7 +20,6 @@ public record WorkOrderResponse(
         Integer qty,
         Integer output,
         Integer balance,
-        BuyerLookupResponse buyer,
         List<SizeLookupResponse> sizes,
         ColorLookupResponse color,
         WorkOrderStatus status,

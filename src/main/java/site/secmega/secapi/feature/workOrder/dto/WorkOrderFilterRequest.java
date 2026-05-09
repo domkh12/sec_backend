@@ -3,7 +3,8 @@ package site.secmega.secapi.feature.workOrder.dto;
 public record WorkOrderFilterRequest(
         Integer pageNo,
         Integer pageSize,
-        String search
+        String search,
+        Boolean isActive
 ) {
     public WorkOrderFilterRequest{
         if (pageNo == null){

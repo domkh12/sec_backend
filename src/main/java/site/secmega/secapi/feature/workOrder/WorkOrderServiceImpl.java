@@ -189,6 +189,10 @@ public class WorkOrderServiceImpl implements WorkOrderService{
             );
         }
 
+        if (workOrderFilterRequest.isActive() != null){
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("isActive"), workOrderFilterRequest.isActive()));
+        }
+
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         PageRequest pageRequest = PageRequest.of(workOrderFilterRequest.pageNo() - 1, workOrderFilterRequest.pageSize(), sort);
         Page<WorkOrder> workOrders = workOrderRepository.findAll(spec, pageRequest);
