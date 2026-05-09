@@ -20,7 +20,7 @@ public class StatusScheduler {
     // Runs at 1:00 AM every day
     @Scheduled(cron = "0 0 1 * * *")
     public void checkDelayedOrders() {
-        int updatedCount = purchaseOrderRepository.updateDelayedOrders(LocalDate.now(), POStatus.DELAYED);
+        int updatedCount = purchaseOrderRepository.updateStatusByShipmentDateBefore(POStatus.DELAYED, LocalDate.now());
         System.out.println("Updated " + updatedCount + " orders to DELAYED status.");
     }
 

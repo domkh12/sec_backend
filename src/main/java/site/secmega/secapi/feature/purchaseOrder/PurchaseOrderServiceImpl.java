@@ -9,16 +9,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.base.POStatus;
+import site.secmega.secapi.base.WorkOrderStatus;
 import site.secmega.secapi.domain.ProductionLine;
 import site.secmega.secapi.domain.PurchaseOrder;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
 import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderFilterRequest;
+import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderLookupResponse;
 import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderRequest;
 import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderResponse;
 import site.secmega.secapi.feature.style.StyleRepository;
 import site.secmega.secapi.mapper.PurchaseOrderMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +31,31 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
     private final PurchaseOrderMapper purchaseOrderMapper;
     private final StyleRepository styleRepository;
     private final BuyerRepository buyerRepository;
+
+    @Override
+    public void updatePOStatus(Long id) {
+        PurchaseOrder purchaseOrder = purchaseOrderRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PO not found!")
+        );
+        boolean hasActiveMO = purchaseOrder.getWorkOrders().stream().anyMatch(wo -> wo.getStatus().equals(WorkOrderStatus.ACTIVE));
+
+        if (hasActiveMO){
+            purchaseOrder.setStatus(POStatus.IN_PROGRESS);
+        }else {
+            purchaseOrder.setStatus(POStatus.PENDING);
+        }
+
+        purchaseOrderRepository.save(purchaseOrder);
+    }
+
+    @Override
+    public List<PurchaseOrderLookupResponse> getPOLookup() {
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        List<PurchaseOrder> po = purchaseOrderRepository.findAll(sort);
+
+        return po.stream().map(purchaseOrderMapper::toPurchaseOrderLookupResponse).toList();
+    }
 
     @Override
     public void deletePO(Long id) {

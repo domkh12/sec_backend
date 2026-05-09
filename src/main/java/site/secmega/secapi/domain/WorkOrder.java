@@ -32,12 +32,10 @@ public class WorkOrder extends BaseEntity{
     private LocalDate endDate;
     private String image;
     private String orderFollower;
+    private Boolean isActive;
 
     @ManyToOne
     private Color color;
-
-    @ManyToOne
-    private Style style;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(joinColumns = @JoinColumn(name = "wo_id", referencedColumnName = "id"),

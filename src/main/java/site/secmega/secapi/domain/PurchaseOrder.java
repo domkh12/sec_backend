@@ -40,11 +40,4 @@ public class PurchaseOrder extends BaseEntity{
 
     @ManyToOne
     private Buyer buyer;
-
-    public POStatus getStatus() {
-        if (this.shipmentDate != null && this.shipmentDate.isBefore(LocalDate.now())) {
-            return POStatus.DELAYED; // Assuming DELAYED exists in your POStatus enum
-        }
-        return this.status;
-    }
 }

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface WorkOrderService {
+    void updateWOStatus(Long id, @Valid WorkOrderStatusRequest workOrderStatusRequest);
+
     void deleteWorkOrder(Long id);
 
     WorkOrderResponse updateWorkOrder(Long id, WorkOrderRequest workOrderRequest);

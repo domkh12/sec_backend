@@ -9,14 +9,10 @@ import java.util.List;
 public record WorkOrderRequest(
         @NotBlank(message = "MO is required")
         String mo,
-        @NotBlank(message = "PO is required")
-        String po,
+        @NotNull(message = "PO is required")
+        Long poId,
         @NotNull(message = "Quantity cannot be null")
         Integer qty,
-        @NotNull(message = "Buyer ID cannot be null")
-        Long buyerId,
-        @NotBlank(message = "Style is required")
-        String styleId,
         @NotNull(message = "Product ID cannot be null")
         Long colorId,
         @NotNull(message = "Size ID cannot be null")
@@ -25,6 +21,7 @@ public record WorkOrderRequest(
         LocalDate startDate,
         @NotNull(message = "End Date ID cannot be null")
         LocalDate endDate,
-        String image
+        String image,
+        Boolean isActive
 ) {
 }

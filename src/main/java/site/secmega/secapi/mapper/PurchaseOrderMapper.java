@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import site.secmega.secapi.domain.PurchaseOrder;
+import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderLookupResponse;
 import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderRequest;
 import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderResponse;
 
@@ -14,4 +15,5 @@ public interface PurchaseOrderMapper {
     PurchaseOrderResponse toPurchaseOrderResponse(PurchaseOrder purchaseOrder);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromPurchaseOrderRequest(PurchaseOrderRequest purchaseOrderRequest,@MappingTarget PurchaseOrder purchaseOrder);
+    PurchaseOrderLookupResponse toPurchaseOrderLookupResponse(PurchaseOrder purchaseOrder);
 }

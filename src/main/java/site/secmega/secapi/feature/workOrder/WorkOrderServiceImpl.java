@@ -17,6 +17,8 @@ import site.secmega.secapi.feature.buyer.dto.BuyerLookupResponse;
 import site.secmega.secapi.feature.color.ColorRepository;
 import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
 import site.secmega.secapi.feature.outputDetail.OutputDetailRepository;
+import site.secmega.secapi.feature.purchaseOrder.PurchaseOrderRepository;
+import site.secmega.secapi.feature.purchaseOrder.PurchaseOrderService;
 import site.secmega.secapi.feature.size.SizeRepository;
 import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
 import site.secmega.secapi.feature.user.UserRepository;
@@ -34,12 +36,29 @@ public class WorkOrderServiceImpl implements WorkOrderService{
 
     private final WorkOrderRepository workOrderRepository;
     private final WorkOrderMapper workOrderMapper;
-    private final BuyerRepository buyerRepository;
     private final ColorRepository colorRepository;
     private final SizeRepository sizeRepository;
     private final AuthUtil authUtil;
     private final UserRepository userRepository;
     private final OutputDetailRepository outputDetailRepository;
+    private final PurchaseOrderRepository purchaseOrderRepository;
+    private final PurchaseOrderService purchaseOrderService;
+
+    @Override
+    public void updateWOStatus(Long id, WorkOrderStatusRequest workOrderStatusRequest) {
+        WorkOrder workOrder = workOrderRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Work Order Not found!")
+        );
+        workOrderMapper.updateStatusWorkOrder(workOrderStatusRequest, workOrder);
+        if (workOrderStatusRequest.isActive() == true){
+            workOrder.setStatus(WorkOrderStatus.ACTIVE);
+
+        }else {
+            workOrder.setStatus(WorkOrderStatus.PENDING);
+        }
+        workOrderRepository.save(workOrder);
+        purchaseOrderService.updatePOStatus(workOrder.getPurchaseOrder().getId());
+    }
 
     @Override
     public void deleteWorkOrder(Long id) {
@@ -73,9 +92,16 @@ public class WorkOrderServiceImpl implements WorkOrderService{
             List<Size> sizes = sizeRepository.findByIdIn(workOrderRequest.sizeIds());
             workOrder.setSizes(sizes);
         }
+
+        if (workOrderRequest.poId() != null){
+            PurchaseOrder po = purchaseOrderRepository.findById(workOrderRequest.poId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PO not found!")
+            );
+            workOrder.setPurchaseOrder(po);
+        }
+
         WorkOrder savedWO = workOrderRepository.save(workOrder);
-//        return workOrderMapper.toWorkOrderResponse(savedWO);
-        return null;
+        return workOrderMapper.toWorkOrderResponse(savedWO);
     }
 
     @Override
@@ -116,12 +142,18 @@ public class WorkOrderServiceImpl implements WorkOrderService{
            workOrder.setSizes(sizes);
         }
 
+        if (workOrderRequest.poId() != null){
+            PurchaseOrder po = purchaseOrderRepository.findById(workOrderRequest.poId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PO not found!")
+            );
+            workOrder.setPurchaseOrder(po);
+        }
+        workOrder.setIsActive(false);
         workOrder.setStatus(WorkOrderStatus.PENDING);
         workOrder.setOrderFollower(user.getNameEn());
         WorkOrder savedWorkOrder = workOrderRepository.save(workOrder);
 
-//        return toWorkOrderResponse(savedWorkOrder);
-        return null;
+        return workOrderMapper.toWorkOrderResponse(savedWorkOrder);
     }
 
     @Override
@@ -139,7 +171,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
         WorkOrder workOrder = workOrderRepository.findByMo(mo).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Work order not found!")
         );
-        return ResponseEntity.ok(Map.of("style", workOrder.getStyle().getStyleNo()));
+        return ResponseEntity.ok(Map.of("style", workOrder.getPurchaseOrder().getStyle().getStyleNo()));
     }
 
     @Override
@@ -187,7 +219,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                             .id(w.getId())
                             .mo(w.getMo())
                             .po(w.getPurchaseOrder().getPo())
-                            .style(w.getStyle().getStyleNo())
+                            .style(w.getPurchaseOrder().getStyle().getStyleNo())
                             .color(colorResp)
                             .sizes(sizeResps)
                             .qty(w.getQty())
@@ -197,6 +229,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                             .image(w.getImage())
                             .output(output)
                             .balance(w.getQty() - output)
+                            .isActive(w.getIsActive())
                             .build();
                 })
                 .toList();

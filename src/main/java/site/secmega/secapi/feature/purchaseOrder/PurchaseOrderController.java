@@ -7,8 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderFilterRequest;
+import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderLookupResponse;
 import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderRequest;
 import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderResponse;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/purchase-orders")
@@ -16,6 +19,13 @@ import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderResponse;
 public class PurchaseOrderController {
 
     private final PurchaseOrderService purchaseOrderService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @GetMapping("/lookup")
+    @ResponseStatus(HttpStatus.OK)
+    List<PurchaseOrderLookupResponse> getPOLookup(){
+        return purchaseOrderService.getPOLookup();
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @DeleteMapping("/{id}")
