@@ -32,4 +32,7 @@ public class Style extends BaseEntity{
      * */
     @OneToMany(mappedBy = "style")
     private List<PurchaseOrder> purchaseOrders;
+
+    @ManyToMany(mappedBy = "styles")
+    private List<Material> materials;
 }

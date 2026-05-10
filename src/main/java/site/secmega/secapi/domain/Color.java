@@ -20,4 +20,14 @@ public class Color extends BaseEntity {
     private Long id;
     @Column(nullable = false)
     private String color;
+
+    /**
+     * Relationship
+     * */
+
+    @OneToMany(mappedBy = "color")
+    private List<Material> materials;
+
+    @OneToMany(mappedBy = "color")
+    private List<WorkOrder> workOrders;
 }

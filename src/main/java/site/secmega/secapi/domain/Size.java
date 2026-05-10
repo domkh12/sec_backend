@@ -32,4 +32,7 @@ public class Size extends BaseEntity{
 
     @OneToMany(mappedBy = "size")
     private List<Bundle> bundles;
+
+    @OneToMany(mappedBy = "size")
+    private List<Material> materials;
 }

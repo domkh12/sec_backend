@@ -21,9 +21,8 @@ public class Material extends BaseEntity{
     private Long id;
     private String code;
     private String name;
+    private String description;
     private String unit;
-    private String size;
-    private String color;
     private String image;
     private Double balance;
     private MaterialStatus status;
@@ -31,8 +30,20 @@ public class Material extends BaseEntity{
     /**
      * Relationship
      * */
+    @ManyToOne
+    private Color color;
+
+    @ManyToOne
+    private Size size;
+
     @OneToMany(mappedBy = "material")
     private List<MaterialDetail> materialDetails;
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(joinColumns = @JoinColumn(name = "material_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "style_id", referencedColumnName = "id")
+    )
+    private List<Style> styles;
 
     public void setBalance(Double balance) {
         this.balance = balance;

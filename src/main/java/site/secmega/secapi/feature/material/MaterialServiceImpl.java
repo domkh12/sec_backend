@@ -16,11 +16,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.base.MaterialStatus;
 import site.secmega.secapi.base.TransactionType;
-import site.secmega.secapi.domain.Material;
-import site.secmega.secapi.domain.MaterialDetail;
-import site.secmega.secapi.domain.User;
+import site.secmega.secapi.domain.*;
+import site.secmega.secapi.feature.color.ColorRepository;
+import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
 import site.secmega.secapi.feature.material.dto.*;
 import site.secmega.secapi.feature.report.GenerateReportService;
+import site.secmega.secapi.feature.size.SizeRepository;
+import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
+import site.secmega.secapi.feature.style.StyleRepository;
+import site.secmega.secapi.feature.style.dto.StyleLookupResponse;
 import site.secmega.secapi.feature.user.UserRepository;
 import site.secmega.secapi.mapper.MaterialMapper;
 import site.secmega.secapi.util.AuthUtil;
@@ -42,6 +46,9 @@ public class MaterialServiceImpl implements MaterialService{
     private final MaterialDetailRepository materialDetailRepository;
     private final AuthUtil authUtil;
     private final GenerateReportService generateReportService;
+    private final StyleRepository styleRepository;
+    private final SizeRepository sizeRepository;
+    private final ColorRepository colorRepository;
 
     @Value("${materialExcel.template.path}")
     String excelTemplatePath;
@@ -97,6 +104,24 @@ public class MaterialServiceImpl implements MaterialService{
         }
 
         materialMapper.updateFromMaterialRequest(materialRequest, material);
+        if (!materialRequest.styleIds().isEmpty()){
+            List<Style> styles = styleRepository.findByIdInAndDeletedAtNull(materialRequest.styleIds());
+            material.setStyles(styles);
+        }
+
+        if (materialRequest.sizeId() != null){
+            Size size = sizeRepository.findById(materialRequest.sizeId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Size not found")
+            );
+            material.setSize(size);
+        }
+
+        if (materialRequest.colorId() != null){
+            Color color = colorRepository.findById(materialRequest.colorId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Color not found")
+            );
+            material.setColor(color);
+        }
         material.setUpdatedAt(LocalDateTime.now());
         Material updatedMaterial = materialRepository.save(material);
         return materialMapper.toMaterialResponse(updatedMaterial);
@@ -290,12 +315,23 @@ public class MaterialServiceImpl implements MaterialService{
                 .id(material.getId())
                 .code(material.getCode())
                 .name(material.getName())
+                .description(material.getDescription())
                 .balance(material.getBalance())
+                .styles(material.getStyles().stream().map(style -> StyleLookupResponse.builder()
+                        .id(style.getId())
+                        .styleNo(style.getStyleNo())
+                        .build()).toList())
                 .status(material.getStatus())
                 .unit(material.getUnit())
                 .image(material.getImage())
-                .size(material.getSize())
-                .color(material.getColor())
+                .size(SizeLookupResponse.builder()
+                        .id(material.getSize().getId())
+                        .size(material.getSize().getSize())
+                        .build())
+                .color(ColorLookupResponse.builder()
+                        .id(material.getColor().getId())
+                        .color(material.getColor().getColor())
+                        .build())
                 .totalInput(material.getMaterialDetails().stream().filter(detail -> detail.getType() == TransactionType.INVENTORY_IN).mapToDouble(MaterialDetail::getQuantity).sum())
                 .totalOutput(material.getMaterialDetails().stream().filter(detail -> detail.getType() == TransactionType.INVENTORY_OUT).mapToDouble(MaterialDetail::getQuantity).sum())
                 .build());
@@ -313,6 +349,25 @@ public class MaterialServiceImpl implements MaterialService{
         }
 
         Material material = materialMapper.fromMaterialRequest(materialRequest);
+        if (!materialRequest.styleIds().isEmpty()){
+            List<Style> styles = styleRepository.findByIdInAndDeletedAtNull(materialRequest.styleIds());
+            material.setStyles(styles);
+        }
+
+        if (materialRequest.sizeId() != null){
+            Size size = sizeRepository.findById(materialRequest.sizeId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Size not found")
+            );
+            material.setSize(size);
+        }
+
+        if (materialRequest.colorId() != null){
+            Color color = colorRepository.findById(materialRequest.colorId()).orElseThrow(
+                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Color not found")
+            );
+            material.setColor(color);
+        }
+
         material.setStatus(MaterialStatus.OUT_OF_STOCK);
         material.setBalance(0.0);
         Material savedMaterial = materialRepository.save(material);
