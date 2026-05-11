@@ -19,6 +19,7 @@ import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
 import site.secmega.secapi.feature.outputDetail.OutputDetailRepository;
 import site.secmega.secapi.feature.purchaseOrder.PurchaseOrderRepository;
 import site.secmega.secapi.feature.purchaseOrder.PurchaseOrderService;
+import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderLookupResponse;
 import site.secmega.secapi.feature.size.SizeRepository;
 import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
 import site.secmega.secapi.feature.user.UserRepository;
@@ -222,7 +223,10 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                     return WorkOrderResponse.builder()
                             .id(w.getId())
                             .mo(w.getMo())
-                            .po(w.getPurchaseOrder().getPo())
+                            .po(PurchaseOrderLookupResponse.builder()
+                                    .id(w.getPurchaseOrder().getId())
+                                    .po(w.getPurchaseOrder().getPo())
+                                    .build())
                             .style(w.getPurchaseOrder().getStyle().getStyleNo())
                             .color(colorResp)
                             .sizes(sizeResps)

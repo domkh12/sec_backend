@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import site.secmega.secapi.base.WorkOrderStatus;
 import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
+import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderLookupResponse;
 import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
 
 import java.time.LocalDate;
@@ -13,7 +14,7 @@ import java.util.List;
 public record WorkOrderResponse(
         Long id,
         String mo,
-        String po,
+        PurchaseOrderLookupResponse po,
         String style,
         Integer qty,
         Integer output,

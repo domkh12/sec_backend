@@ -31,7 +31,7 @@ public class FileUtil {
                 .ownerType(ownerType)
                 .uri(uri)
                 .ownerId(userId)
-                .current(true)          // 👈 this is the active one
+                .current(true)
                 .uploadedAt(LocalDateTime.now())
                 .build();
 

@@ -35,6 +35,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -87,7 +88,26 @@ public class MaterialServiceImpl implements MaterialService{
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         List<Material> materials = materialRepository.findAll(sort);
 
-        File file = generateReportService.generateExcelReport(materials, excelTemplatePath);
+        // Map to flat report beans
+        List<MaterialReportResponse> reportBeans = materials.stream()
+                .map(detail -> MaterialReportResponse.builder()
+                        .code(detail.getCode())
+                        .name(detail.getName())
+                        .description(detail.getDescription())
+                        .styles(
+                                detail.getStyles() == null ? "" :
+                                        detail.getStyles().stream()
+                                        .map(Style::getStyleNo)
+                                        .collect(Collectors.joining(", "))
+                        )
+                        .unit(detail.getUnit())
+                        .size(detail.getSize().getSize() != null ? detail.getSize().getSize() : "")
+                        .color(detail.getColor() != null ? detail.getColor().getColor() : "")
+                        .balance(detail.getBalance())
+                        .build()
+                )
+                .toList();
+        File file = generateReportService.generateExcelReport(reportBeans, excelTemplatePath);
         HttpHeaders headers = Util.getHttpHeaders("Material", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
 
         return new ResponseEntity<>(new InputStreamResource(new FileInputStream(file)), headers, HttpStatus.OK);
@@ -104,10 +124,10 @@ public class MaterialServiceImpl implements MaterialService{
         }
 
         materialMapper.updateFromMaterialRequest(materialRequest, material);
-        if (!materialRequest.styleIds().isEmpty()){
-            List<Style> styles = styleRepository.findByIdInAndDeletedAtNull(materialRequest.styleIds());
-            material.setStyles(styles);
-        }
+
+        List<Style> styles = styleRepository.findByIdInAndDeletedAtNull(materialRequest.styleIds());
+        material.setStyles(styles);
+
 
         if (materialRequest.sizeId() != null){
             Size size = sizeRepository.findById(materialRequest.sizeId()).orElseThrow(

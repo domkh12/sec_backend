@@ -20,9 +20,10 @@
 	</style>
 	<dataset name="MaterialDataset" uuid="a1b2c3d4-0000-0000-0000-000000000001">
 		<query language="sql"><![CDATA[]]></query>
-		<field name="id" class="java.lang.Long"/>
 		<field name="code" class="java.lang.String"/>
 		<field name="name" class="java.lang.String"/>
+		<field name="description" class="java.lang.String"/>
+		<field name="styles" class="java.lang.String"/>
 		<field name="unit" class="java.lang.String"/>
 		<field name="size" class="java.lang.String"/>
 		<field name="color" class="java.lang.String"/>
@@ -32,23 +33,11 @@
 	<query language="sql"><![CDATA[]]></query>
 	<detail>
 		<band height="69">
-			<element kind="component" uuid="a1b2c3d4-0000-0000-0000-000000000002" x="0" y="0" width="842" height="69">
+			<element kind="component" uuid="a1b2c3d4-0000-0000-0000-000000000002" x="0" y="0" width="1320" height="69">
 				<component kind="table">
 					<datasetRun uuid="a1b2c3d4-0000-0000-0000-000000000003" subDataset="MaterialDataset">
 						<dataSourceExpression><![CDATA[$P{CollectionBeanParam}]]></dataSourceExpression>
 					</datasetRun>
-					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000010" width="80">
-						<columnHeader height="35" rowSpan="1" style="Table_CH">
-							<element kind="staticText" uuid="a1b2c3d4-0000-0000-0000-000000000011" x="0" y="0" width="80" height="35" hTextAlign="Center" vTextAlign="Middle">
-								<text><![CDATA[ID]]></text>
-							</element>
-						</columnHeader>
-						<detailCell height="35" style="Table_TD">
-							<element kind="textField" uuid="a1b2c3d4-0000-0000-0000-000000000012" x="0" y="0" width="80" height="35" linkType="None" linkTarget="Self" hTextAlign="Center" vTextAlign="Middle">
-								<expression><![CDATA[$F{id}]]></expression>
-							</element>
-						</detailCell>
-					</column>
 					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000020" width="180">
 						<columnHeader height="35" rowSpan="1" style="Table_CH">
 							<element kind="staticText" uuid="a1b2c3d4-0000-0000-0000-000000000021" x="0" y="0" width="180" height="35" hTextAlign="Center" vTextAlign="Middle">
@@ -61,15 +50,39 @@
 							</element>
 						</detailCell>
 					</column>
+					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000030" width="252">
+						<columnHeader height="35" rowSpan="1" style="Table_CH">
+							<element kind="staticText" uuid="a1b2c3d4-0000-0000-0000-000000000031" x="0" y="0" width="252" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<text><![CDATA[Material]]></text>
+							</element>
+						</columnHeader>
+						<detailCell height="35" style="Table_TD">
+							<element kind="textField" uuid="a1b2c3d4-0000-0000-0000-000000000032" x="0" y="0" width="252" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<expression><![CDATA[$F{name}]]></expression>
+							</element>
+						</detailCell>
+					</column>
 					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000030" width="282">
 						<columnHeader height="35" rowSpan="1" style="Table_CH">
 							<element kind="staticText" uuid="a1b2c3d4-0000-0000-0000-000000000031" x="0" y="0" width="282" height="35" hTextAlign="Center" vTextAlign="Middle">
-								<text><![CDATA[Name]]></text>
+								<text><![CDATA[Description]]></text>
 							</element>
 						</columnHeader>
 						<detailCell height="35" style="Table_TD">
 							<element kind="textField" uuid="a1b2c3d4-0000-0000-0000-000000000032" x="0" y="0" width="282" height="35" hTextAlign="Center" vTextAlign="Middle">
-								<expression><![CDATA[$F{name}]]></expression>
+								<expression><![CDATA[$F{description}]]></expression>
+							</element>
+						</detailCell>
+					</column>
+					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000030" width="282">
+						<columnHeader height="35" rowSpan="1" style="Table_CH">
+							<element kind="staticText" uuid="a1b2c3d4-0000-0000-0000-000000000031" x="0" y="0" width="282" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<text><![CDATA[Style]]></text>
+							</element>
+						</columnHeader>
+						<detailCell height="35" style="Table_TD">
+							<element kind="textField" uuid="a1b2c3d4-0000-0000-0000-000000000032" x="0" y="0" width="282" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<expression><![CDATA[$F{styles}]]></expression>
 							</element>
 						</detailCell>
 					</column>

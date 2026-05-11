@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.base.StyleStatus;
 import site.secmega.secapi.domain.*;
-import site.secmega.secapi.feature.color.ColorRepository;
 import site.secmega.secapi.feature.style.dto.*;
-import site.secmega.secapi.feature.size.SizeRepository;
 import site.secmega.secapi.mapper.StyleMapper;
 
 import java.time.LocalDateTime;
