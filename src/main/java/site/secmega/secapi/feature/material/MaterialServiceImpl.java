@@ -119,10 +119,6 @@ public class MaterialServiceImpl implements MaterialService{
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found")
         );
 
-        if (materialRepository.existsByCodeAndIdNotAndDeletedAtNull(materialRequest.code(), id)){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Material code already exist");
-        }
-
         materialMapper.updateFromMaterialRequest(materialRequest, material);
 
         List<Style> styles = styleRepository.findByIdInAndDeletedAtNull(materialRequest.styleIds());
@@ -319,12 +315,12 @@ public class MaterialServiceImpl implements MaterialService{
             spec = spec.and((root, query, cb) -> cb.equal(root.get("unit"), materialFilterRequest.unit()));
         }
 
-        if (!materialFilterRequest.size().isBlank()){
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("size"), materialFilterRequest.size()));
+        if (materialFilterRequest.size() != null){
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("size").get("id"), materialFilterRequest.size()));
         }
 
-        if (!materialFilterRequest.color().isBlank()){
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("color"), materialFilterRequest.color()));
+        if (materialFilterRequest.color() != null){
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("color").get("id"), materialFilterRequest.color()));
         }
 
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
@@ -359,14 +355,6 @@ public class MaterialServiceImpl implements MaterialService{
 
     @Override
     public MaterialResponse createMaterial(MaterialRequest materialRequest) throws IOException {
-
-        if (materialRepository.existsByCodeAndDeletedAtNull(materialRequest.code())){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Material code already exist");
-        }
-
-        if (materialRepository.existsByNameAndDeletedAtNull(materialRequest.name())){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Material name already exist");
-        }
 
         Material material = materialMapper.fromMaterialRequest(materialRequest);
         if (!materialRequest.styleIds().isEmpty()){

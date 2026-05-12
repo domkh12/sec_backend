@@ -8,8 +8,8 @@ public record MaterialFilterRequest(
         String search,
         MaterialStatus status,
         String unit,
-        String size,
-        String color
+        Long size,
+        Long color
 ) {
     public MaterialFilterRequest{
         if (pageNo == null){
