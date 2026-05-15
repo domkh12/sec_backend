@@ -54,7 +54,7 @@ public class DepartmentServiceImpl implements DepartmentService{
 
     @Override
     public List<DepartmentLookupResponse> getDeptLookup() {
-        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        Sort sort = Sort.by(Sort.Direction.ASC, "processNo");
         List<Department> departments = departmentRepository.findAll(sort);
         return departments.stream().map(department -> {
              return DepartmentLookupResponse.builder()
