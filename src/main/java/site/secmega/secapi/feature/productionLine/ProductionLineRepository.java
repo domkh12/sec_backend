@@ -20,5 +20,8 @@ public interface ProductionLineRepository extends JpaRepository<ProductionLine, 
     @Query("select p from ProductionLine p where p.department.processNo = ?1 order by p.line")
     List<ProductionLine> findByDepartment_ProcessNoOrderByLineAsc(Integer processNo, Sort sort);
 
+    @Query("select p from ProductionLine p where p.deletedAt is null order by p.department.processNo")
+    List<ProductionLine> findByDeletedAtNullOrderByDepartment_ProcessNoAsc();
+
 
 }

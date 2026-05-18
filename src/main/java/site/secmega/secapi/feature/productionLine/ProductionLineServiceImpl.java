@@ -44,8 +44,7 @@ public class ProductionLineServiceImpl implements ProductionLineService{
 
     @Override
     public List<ProductionLineLookupResponse> getProductionLineLookup() {
-        Sort sort = Sort.by(Sort.Direction.ASC, "line");
-        List<ProductionLine> productionLines = productionLineRepository.findAll(sort);
+        List<ProductionLine> productionLines = productionLineRepository.findByDeletedAtNullOrderByDepartment_ProcessNoAsc();
 
         return productionLines.stream().map(productionLineMapper::toProductionLineLookupResponse).toList();
     }
