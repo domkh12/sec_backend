@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import site.secmega.secapi.domain.WorkOrder;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -24,7 +26,6 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long>, Jpa
 
     @Query("select (count(w) > 0) from WorkOrder w where upper(w.mo) = upper(?1) and w.deletedAt is null and w.id <> ?2")
     boolean existsByMoIgnoreCaseAndDeletedAtNullAndIdNot(String mo, Long id);
-
 
 
 }

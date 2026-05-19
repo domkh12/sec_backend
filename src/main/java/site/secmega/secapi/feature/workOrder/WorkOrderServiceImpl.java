@@ -17,6 +17,7 @@ import site.secmega.secapi.feature.buyer.dto.BuyerLookupResponse;
 import site.secmega.secapi.feature.color.ColorRepository;
 import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
 import site.secmega.secapi.feature.outputDetail.OutputDetailRepository;
+import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.purchaseOrder.PurchaseOrderRepository;
 import site.secmega.secapi.feature.purchaseOrder.PurchaseOrderService;
 import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderLookupResponse;
@@ -44,6 +45,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
     private final OutputDetailRepository outputDetailRepository;
     private final PurchaseOrderRepository purchaseOrderRepository;
     private final PurchaseOrderService purchaseOrderService;
+    private final ProductionLineRepository productionLineRepository;
 
     @Override
     public void updateWOStatus(Long id, WorkOrderStatusRequest workOrderStatusRequest) {
@@ -92,6 +94,11 @@ public class WorkOrderServiceImpl implements WorkOrderService{
         if (!workOrderRequest.sizeIds().isEmpty()){
             List<Size> sizes = sizeRepository.findByIdIn(workOrderRequest.sizeIds());
             workOrder.setSizes(sizes);
+        }
+
+        if (!workOrderRequest.lineIds().isEmpty()){
+            List<ProductionLine> lines = productionLineRepository.findByIdInAndDeletedAtNull(workOrderRequest.lineIds());
+            workOrder.setProductionLines(lines);
         }
 
         if (workOrderRequest.poId() != null){
@@ -149,6 +156,12 @@ public class WorkOrderServiceImpl implements WorkOrderService{
             );
             workOrder.setPurchaseOrder(po);
         }
+
+        if (!workOrderRequest.lineIds().isEmpty()){
+            List<ProductionLine> lines = productionLineRepository.findByIdInAndDeletedAtNull(workOrderRequest.lineIds());
+            workOrder.setProductionLines(lines);
+        }
+
         workOrder.setIsActive(false);
         workOrder.setStatus(WorkOrderStatus.PENDING);
         workOrder.setOrderFollower(user.getNameEn());
