@@ -48,6 +48,51 @@ public class WorkOrderServiceImpl implements WorkOrderService{
     private final ProductionLineRepository productionLineRepository;
 
     @Override
+    public List<WorkOrderResponse> getWOByLine(Long id) {
+        List<WorkOrder> workOrders = workOrderRepository.findByProductionLines_IdAndDeletedAtNullAndIsActiveTrue(id);
+
+        return workOrders.stream()
+                .map(w -> {
+
+                    // Safe mapping for Color (This is where your crash is)
+                    ColorLookupResponse colorResp = (w.getColor() != null) ?
+                            ColorLookupResponse.builder()
+                            .id(w.getColor().getId())
+                            .color(w.getColor().getColor())
+                            .build() : null;
+
+                    // Safe mapping for Sizes
+                    List<SizeLookupResponse> sizeResps = (w.getSizes() != null) ?
+                            w.getSizes().stream().map(size -> SizeLookupResponse.builder()
+                                                              .id(size.getId())
+                                                              .size(size.getSize())
+                                                              .build()).toList() : List.of();
+                    Integer output = outputDetailRepository.sumByFromLine_Id(id);
+
+                    return WorkOrderResponse.builder()
+                            .id(w.getId())
+                            .mo(w.getMo())
+                            .po(PurchaseOrderLookupResponse.builder()
+                                    .id(w.getPurchaseOrder().getId())
+                                    .po(w.getPurchaseOrder().getPo())
+                                    .build())
+                            .style(w.getPurchaseOrder().getStyle().getStyleNo())
+                            .color(colorResp)
+                            .sizes(sizeResps)
+                            .qty(w.getQty())
+                            .startDate(w.getStartDate())
+                            .endDate(w.getEndDate())
+                            .status(w.getStatus())
+                            .image(w.getImage())
+                            .output(output)
+                            .balance(w.getQty() - output)
+                            .isActive(w.getIsActive())
+                            .build();
+                })
+                .toList();
+    }
+
+    @Override
     public void updateWOStatus(Long id, WorkOrderStatusRequest workOrderStatusRequest) {
         WorkOrder workOrder = workOrderRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Work Order Not found!")
@@ -125,7 +170,6 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                 .totalOutput(totalOutput)
                 .totalBalance(totalWorkOrderQty - totalOutput)
                 .build();
-
     }
 
     @Override

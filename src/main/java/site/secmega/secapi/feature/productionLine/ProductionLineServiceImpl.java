@@ -33,7 +33,19 @@ public class ProductionLineServiceImpl implements ProductionLineService{
     public List<ProductionLineLookupResponse> getProductionLineByDeptNo(Integer processNo) {
         Sort sort = Sort.by(Sort.Direction.ASC, "line");
         List<ProductionLine> productionLines = productionLineRepository.findByDepartment_ProcessNoOrderByLineAsc(processNo, sort);
-        return productionLines.stream().map(productionLineMapper::toProductionLineLookupResponse).toList();
+        return productionLines.stream().map(
+                line -> ProductionLineLookupResponse.builder()
+                        .id(line.getId())
+                        .line(line.getLine())
+                        .image(line.getImage())
+                        .isInput(line.getDepartment().getProcessNo() == 1)
+                        .department(DepartmentForLineResponse.builder()
+                                .id(line.getDepartment().getId())
+                                .processNo(line.getDepartment().getProcessNo())
+                                .name(line.getDepartment().getDepartment())
+                                .build())
+                        .build()
+        ).toList();
     }
 
     @Override

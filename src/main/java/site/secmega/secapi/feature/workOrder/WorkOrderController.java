@@ -20,6 +20,13 @@ public class  WorkOrderController {
     private final WorkOrderService workOrderService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
+    @GetMapping("/production-line/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    List<WorkOrderResponse> getWOByLine(@PathVariable Long id){
+        return workOrderService.getWOByLine(id);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @PutMapping("/{id}/status")
     @ResponseStatus(HttpStatus.OK)
     void updateWOStatus(@PathVariable Long id, @RequestBody @Valid WorkOrderStatusRequest workOrderStatusRequest){
