@@ -20,23 +20,39 @@
 	</style>
 	<dataset name="MaterialDataset" uuid="a1b2c3d4-0000-0000-0000-000000000001">
 		<query language="sql"><![CDATA[]]></query>
-		<field name="transactionDate" class="java.time.LocalDateTime"/>
+		<field name="date" class="java.lang.String"/>
 		<field name="quantity" class="java.lang.Double"/>
 		<field name="qtyBalance" class="java.lang.Double"/>
-		<field name="material.name" class="java.lang.String"/>
-		<field name="material.code" class="java.lang.String"/>
-		<field name="material.unit" class="java.lang.String"/>
-		<field name="user.nameEn" class="java.lang.String"/>
+		<field name="color" class="java.lang.String"/>
+		<field name="size" class="java.lang.String"/>
+		<field name="material" class="java.lang.String"/>
+		<field name="style" class="java.lang.String"/>
+		<field name="code" class="java.lang.String"/>
+		<field name="unit" class="java.lang.String"/>
+		<field name="nameReceiver" class="java.lang.String"/>
 	</dataset>
 	<parameter name="CollectionBeanParam" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<query language="sql"><![CDATA[]]></query>
 	<detail>
 		<band height="69">
-			<element kind="component" uuid="a1b2c3d4-0000-0000-0000-000000000002" x="0" y="0" width="842" height="69">
+			<element kind="component" uuid="a1b2c3d4-0000-0000-0000-000000000002" x="0" y="0" width="1260" height="69">
 				<component kind="table">
 					<datasetRun uuid="a1b2c3d4-0000-0000-0000-000000000003" subDataset="MaterialDataset">
 						<dataSourceExpression><![CDATA[$P{CollectionBeanParam}]]></dataSourceExpression>
 					</datasetRun>
+					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000020" width="160">
+						<columnHeader height="35" rowSpan="1" style="Table_CH">
+							<element kind="staticText" uuid="a1b2c3d4-0000-0000-0000-000000000021" x="0" y="0" width="160" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<text><![CDATA[Date]]></text>
+							</element>
+						</columnHeader>
+						<detailCell height="35" style="Table_TD">
+							<element kind="textField" uuid="5d45071f-7e95-449c-aeab-74333a0f2b03" x="0" y="0" width="160" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<expression><![CDATA[$F{date}]]></expression>
+							</element>
+						</detailCell>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
+					</column>
 					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000020" width="160">
 						<columnHeader height="35" rowSpan="1" style="Table_CH">
 							<element kind="staticText" uuid="a1b2c3d4-0000-0000-0000-000000000021" x="0" y="0" width="160" height="35" hTextAlign="Center" vTextAlign="Middle">
@@ -45,7 +61,7 @@
 						</columnHeader>
 						<detailCell height="35" style="Table_TD">
 							<element kind="textField" uuid="5d45071f-7e95-449c-aeab-74333a0f2b03" x="0" y="0" width="160" height="35" hTextAlign="Center" vTextAlign="Middle">
-								<expression><![CDATA[$F{material.code}]]></expression>
+								<expression><![CDATA[$F{code}]]></expression>
 							</element>
 						</detailCell>
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column1"/>
@@ -58,7 +74,20 @@
 						</columnHeader>
 						<detailCell height="35" style="Table_TD">
 							<element kind="textField" uuid="b9928486-ddc5-45f1-8fee-0acd8e63c477" x="0" y="0" width="179" height="35" hTextAlign="Center" vTextAlign="Middle">
-								<expression><![CDATA[$F{material.name}]]></expression>
+								<expression><![CDATA[$F{material}]]></expression>
+							</element>
+						</detailCell>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+					</column>
+					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000030" width="179">
+						<columnHeader height="35" rowSpan="1" style="Table_CH">
+							<element kind="staticText" uuid="a1b2c3d4-0000-0000-0000-000000000031" x="0" y="0" width="179" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<text><![CDATA[Style]]></text>
+							</element>
+						</columnHeader>
+						<detailCell height="35" style="Table_TD">
+							<element kind="textField" uuid="b9928486-ddc5-45f1-8fee-0acd8e63c477" x="0" y="0" width="179" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<expression><![CDATA[$F{style}]]></expression>
 							</element>
 						</detailCell>
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
@@ -71,10 +100,36 @@
 						</columnHeader>
 						<detailCell height="35" style="Table_TD">
 							<element kind="textField" uuid="a1b2c3d4-0000-0000-0000-000000000042" x="0" y="0" width="121" height="35" hTextAlign="Center" vTextAlign="Middle">
-								<expression><![CDATA[$F{material.unit}]]></expression>
+								<expression><![CDATA[$F{unit}]]></expression>
 							</element>
 						</detailCell>
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column3"/>
+					</column>
+					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000030" width="179">
+						<columnHeader height="35" rowSpan="1" style="Table_CH">
+							<element kind="staticText" uuid="a1b2c3d4-0000-0000-0000-000000000031" x="0" y="0" width="179" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<text><![CDATA[Size]]></text>
+							</element>
+						</columnHeader>
+						<detailCell height="35" style="Table_TD">
+							<element kind="textField" uuid="b9928486-ddc5-45f1-8fee-0acd8e63c477" x="0" y="0" width="179" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<expression><![CDATA[$F{size}]]></expression>
+							</element>
+						</detailCell>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
+					</column>
+					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000030" width="179">
+						<columnHeader height="35" rowSpan="1" style="Table_CH">
+							<element kind="staticText" uuid="a1b2c3d4-0000-0000-0000-000000000031" x="0" y="0" width="179" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<text><![CDATA[Color]]></text>
+							</element>
+						</columnHeader>
+						<detailCell height="35" style="Table_TD">
+							<element kind="textField" uuid="b9928486-ddc5-45f1-8fee-0acd8e63c477" x="0" y="0" width="179" height="35" hTextAlign="Center" vTextAlign="Middle">
+								<expression><![CDATA[$F{color}]]></expression>
+							</element>
+						</detailCell>
+						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column2"/>
 					</column>
 					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000050" width="119">
 						<columnHeader height="35" rowSpan="1" style="Table_CH">
@@ -110,7 +165,7 @@
 						</columnHeader>
 						<detailCell height="35" style="Table_TD">
 							<element kind="textField" uuid="325567cc-7c46-415f-95d2-f8f525eabdbc" x="0" y="0" width="131" height="35" hTextAlign="Center" vTextAlign="Middle">
-								<expression><![CDATA[$F{user.nameEn}]]></expression>
+								<expression><![CDATA[$F{nameReceiver}]]></expression>
 							</element>
 						</detailCell>
 						<property name="com.jaspersoft.studio.components.table.model.column.name" value="Column4"/>
