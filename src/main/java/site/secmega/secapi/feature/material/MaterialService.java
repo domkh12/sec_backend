@@ -34,4 +34,7 @@ public interface MaterialService {
     ResponseEntity<InputStreamResource> getReportStockIn(Long id) throws IOException;
 
     ResponseEntity<InputStreamResource> getReportStockOut(Long id) throws IOException;
+
+    void deleteStock(Long id);
+
 }

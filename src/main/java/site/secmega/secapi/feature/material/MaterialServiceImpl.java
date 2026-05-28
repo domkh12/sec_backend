@@ -61,6 +61,12 @@ public class MaterialServiceImpl implements MaterialService{
     @Value("${materialStockOutExcel.template.path}")
     String stockOutExcelTemplatePath;
 
+        @Override
+    public void deleteStock(Long id) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'deleteStock'");
+    }
+
     @Override
     public ResponseEntity<InputStreamResource> getReportStockOut(Long id) throws IOException {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
