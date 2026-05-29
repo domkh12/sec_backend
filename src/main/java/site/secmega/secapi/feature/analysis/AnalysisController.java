@@ -1,10 +1,14 @@
 package site.secmega.secapi.feature.analysis;
 
 import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDate;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import site.secmega.secapi.feature.analysis.dto.AnalysisOutputResponse;
@@ -19,7 +23,7 @@ public class AnalysisController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/output")
     @ResponseStatus(HttpStatus.OK)
-    AnalysisOutputResponse getAnalysisOutput(){
+    AnalysisOutputResponse getAnalysisOutput(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
         return analysisService.getAnalysisOutput();
     }
 

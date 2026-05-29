@@ -63,8 +63,10 @@ public class MaterialServiceImpl implements MaterialService{
 
         @Override
     public void deleteStock(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteStock'");
+        MaterialDetail materialDetail = materialDetailRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material detail not found")
+        );
+        materialDetailRepository.delete(materialDetail);
     }
 
     @Override
