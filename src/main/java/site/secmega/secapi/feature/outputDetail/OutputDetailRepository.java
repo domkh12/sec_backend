@@ -5,6 +5,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import site.secmega.secapi.domain.OutputDetail;
 
+import java.time.LocalDate;
+
 @Repository
 public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long> {
     @Query("SELECT COALESCE(SUM(o.goodQty), 0) FROM OutputDetail o")
@@ -15,6 +17,12 @@ public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long
 
     @Query("select COALESCE(SUM(o.goodQty), 0) from OutputDetail o where o.fromLine.id = ?1")
     Integer sumByFromLine_Id(Long id);
+
+    @Query("select COALESCE(SUM(o.goodQty), 0) from OutputDetail o where o.outputDate = ?1 and o.fromLine.department.processNo = ?2")
+    Integer totalInputByDate(LocalDate outputDate, Integer processNo);
+
+    @Query("select COALESCE(SUM(o.goodQty), 0) from OutputDetail o where o.outputDate = ?1 and o.fromLine.department.processNo = ?2")
+    Integer totalOutputSewingByDate(LocalDate outputDate, Integer processNo);
 
     
 

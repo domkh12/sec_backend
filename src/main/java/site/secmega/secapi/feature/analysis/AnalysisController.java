@@ -21,10 +21,10 @@ public class AnalysisController {
     private final AnalysisService analysisService;
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping("/output")
+    @GetMapping("/output-today")
     @ResponseStatus(HttpStatus.OK)
-    AnalysisOutputResponse getAnalysisOutput(@RequestParam LocalDate startDate, @RequestParam LocalDate endDate) {
-        return analysisService.getAnalysisOutput();
+    AnalysisOutputResponse getAnalysisOutputToday() {
+        return analysisService.getAnalysisOutputToday();
     }
 
 }

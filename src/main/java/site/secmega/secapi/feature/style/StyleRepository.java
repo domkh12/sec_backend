@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
+import site.secmega.secapi.base.POStatus;
 import site.secmega.secapi.base.StyleStatus;
 import site.secmega.secapi.domain.Style;
 

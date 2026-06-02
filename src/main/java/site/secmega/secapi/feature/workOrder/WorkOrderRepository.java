@@ -37,5 +37,8 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long>, Jpa
             where productionLines.id = ?1 and w.deletedAt is null and w.isActive = true""")
     List<WorkOrder> findByProductionLines_IdAndDeletedAtNullAndIsActiveTrue(Long id);
 
+    @Query("select w from WorkOrder w where w.isActive = ?1")
+    List<WorkOrder> findByIsActive(Boolean isActive);
+
 
 }

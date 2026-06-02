@@ -21,10 +21,10 @@ public class MaterialController {
     private final MaterialService materialService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
-    @DeleteMapping("/details/{id}")
+    @DeleteMapping("/stock-in/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void deleteStock(@PathVariable Long id) throws IOException {
-        materialService.deleteStock(id);
+    void deleteStockIn(@PathVariable Long id) {
+        materialService.deleteStockIn(id);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
