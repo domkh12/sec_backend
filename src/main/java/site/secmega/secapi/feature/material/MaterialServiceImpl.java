@@ -75,6 +75,19 @@ public class MaterialServiceImpl implements MaterialService{
     }
 
     @Override
+    public void deleteStockOut(Long id) {
+        MaterialDetail materialDetail = materialDetailRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material detail not found")
+        );
+        Material material = materialRepository.findById(materialDetail.getMaterial().getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found!")
+        );
+        material.setBalance(material.getBalance() + materialDetail.getQuantity());
+        materialDetailRepository.delete(materialDetail);
+        materialRepository.save(material);
+    }
+
+    @Override
     public ResponseEntity<InputStreamResource> getReportStockOut(Long id) throws IOException {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         List<MaterialDetail> materialDetails = materialDetailRepository.findByTypeAndMaterial_IdOrderByIdDesc(TransactionType.INVENTORY_OUT, id, sort);

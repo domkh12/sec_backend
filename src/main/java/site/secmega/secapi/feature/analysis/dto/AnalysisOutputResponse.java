@@ -8,6 +8,7 @@ import java.util.List;
 public record AnalysisOutputResponse(
     Integer totalOutput,
     Integer totalInput,
+    Integer totalStyleActive,
     Integer totalActiveStyle,
     List<MoResponse> mo
 ) {

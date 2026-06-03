@@ -3,11 +3,12 @@ package site.secmega.secapi.feature.style;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import site.secmega.secapi.base.POStatus;
 import site.secmega.secapi.base.StyleStatus;
 import site.secmega.secapi.domain.Style;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -22,6 +23,17 @@ public interface StyleRepository extends JpaRepository<Style, Long>, JpaSpecific
 
     @Query("select s from Style s where s.id in ?1 and s.deletedAt is null")
     List<Style> findByIdInAndDeletedAtNull(Collection<Long> ids);
+
+    @Query("""
+    select count(distinct s)
+    from Style s
+    join s.purchaseOrders po
+    join po.workOrders wo
+    join wo.outputDetails od
+    where DATE(od.outputDate) = :date
+    and s.deletedAt is null
+    """)
+    Integer countStylesWithOutputDetailsToday(@Param("date") LocalDate date);
 
 
 }
