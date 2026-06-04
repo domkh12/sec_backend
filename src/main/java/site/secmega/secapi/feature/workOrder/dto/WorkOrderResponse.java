@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import site.secmega.secapi.base.WorkOrderStatus;
 import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
+import site.secmega.secapi.feature.productionLine.dto.ProductionLineLookupResponse;
 import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderLookupResponse;
 import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
 
@@ -20,6 +21,7 @@ public record WorkOrderResponse(
         Integer output,
         Integer balance,
         List<SizeLookupResponse> sizes,
+        List<ProductionLineLookupResponse> lines,
         ColorLookupResponse color,
         WorkOrderStatus status,
         @JsonFormat(pattern = "dd-MM-yyyy")

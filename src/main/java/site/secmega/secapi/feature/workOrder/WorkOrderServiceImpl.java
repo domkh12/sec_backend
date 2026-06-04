@@ -12,12 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.base.WorkOrderStatus;
 import site.secmega.secapi.domain.*;
-import site.secmega.secapi.feature.buyer.BuyerRepository;
-import site.secmega.secapi.feature.buyer.dto.BuyerLookupResponse;
 import site.secmega.secapi.feature.color.ColorRepository;
 import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
 import site.secmega.secapi.feature.outputDetail.OutputDetailRepository;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
+import site.secmega.secapi.feature.productionLine.dto.ProductionLineLookupResponse;
 import site.secmega.secapi.feature.purchaseOrder.PurchaseOrderRepository;
 import site.secmega.secapi.feature.purchaseOrder.PurchaseOrderService;
 import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderLookupResponse;
@@ -277,6 +276,12 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                                                               .build()).toList() : List.of();
                     Integer output = outputDetailRepository.sumGoodQtyByWorkOrder_Id(w.getId());
 
+                    List<ProductionLineLookupResponse> lineResps = (w.getProductionLines() != null) ?
+                            w.getProductionLines().stream().map(line -> ProductionLineLookupResponse.builder()
+                                    .id(line.getId())
+                                    .line(line.getLine())
+                                    .build()).toList() : List.of();
+
                     return WorkOrderResponse.builder()
                             .id(w.getId())
                             .mo(w.getMo())
@@ -287,6 +292,8 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                             .style(w.getPurchaseOrder().getStyle().getStyleNo())
                             .color(colorResp)
                             .sizes(sizeResps)
+                            .lines(lineResps)
+                            .balance(output)
                             .qty(w.getQty())
                             .startDate(w.getStartDate())
                             .endDate(w.getEndDate())
