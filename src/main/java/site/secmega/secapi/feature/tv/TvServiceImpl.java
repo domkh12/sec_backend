@@ -254,6 +254,7 @@ public class TvServiceImpl implements TvService{
         return TvDataResponse.builder()
                 .line(tv.getLine())
                 .worker(tv.getWorker())
+                .helper(tv.getHelper())
                 .day(days)
                 .orderNo(tv.getOrderNo())
                 .totalInLine(tv.getTotalInLine())

@@ -1,6 +1,7 @@
 package site.secmega.secapi.feature.analysis.dto;
 
 import lombok.Builder;
+import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
 
 import java.util.List;
 
@@ -10,6 +11,7 @@ public record MoResponse(
         Integer outputQty,
         String buyer,
         Integer inputQty,
-        List<SizeOutput> sizeOutputs
+        List<SizeOutput> sizeOutputs,
+        ColorLookupResponse color
 ) {
 }
