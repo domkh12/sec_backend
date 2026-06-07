@@ -2,6 +2,8 @@ package site.secmega.secapi.feature.outputDetail.dto;
 
 import jakarta.validation.constraints.NotNull;
 
+import java.time.LocalDate;
+
 public record OutputDetailRequest(
         @NotNull(message = "Time cannot be null")
         Long timeId,
@@ -9,10 +11,9 @@ public record OutputDetailRequest(
         Long sizeId,
         @NotNull(message = "From Line cannot be null")
         Long fromLineId,
-        @NotNull(message = "To Line cannot be null")
         Long toLineId,
         String mo,
-        Integer goodQty
-
+        Integer goodQty,
+        LocalDate outputDate
 ) {
 }

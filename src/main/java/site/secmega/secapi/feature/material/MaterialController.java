@@ -21,6 +21,20 @@ public class MaterialController {
     private final MaterialService materialService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
+    @DeleteMapping("/stock-out/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteStockOut(@PathVariable Long id) {
+        materialService.deleteStockOut(id);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
+    @DeleteMapping("/stock-in/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteStockIn(@PathVariable Long id) {
+        materialService.deleteStockIn(id);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @GetMapping("/{id}/report-stock-out-excel")
     @ResponseStatus(HttpStatus.OK)
     ResponseEntity<InputStreamResource> getReportStockOut(@PathVariable Long id) throws IOException {

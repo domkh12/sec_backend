@@ -49,4 +49,7 @@ public class ProductionLine extends BaseEntity{
 
     @OneToMany(mappedBy = "productionLine")
     private List<DefectDetail> defectDetails;
+
+    @ManyToMany(mappedBy = "productionLines")
+    private List<WorkOrder> workOrders;
 }

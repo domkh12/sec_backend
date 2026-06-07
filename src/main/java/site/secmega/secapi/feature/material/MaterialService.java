@@ -6,8 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import site.secmega.secapi.feature.material.dto.*;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public interface MaterialService {
@@ -34,4 +32,8 @@ public interface MaterialService {
     ResponseEntity<InputStreamResource> getReportStockIn(Long id) throws IOException;
 
     ResponseEntity<InputStreamResource> getReportStockOut(Long id) throws IOException;
+
+    void deleteStockIn(Long id);
+
+    void deleteStockOut(Long id);
 }

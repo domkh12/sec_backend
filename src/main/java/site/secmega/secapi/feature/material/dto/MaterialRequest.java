@@ -15,9 +15,7 @@ public record MaterialRequest(
         String unit,
         String image,
         Long sizeId,
-        @NotNull(message = "Color is required")
         Long colorId,
-        @NotNull(message = "Style is required")
         List<Long> styleIds
 ) {
 }

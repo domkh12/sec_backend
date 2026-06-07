@@ -1,6 +1,8 @@
 package site.secmega.secapi.feature.analysis;
 
 import lombok.RequiredArgsConstructor;
+
+
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,10 +19,10 @@ public class AnalysisController {
     private final AnalysisService analysisService;
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
-    @GetMapping("/output")
+    @GetMapping("/output-today")
     @ResponseStatus(HttpStatus.OK)
-    AnalysisOutputResponse getAnalysisOutput(){
-        return analysisService.getAnalysisOutput();
+    AnalysisOutputResponse getAnalysisOutputToday() {
+        return analysisService.getAnalysisOutputToday();
     }
 
 }

@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import site.secmega.secapi.domain.ProductionLine;
 
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -19,6 +20,12 @@ public interface ProductionLineRepository extends JpaRepository<ProductionLine, 
 
     @Query("select p from ProductionLine p where p.department.processNo = ?1 order by p.line")
     List<ProductionLine> findByDepartment_ProcessNoOrderByLineAsc(Integer processNo, Sort sort);
+
+    @Query("select p from ProductionLine p where p.deletedAt is null order by p.department.processNo")
+    List<ProductionLine> findByDeletedAtNullOrderByDepartment_ProcessNoAsc();
+
+    @Query("select p from ProductionLine p where p.id in ?1 and p.deletedAt is null")
+    List<ProductionLine> findByIdInAndDeletedAtNull(Collection<Long> ids);
 
 
 }

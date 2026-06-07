@@ -12,6 +12,7 @@ import site.secmega.secapi.base.ProductionLineStatus;
 import site.secmega.secapi.domain.Department;
 import site.secmega.secapi.domain.ProductionLine;
 import site.secmega.secapi.feature.department.DepartmentRepository;
+import site.secmega.secapi.feature.department.dto.DepartmentForLineResponse;
 import site.secmega.secapi.feature.productionLine.dto.*;
 import site.secmega.secapi.mapper.ProductionLineMapper;
 
@@ -32,22 +33,55 @@ public class ProductionLineServiceImpl implements ProductionLineService{
     public List<ProductionLineLookupResponse> getProductionLineByDeptNo(Integer processNo) {
         Sort sort = Sort.by(Sort.Direction.ASC, "line");
         List<ProductionLine> productionLines = productionLineRepository.findByDepartment_ProcessNoOrderByLineAsc(processNo, sort);
-        return productionLines.stream().map(productionLineMapper::toProductionLineLookupResponse).toList();
+        return productionLines.stream().map(
+                line -> ProductionLineLookupResponse.builder()
+                        .id(line.getId())
+                        .line(line.getLine())
+                        .image(line.getImage())
+                        .isInput(line.getDepartment().getProcessNo() == 1)
+                        .department(DepartmentForLineResponse.builder()
+                                .id(line.getDepartment().getId())
+                                .processNo(line.getDepartment().getProcessNo())
+                                .name(line.getDepartment().getDepartment())
+                                .build())
+                        .build()
+        ).toList();
     }
 
     @Override
     public List<ProductionLineLookupResponse> getProductionLineByDept(Long id) {
         Sort sort = Sort.by(Sort.Direction.ASC, "line");
         List<ProductionLine> productionLines = productionLineRepository.findByDepartment_IdOrderByLineAsc(id, sort);
-        return productionLines.stream().map(productionLineMapper::toProductionLineLookupResponse).toList();
+        return productionLines.stream().map(
+                line -> ProductionLineLookupResponse.builder()
+                        .id(line.getId())
+                        .line(line.getLine())
+                        .image(line.getImage())
+                        .isInput(line.getDepartment().getProcessNo() == 1)
+                        .department(DepartmentForLineResponse.builder()
+                                .id(line.getDepartment().getId())
+                                .processNo(line.getDepartment().getProcessNo())
+                                .name(line.getDepartment().getDepartment())
+                                .build())
+                        .build()
+        ).toList();
     }
 
     @Override
     public List<ProductionLineLookupResponse> getProductionLineLookup() {
-        Sort sort = Sort.by(Sort.Direction.ASC, "line");
-        List<ProductionLine> productionLines = productionLineRepository.findAll(sort);
+        List<ProductionLine> productionLines = productionLineRepository.findByDeletedAtNullOrderByDepartment_ProcessNoAsc();
 
-        return productionLines.stream().map(productionLineMapper::toProductionLineLookupResponse).toList();
+        return productionLines.stream().map(line -> ProductionLineLookupResponse.builder()
+                .id(line.getId())
+                .line(line.getLine())
+                .isInput(line.getDepartment().getProcessNo() == 1)
+                .image(line.getImage())
+                .department(DepartmentForLineResponse.builder()
+                        .id(line.getDepartment().getId())
+                        .processNo(line.getDepartment().getProcessNo())
+                        .name(line.getDepartment().getDepartment())
+                        .build())
+                .build()).toList();
     }
 
     @Override

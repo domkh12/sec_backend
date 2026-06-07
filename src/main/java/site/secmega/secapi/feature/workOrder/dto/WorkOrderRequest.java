@@ -17,6 +17,8 @@ public record WorkOrderRequest(
         Long colorId,
         @NotNull(message = "Size ID cannot be null")
         List<Long> sizeIds,
+        @NotNull(message = "Line ID cannot be null")
+        List<Long> lineIds,
         @NotNull(message = "Start Date cannot be null")
         LocalDate startDate,
         @NotNull(message = "End Date ID cannot be null")

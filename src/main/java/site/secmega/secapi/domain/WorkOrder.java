@@ -55,4 +55,10 @@ public class WorkOrder extends BaseEntity{
     @ManyToOne
     private PurchaseOrder purchaseOrder;
 
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(joinColumns = @JoinColumn(name = "wo_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "line_id", referencedColumnName = "id")
+    )
+    private List<ProductionLine> productionLines;
+
 }

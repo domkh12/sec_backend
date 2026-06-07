@@ -18,8 +18,7 @@ public class StyleController {
 
     private final StyleService styleService;
 
-
-    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_WAREHOUSE')")
     @GetMapping("/lookup")
     @ResponseStatus(HttpStatus.OK)
     List<StyleLookupResponse> getStyleLookup(){

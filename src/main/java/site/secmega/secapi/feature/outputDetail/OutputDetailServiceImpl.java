@@ -48,17 +48,17 @@ public class OutputDetailServiceImpl implements OutputDetailService{
             );
             outputDetail.setFromLine(fromLine);
 
-            ProductionLine toLine = productionLineRepository.findById(od.toLineId()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "To Line not found!")
-            );
-            outputDetail.setToLine(toLine);
+            if (od.toLineId() != null) {
+                ProductionLine toLine = productionLineRepository.findById(od.toLineId()).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "To Line not found!")
+                );
+                outputDetail.setToLine(toLine);
+            }
 
             Size size = sizeRepository.findById(od.sizeId()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Size not found")
             );
             outputDetail.setSize(size);
-
-            outputDetail.setOutputDate(LocalDate.now());
             outputDetailRepository.save(outputDetail);
         });
         return null;
