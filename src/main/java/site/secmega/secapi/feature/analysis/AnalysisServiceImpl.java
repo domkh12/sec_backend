@@ -28,9 +28,12 @@ public class AnalysisServiceImpl implements AnalysisService{
     @Override
     public AnalysisOutputResponse getAnalysisOutputToday() {
         LocalDate today = LocalDate.now();
-        Integer totalInput = outputDetailRepository.totalInputByDate(today, 1);
-        Integer totalOutput = outputDetailRepository.totalOutputSewingByDate(today, 2);
+        Integer totalInputToday = outputDetailRepository.totalInputByDate(today, 1);
+        Integer totalOutputToday = outputDetailRepository.totalOutputSewingByDate(today, 2);
         Integer totalStyleActive = styleRepository.countStylesWithOutputDetailsToday(today);
+        Integer totalWorkOrderQty = workOrderRepository.sumByIsActiveTrue();
+        Integer totalOutput = outputDetailRepository.totalOutputQty(2);
+        Integer totalBalance = totalWorkOrderQty - totalOutput;
         List<MoResponse> moResponses = workOrderRepository.findByIsActive(true).stream().map(
                 wo -> MoResponse.builder()
                         .mo(wo.getMo())
@@ -52,12 +55,16 @@ public class AnalysisServiceImpl implements AnalysisService{
                 BuyerAnalysisResponse.builder()
                         .id(buyer.getId())
                         .name(buyer.getName())
+                        .mos((int) buyer.getPurchaseOrders().stream().flatMap(po -> po.getWorkOrders().stream()).filter(wo -> wo.getIsActive()).count())
+                        .outputQty(buyer.getPurchaseOrders().stream().flatMap(po -> po.getWorkOrders().stream()).filter(wo -> wo.getIsActive()).mapToInt(wo -> outputDetailRepository.totalOutputTodayByMO(wo.getMo(), today, 2)).sum())
+                        .inputQty(buyer.getPurchaseOrders().stream().flatMap(po -> po.getWorkOrders().stream()).filter(wo -> wo.getIsActive()).mapToInt(wo -> outputDetailRepository.totalOutputTodayByMO(wo.getMo(), today, 1)).sum())
                         .build()
                 ).toList();
         return AnalysisOutputResponse.builder()
-                .totalInput(totalInput)
-                .totalOutput(totalOutput)
+                .totalInput(totalInputToday)
+                .totalOutput(totalOutputToday)
                 .totalStyleActive(totalStyleActive)
+                .totalBalance(totalBalance)
                 .mo(moResponses)
                 .buyers(buyerAnalysisResponses)
                 .build();

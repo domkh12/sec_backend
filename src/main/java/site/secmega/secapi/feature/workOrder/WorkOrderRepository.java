@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import site.secmega.secapi.base.WorkOrderStatus;
 import site.secmega.secapi.domain.WorkOrder;
 
 import java.time.LocalDate;
@@ -41,5 +42,9 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long>, Jpa
 
     @Query("select w from WorkOrder w where w.isActive = ?1")
     List<WorkOrder> findByIsActive(Boolean isActive);
+
+    @Query("select COALESCE(SUM(w.qty), 0) from WorkOrder w where w.isActive = true")
+    Integer sumByIsActiveTrue();
+
 
 }

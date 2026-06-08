@@ -34,6 +34,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -61,6 +62,32 @@ public class MaterialServiceImpl implements MaterialService{
     String stockOutExcelTemplatePath;
 
     @Override
+    public void deleteStockIn(Long id) {
+        MaterialDetail materialDetail = materialDetailRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material detail not found")
+        );
+        Material material = materialRepository.findById(materialDetail.getMaterial().getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found!")
+        );
+        material.setBalance(material.getBalance() - materialDetail.getQuantity());
+        materialDetailRepository.delete(materialDetail);
+        materialRepository.save(material);
+    }
+
+    @Override
+    public void deleteStockOut(Long id) {
+        MaterialDetail materialDetail = materialDetailRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material detail not found")
+        );
+        Material material = materialRepository.findById(materialDetail.getMaterial().getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found!")
+        );
+        material.setBalance(material.getBalance() + materialDetail.getQuantity());
+        materialDetailRepository.delete(materialDetail);
+        materialRepository.save(material);
+    }
+
+    @Override
     public ResponseEntity<InputStreamResource> getReportStockOut(Long id) throws IOException {
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         List<MaterialDetail> materialDetails = materialDetailRepository.findByTypeAndMaterial_IdOrderByIdDesc(TransactionType.INVENTORY_OUT, id, sort);
@@ -76,7 +103,26 @@ public class MaterialServiceImpl implements MaterialService{
         Sort sort = Sort.by(Sort.Direction.DESC, "id");
         List<MaterialDetail> materialDetails = materialDetailRepository.findByTypeAndMaterial_IdOrderByIdDesc(TransactionType.INVENTORY_IN, id, sort);
 
-        File file = generateReportService.generateExcelReport(materialDetails, stockInExcelTemplatePath);
+        List<MaterialReportStockInResponse> reportStockIn = materialDetails.stream()
+                .map(detail -> MaterialReportStockInResponse.builder()
+                        .code(detail.getMaterial().getCode())
+                        .material(detail.getMaterial().getName())
+                        .size(detail.getMaterial().getSize() != null ? detail.getMaterial().getSize().getSize() : "")
+                        .color(detail.getMaterial().getColor() != null ? detail.getMaterial().getColor().getColor() : "")
+                        .nameReceiver(detail.getUser().getNameEn())
+                        .date(detail.getTransactionDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")))
+                        .quantity(detail.getQuantity())
+                        .qtyBalance(detail.getQtyBalance())
+                        .unit(detail.getMaterial().getUnit())
+                        .style(detail.getMaterial().getStyles().stream()
+                                .map(Style::getStyleNo)
+                                .collect(Collectors.joining(", "))
+                        )
+                        .build()
+                )
+                .toList();
+
+        File file = generateReportService.generateExcelReport(reportStockIn, stockInExcelTemplatePath);
         HttpHeaders headers = Util.getHttpHeaders("MaterialDetail", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
 
         return new ResponseEntity<>(new InputStreamResource(new FileInputStream(file)), headers, HttpStatus.OK);
@@ -101,7 +147,7 @@ public class MaterialServiceImpl implements MaterialService{
                                         .collect(Collectors.joining(", "))
                         )
                         .unit(detail.getUnit())
-                        .size(detail.getSize() != null ? detail.getSize().getSize() : "")
+                        .size(detail.getSize().getSize() != null ? detail.getSize().getSize() : "")
                         .color(detail.getColor() != null ? detail.getColor().getColor() : "")
                         .balance(detail.getBalance())
                         .build()
@@ -130,6 +176,8 @@ public class MaterialServiceImpl implements MaterialService{
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Size not found")
             );
             material.setSize(size);
+        }else {
+            material.setSize(null);
         }
 
         if (materialRequest.colorId() != null){
@@ -137,6 +185,8 @@ public class MaterialServiceImpl implements MaterialService{
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Color not found")
             );
             material.setColor(color);
+        }else {
+            material.setColor(null);
         }
         material.setUpdatedAt(LocalDateTime.now());
         Material updatedMaterial = materialRepository.save(material);
@@ -340,13 +390,15 @@ public class MaterialServiceImpl implements MaterialService{
                 .status(material.getStatus())
                 .unit(material.getUnit())
                 .image(material.getImage())
-                .size(SizeLookupResponse.builder()
-                        .id(material.getSize() != null ? material.getSize().getId() : null)
-                        .size(material.getSize() != null ? material.getSize().getSize() : null)
+                .size(material.getSize() == null ? null :
+                        SizeLookupResponse.builder()
+                        .id(material.getSize().getId())
+                        .size(material.getSize().getSize())
                         .build())
-                .color(ColorLookupResponse.builder()
-                        .id(material.getColor() != null ? material.getColor().getId() : null)
-                        .color(material.getColor() != null ? material.getColor().getColor() : null)
+                .color(material.getColor() == null ? null :
+                        ColorLookupResponse.builder()
+                        .id(material.getColor().getId())
+                        .color(material.getColor().getColor())
                         .build())
                 .totalInput(material.getMaterialDetails().stream().filter(detail -> detail.getType() == TransactionType.INVENTORY_IN).mapToDouble(MaterialDetail::getQuantity).sum())
                 .totalOutput(material.getMaterialDetails().stream().filter(detail -> detail.getType() == TransactionType.INVENTORY_OUT).mapToDouble(MaterialDetail::getQuantity).sum())

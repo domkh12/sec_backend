@@ -34,5 +34,8 @@ public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long
             where o.outputDate = ?1 and o.workOrder.mo = ?2 and o.fromLine.department.processNo = ?3 and o.size.id = ?4""")
     Integer totalOutputTodayByMOAndSize(LocalDate outputDate, String mo, Integer processNo, Long id);
 
+    @Query("select COALESCE(SUM(o.goodQty), 0) from OutputDetail o where o.fromLine.department.processNo = ?1")
+    Integer totalOutputQty(Integer processNo);
+
 
 }

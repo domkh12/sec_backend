@@ -10,6 +10,7 @@ public record AnalysisOutputResponse(
     Integer totalInput,
     Integer totalStyleActive,
     Integer totalActiveStyle,
+    Integer totalBalance,
     List<MoResponse> mo,
     List<BuyerAnalysisResponse> buyers
 ) {
