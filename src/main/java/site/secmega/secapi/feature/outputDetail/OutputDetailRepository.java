@@ -37,5 +37,8 @@ public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long
     @Query("select COALESCE(SUM(o.goodQty), 0) from OutputDetail o where o.fromLine.department.processNo = ?1")
     Integer totalOutputQty(Integer processNo);
 
+    @Query("select COALESCE(SUM(o.goodQty), 0) from OutputDetail o where o.outputDate = ?1 and o.fromLine.id = ?2")
+    Integer sumOutputByLine(LocalDate outputDate, Long id);
+
 
 }

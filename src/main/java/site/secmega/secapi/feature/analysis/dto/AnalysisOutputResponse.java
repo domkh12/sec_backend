@@ -12,6 +12,7 @@ public record AnalysisOutputResponse(
     Integer totalActiveStyle,
     Integer totalBalance,
     List<MoResponse> mo,
-    List<BuyerAnalysisResponse> buyers
+    List<BuyerAnalysisResponse> buyers,
+    List<LineDataResponse> lineData
 ) {
 }

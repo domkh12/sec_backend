@@ -3,13 +3,11 @@ package site.secmega.secapi.feature.analysis;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
-import site.secmega.secapi.feature.analysis.dto.AnalysisOutputResponse;
-import site.secmega.secapi.feature.analysis.dto.BuyerAnalysisResponse;
-import site.secmega.secapi.feature.analysis.dto.MoResponse;
-import site.secmega.secapi.feature.analysis.dto.SizeOutput;
+import site.secmega.secapi.feature.analysis.dto.*;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
 import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
 import site.secmega.secapi.feature.outputDetail.OutputDetailRepository;
+import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.style.StyleRepository;
 import site.secmega.secapi.feature.workOrder.WorkOrderRepository;
 
@@ -24,6 +22,7 @@ public class AnalysisServiceImpl implements AnalysisService{
     private final WorkOrderRepository workOrderRepository;
     private final StyleRepository styleRepository;
     private final BuyerRepository buyerRepository;
+    private final ProductionLineRepository productionLineRepository;
 
     @Override
     public AnalysisOutputResponse getAnalysisOutputToday() {
@@ -60,6 +59,10 @@ public class AnalysisServiceImpl implements AnalysisService{
                         .inputQty(buyer.getPurchaseOrders().stream().flatMap(po -> po.getWorkOrders().stream()).filter(wo -> wo.getIsActive()).mapToInt(wo -> outputDetailRepository.totalOutputTodayByMO(wo.getMo(), today, 1)).sum())
                         .build()
                 ).toList();
+        List<LineDataResponse> lineDataResponses = productionLineRepository.findByDepartment_ProcessNo(2).stream().map(line -> LineDataResponse.builder()
+                .x(line.getLine())
+                .y(outputDetailRepository.sumOutputByLine(today, line.getId()))
+                .build()).toList();
         return AnalysisOutputResponse.builder()
                 .totalInput(totalInputToday)
                 .totalOutput(totalOutputToday)
@@ -67,6 +70,7 @@ public class AnalysisServiceImpl implements AnalysisService{
                 .totalBalance(totalBalance)
                 .mo(moResponses)
                 .buyers(buyerAnalysisResponses)
+                .lineData(lineDataResponses)
                 .build();
     }
 }
