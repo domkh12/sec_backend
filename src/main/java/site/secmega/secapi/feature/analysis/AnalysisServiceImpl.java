@@ -3,6 +3,7 @@ package site.secmega.secapi.feature.analysis;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import site.secmega.secapi.domain.WorkOrder;
 import site.secmega.secapi.feature.analysis.dto.*;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
 import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
@@ -59,10 +60,43 @@ public class AnalysisServiceImpl implements AnalysisService{
                         .inputQty(buyer.getPurchaseOrders().stream().flatMap(po -> po.getWorkOrders().stream()).filter(wo -> wo.getIsActive()).mapToInt(wo -> outputDetailRepository.totalOutputTodayByMO(wo.getMo(), today, 1)).sum())
                         .build()
                 ).toList();
-        List<LineDataResponse> lineDataResponses = productionLineRepository.findByDepartment_ProcessNo(2).stream().map(line -> LineDataResponse.builder()
-                .x(line.getLine())
-                .y(outputDetailRepository.sumOutputByLine(today, line.getId()))
-                .build()).toList();
+        List<LineDataResponse> lineDataResponses =
+                productionLineRepository.findByDepartment_ProcessNo(2)
+                        .stream()
+                        .map(line -> {
+
+                            List<WorkOrder> activeWos = line.getWorkOrders()
+                                    .stream()
+                                    .filter(WorkOrder::getIsActive)
+                                    .toList();
+
+                            String buyer = activeWos.isEmpty()
+                                    ? null
+                                    : activeWos.getFirst()
+                                    .getPurchaseOrder()
+                                    .getBuyer()
+                                    .getName();
+
+                            return LineDataResponse.builder()
+                                    .x(line.getLine())
+                                    .buyer(buyer)
+                                    .y(outputDetailRepository.sumOutputByLine(today, line.getId()))
+                                    .mos(activeWos.stream()
+                                            .map(wo -> MoResponse.builder()
+                                                    .mo(wo.getMo())
+                                                    .outputQty(outputDetailRepository.sumOutputTodayByMOAndLine(
+                                                            wo.getMo(),
+                                                            today,
+                                                            line.getId()))
+                                                    .inputQty(outputDetailRepository.sumOutputTodayByMOAndLine(
+                                                            wo.getMo(),
+                                                            today,
+                                                            line.getId()))
+                                                    .build())
+                                            .toList())
+                                    .build();
+                        })
+                        .toList();
         return AnalysisOutputResponse.builder()
                 .totalInput(totalInputToday)
                 .totalOutput(totalOutputToday)
