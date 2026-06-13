@@ -36,4 +36,6 @@ public interface MaterialService {
     void deleteStockIn(Long id);
 
     void deleteStockOut(Long id);
+
+    void updateStockIn(Long id, UpdateStockInQtyRequest updateStockInQtyRequest);
 }

@@ -26,6 +26,7 @@ import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
 import site.secmega.secapi.feature.style.StyleRepository;
 import site.secmega.secapi.feature.style.dto.StyleLookupResponse;
 import site.secmega.secapi.feature.user.UserRepository;
+import site.secmega.secapi.mapper.MaterialDetailMapper;
 import site.secmega.secapi.mapper.MaterialMapper;
 import site.secmega.secapi.util.AuthUtil;
 import site.secmega.secapi.util.Util;
@@ -51,6 +52,7 @@ public class MaterialServiceImpl implements MaterialService{
     private final StyleRepository styleRepository;
     private final SizeRepository sizeRepository;
     private final ColorRepository colorRepository;
+    private final MaterialDetailMapper materialDetailMapper;
 
     @Value("${materialExcel.template.path}")
     String excelTemplatePath;
@@ -60,6 +62,17 @@ public class MaterialServiceImpl implements MaterialService{
 
     @Value("${materialStockOutExcel.template.path}")
     String stockOutExcelTemplatePath;
+
+    @Override
+    public void updateStockIn(Long id, UpdateStockInQtyRequest updateStockInQtyRequest) {
+        MaterialDetail materialDetail = materialDetailRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material Detail not found")
+        );
+        materialDetailMapper.updateStockIn(updateStockInQtyRequest, materialDetail);
+        materialDetail.setQuantity(updateStockInQtyRequest.qty());
+        materialDetail.setTransactionDate(updateStockInQtyRequest.transactionDate());
+
+    }
 
     @Override
     public void deleteStockIn(Long id) {

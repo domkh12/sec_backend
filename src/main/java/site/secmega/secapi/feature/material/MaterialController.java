@@ -21,6 +21,13 @@ public class MaterialController {
     private final MaterialService materialService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
+    @PutMapping("/stock-in/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    void updateStockIn(@PathVariable Long id, UpdateStockInQtyRequest updateStockInQtyRequest){
+        materialService.updateStockIn(id, updateStockInQtyRequest);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @DeleteMapping("/stock-out/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteStockOut(@PathVariable Long id) {
