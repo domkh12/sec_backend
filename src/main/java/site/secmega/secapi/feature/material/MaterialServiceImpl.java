@@ -71,7 +71,7 @@ public class MaterialServiceImpl implements MaterialService{
         materialDetailMapper.updateStockIn(updateStockInQtyRequest, materialDetail);
         materialDetail.setQuantity(updateStockInQtyRequest.qty());
         materialDetail.setTransactionDate(updateStockInQtyRequest.transactionDate());
-
+        materialDetailRepository.save(materialDetail);
     }
 
     @Override
