@@ -21,9 +21,9 @@ public class MaterialController {
     private final MaterialService materialService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
-    @PutMapping("/stock-in/{id}")
+    @PatchMapping("/stock-in/{id}")
     @ResponseStatus(HttpStatus.CREATED)
-    void updateStockIn(@PathVariable Long id, UpdateStockInQtyRequest updateStockInQtyRequest){
+    void updateStockIn(@PathVariable Long id,@RequestBody UpdateStockInQtyRequest updateStockInQtyRequest){
         materialService.updateStockIn(id, updateStockInQtyRequest);
     }
 

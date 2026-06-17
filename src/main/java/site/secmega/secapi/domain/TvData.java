@@ -19,6 +19,20 @@ public class TvData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String line;
+    private Integer worker;
+    private Integer helper;
+    private Integer orderQty;
+    private Integer totalInLine;
+    private Integer totalOutput;
+    private Integer orderInline;
+    private Integer balanceInLine;
+    private Integer qcRepairBack;
+    private Integer balanceDay;
+    private String styleNo;
+    private LocalDate startDate;
+    private LocalDate finishDate;
+
     private String date;
     private Integer dTarget;
     private Boolean isToday;

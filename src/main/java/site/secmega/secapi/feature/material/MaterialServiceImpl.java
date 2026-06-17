@@ -69,8 +69,6 @@ public class MaterialServiceImpl implements MaterialService{
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material Detail not found")
         );
         materialDetailMapper.updateStockIn(updateStockInQtyRequest, materialDetail);
-        materialDetail.setQuantity(updateStockInQtyRequest.qty());
-        materialDetail.setTransactionDate(updateStockInQtyRequest.transactionDate());
         materialDetailRepository.save(materialDetail);
     }
 
