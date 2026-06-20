@@ -1,6 +1,7 @@
 package site.secmega.secapi.feature.tv;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class TvServiceImpl implements TvService{
 
     private final TvRepository tvRepository;
@@ -43,7 +45,7 @@ public class TvServiceImpl implements TvService{
         return tvs.stream()
                 .map(tv -> {
                     LocalDate startDate = tv.getStartDate();
-                    Long days = (startDate == null) ? null : ChronoUnit.DAYS.between(startDate, now);
+                    Long days = (startDate == null) ? null : ChronoUnit.DAYS.between(startDate, now) + 1;
 
                     List<TvData> sortedDatas = tv.getTvDatas().stream()
                             .sorted(Comparator.comparing(TvData::getDate).reversed())
@@ -51,7 +53,7 @@ public class TvServiceImpl implements TvService{
 
                     TvData latest    = sortedDatas.size() > 0 ? sortedDatas.get(0) : TvData.builder().build();
                     TvData yesterday = sortedDatas.size() > 1 ? sortedDatas.get(1) : TvData.builder().build();
-
+                    log.info("TV Line [{}] - yesterday: {}", tv.getLine(), yesterday);
                     int yesterdayTotal = Stream.of(
                             yesterday.getH8(), yesterday.getH9(), yesterday.getH10(), yesterday.getH11(),
                             yesterday.getH13(), yesterday.getH14(), yesterday.getH15(), yesterday.getH16(),
@@ -110,25 +112,21 @@ public class TvServiceImpl implements TvService{
         boolean alreadyExists = tvDataRepository.existsByTvAndDate(tv, today);
 
         if (!alreadyExists) {
+            tvDataRepository.clearIsTodayByTv(tv); // ✅ reset all previous
+
             TvData tvData = TvData.builder()
                     .date(today)
                     .isToday(true)
                     .tv(tv)
                     .build();
 
-            tvDataRepository.save(tvData);
+            tvDataRepository.save(tvData); // ✅ save new record
 
-            List<TvData> sortedDatas = tv.getTvDatas().stream()
-                    .sorted(Comparator.comparing(TvData::getDate).reversed())
-                    .toList();
-
-            TvData yesterday = sortedDatas.size() > 1 ? sortedDatas.get(1) : TvData.builder().build();
-            yesterday.setIsToday(false);
-            tvDataRepository.save(yesterday);
             messagingTemplate.convertAndSend("/topic/messages/tv-data-update", MessageRequest.builder()
                     .message("update")
                     .isUpdate(true)
                     .build());
+
             return TvDataResponse.builder()
                     .line(tv.getLine())
                     .worker(tv.getWorker())
@@ -145,7 +143,7 @@ public class TvServiceImpl implements TvService{
                     .hTarg(tv.getHTarg())
                     .input(tv.getInput())
                     .build();
-        }else {
+        } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Today data already exists");
         }
     }
