@@ -1,5 +1,6 @@
 package site.secmega.secapi.feature.purchaseOrder;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -57,12 +58,21 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         return po.stream().map(purchaseOrderMapper::toPurchaseOrderLookupResponse).toList();
     }
 
+    @Transactional
     @Override
     public void deletePO(Long id) {
         PurchaseOrder po = purchaseOrderRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "PO not found!")
         );
-        po.setDeletedAt(LocalDateTime.now());
+        LocalDateTime now = LocalDateTime.now();
+        po.getWorkOrders().forEach(wo -> {
+            wo.getOutputDetails().forEach(od -> od.setDeletedAt(now));
+            wo.getBundles().forEach(b -> b.setDeletedAt(now));
+            wo.getDefectDetails().forEach(dd -> dd.setDeletedAt(now));
+
+            wo.setDeletedAt(now);
+        });
+        po.setDeletedAt(now);
         purchaseOrderRepository.save(po);
     }
 

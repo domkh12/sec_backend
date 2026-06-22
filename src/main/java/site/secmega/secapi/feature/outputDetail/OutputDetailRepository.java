@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 @Repository
 public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long> {
-    @Query("SELECT COALESCE(SUM(o.goodQty), 0) FROM OutputDetail o")
+    @Query("SELECT COALESCE(SUM(o.goodQty), 0) from OutputDetail o where o.deletedAt is null")
     long sumGoodOutputQty();
 
     @Query("SELECT COALESCE(SUM(o.goodQty), 0) FROM OutputDetail o WHERE o.workOrder.id = ?1")

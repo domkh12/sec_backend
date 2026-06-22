@@ -160,7 +160,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
     public WorkOrderStatResponse getWorkOrderStat(WorkOrderFilterRequest workOrderFilterRequest) {
 
         long totalMO = workOrderRepository.countFirstBy();
-        long totalWorkOrderQty = workOrderRepository.sumWorkOrderQty();
+        long totalWorkOrderQty = workOrderRepository.countByDeletedAtNull();
         long totalOutput = outputDetailRepository.sumGoodOutputQty();
 
         return WorkOrderStatResponse.builder()

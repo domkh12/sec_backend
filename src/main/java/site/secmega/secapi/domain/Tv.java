@@ -38,6 +38,11 @@ public class Tv {
     private LocalDate startDate;
     private LocalDate finishDate;
 
+
+    private Long styleId;
+    private Long lineId;
+
+
     // Sewing start time
     @Column(nullable = false)
     private LocalDateTime createdAt;
