@@ -26,6 +26,12 @@ public class AnalysisServiceImpl implements AnalysisService{
     private final ProductionLineRepository productionLineRepository;
 
     @Override
+    public AnalysisOutputResponse getAnalysis(LocalDate dateFrom, LocalDate dateTo) {
+
+        return null;
+    }
+
+    @Override
     public AnalysisOutputResponse getAnalysisOutputToday() {
         LocalDate today = LocalDate.now();
         Integer totalInputToday = outputDetailRepository.totalInputByDate(today, 1);
