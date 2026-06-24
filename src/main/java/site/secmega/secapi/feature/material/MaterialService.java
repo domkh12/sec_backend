@@ -11,6 +11,8 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 public interface MaterialService {
+    void deleteStockIn(Long id);
+
     MaterialResponse createMaterial(@Valid MaterialRequest materialRequest) throws IOException;
 
     Page<MaterialResponse> findAll(MaterialFilterRequest materialFilterRequest);
