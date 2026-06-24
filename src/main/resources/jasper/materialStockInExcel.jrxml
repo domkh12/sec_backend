@@ -160,7 +160,7 @@
 					<column kind="single" uuid="a1b2c3d4-0000-0000-0000-000000000050" width="131">
 						<columnHeader height="35" rowSpan="1" style="Table_CH">
 							<element kind="staticText" uuid="a1b2c3d4-0000-0000-0000-000000000051" x="0" y="0" width="131" height="35" hTextAlign="Center" vTextAlign="Middle">
-								<text><![CDATA[Request By]]></text>
+								<text><![CDATA[Stock In by]]></text>
 							</element>
 						</columnHeader>
 						<detailCell height="35" style="Table_TD">

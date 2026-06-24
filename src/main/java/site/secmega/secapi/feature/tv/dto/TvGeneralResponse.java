@@ -9,6 +9,7 @@ public record TvGeneralResponse(
         String sewStart,
         Long day,
         Integer worker,
+        Integer helper,
         String act,
         Integer hour,
         Integer tarH,

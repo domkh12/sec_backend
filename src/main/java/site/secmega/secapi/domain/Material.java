@@ -26,7 +26,6 @@ public class Material extends BaseEntity{
     private String description;
     private String unit;
     private String image;
-    private Double balance;
     private MaterialStatus status;
 
     /**
@@ -47,18 +46,4 @@ public class Material extends BaseEntity{
     )
     private List<Style> styles;
 
-    public void setBalance(Double balance) {
-        this.balance = balance;
-        syncStatus();
-    }
-
-    private void syncStatus() {
-        if (balance == null || balance <= 0) {
-            this.status = MaterialStatus.OUT_OF_STOCK;
-        } else if (balance <= 10) {
-            this.status = MaterialStatus.LOW_STOCK;
-        } else {
-            this.status = MaterialStatus.OK;
-        }
-    }
 }

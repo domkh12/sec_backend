@@ -26,6 +26,7 @@ import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
 import site.secmega.secapi.feature.style.StyleRepository;
 import site.secmega.secapi.feature.style.dto.StyleLookupResponse;
 import site.secmega.secapi.feature.user.UserRepository;
+import site.secmega.secapi.mapper.MaterialDetailMapper;
 import site.secmega.secapi.mapper.MaterialMapper;
 import site.secmega.secapi.util.AuthUtil;
 import site.secmega.secapi.util.Util;
@@ -51,6 +52,7 @@ public class MaterialServiceImpl implements MaterialService{
     private final StyleRepository styleRepository;
     private final SizeRepository sizeRepository;
     private final ColorRepository colorRepository;
+    private final MaterialDetailMapper materialDetailMapper;
 
     @Value("${materialExcel.template.path}")
     String excelTemplatePath;
@@ -68,6 +70,41 @@ public class MaterialServiceImpl implements MaterialService{
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
         );
         materialDetailRepository.delete(materialDetail);
+    }
+
+    @Override
+    public void updateStockIn(Long id, UpdateStockInQtyRequest updateStockInQtyRequest) {
+        MaterialDetail materialDetail = materialDetailRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material Detail not found")
+        );
+        materialDetailMapper.updateStockIn(updateStockInQtyRequest, materialDetail);
+        materialDetailRepository.save(materialDetail);
+    }
+
+    @Override
+    public void deleteStockIn(Long id) {
+        MaterialDetail materialDetail = materialDetailRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material detail not found")
+        );
+        Material material = materialRepository.findById(materialDetail.getMaterial().getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found!")
+        );
+//        material.setBalance(material.getBalance() - materialDetail.getQuantity());
+        materialDetailRepository.delete(materialDetail);
+        materialRepository.save(material);
+    }
+
+    @Override
+    public void deleteStockOut(Long id) {
+        MaterialDetail materialDetail = materialDetailRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material detail not found")
+        );
+        Material material = materialRepository.findById(materialDetail.getMaterial().getId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found!")
+        );
+//        material.setBalance(material.getBalance() + materialDetail.getQuantity());
+        materialDetailRepository.delete(materialDetail);
+        materialRepository.save(material);
     }
 
     @Override
@@ -95,7 +132,6 @@ public class MaterialServiceImpl implements MaterialService{
                         .nameReceiver(detail.getUser().getNameEn())
                         .date(detail.getTransactionDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")))
                         .quantity(detail.getQuantity())
-                        .qtyBalance(detail.getQtyBalance())
                         .unit(detail.getMaterial().getUnit())
                         .style(detail.getMaterial().getStyles().stream()
                                 .map(Style::getStyleNo)
@@ -132,7 +168,7 @@ public class MaterialServiceImpl implements MaterialService{
                         .unit(detail.getUnit())
                         .size(detail.getSize().getSize() != null ? detail.getSize().getSize() : "")
                         .color(detail.getColor() != null ? detail.getColor().getColor() : "")
-                        .balance(detail.getBalance())
+                        .balance(materialDetailRepository.sumStockQtyByType(detail.getId(), TransactionType.INVENTORY_IN) - materialDetailRepository.sumStockQtyByType(detail.getId(), TransactionType.INVENTORY_OUT))
                         .build()
                 )
                 .toList();
@@ -193,26 +229,26 @@ public class MaterialServiceImpl implements MaterialService{
         Material material = materialRepository.findById(stockOutRequest.materialId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Material not found")
         );
-        if (material.getBalance() < stockOutRequest.qtyOutput()){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Material balance is not enough");
-        }
+//        if (material.getBalance() < stockOutRequest.qtyOutput()){
+//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Material balance is not enough");
+//        }
 
         MaterialDetail materialDetail = MaterialDetail.builder()
                 .quantity(stockOutRequest.qtyOutput())
                 .transactionDate(stockOutRequest.dateOutput())
                 .material(material)
                 .type(TransactionType.INVENTORY_OUT)
-                .qtyBalance(material.getBalance() - stockOutRequest.qtyOutput())
+//                .qtyBalance(material.getBalance() - stockOutRequest.qtyOutput())
                 .user(user)
                 .build();
-        material.setBalance(material.getBalance() - stockOutRequest.qtyOutput());
+//        material.setBalance(material.getBalance() - stockOutRequest.qtyOutput());
         materialDetailRepository.save(materialDetail);
         materialRepository.save(material);
+        updateMaterialStatus(material);
 
         return StockOutResponse.builder()
                 .id(materialDetail.getId())
                 .materialName(material.getName())
-                .qtyBalance(materialDetail.getQtyBalance())
                 .qtyOutput(materialDetail.getQuantity())
                 .dateOutput(materialDetail.getTransactionDate())
                 .requester(user.getNameEn())
@@ -242,7 +278,6 @@ public class MaterialServiceImpl implements MaterialService{
                 .id(detail.getId())
                 .requester(detail.getUser().getNameEn())
                 .materialName(detail.getMaterial().getName())
-                .qtyBalance(detail.getQtyBalance())
                 .qtyOutput(detail.getQuantity())
                 .unit(detail.getMaterial().getUnit())
                 .dateOutput(detail.getTransactionDate())
@@ -286,7 +321,6 @@ public class MaterialServiceImpl implements MaterialService{
                     .id(detail.getId())
                     .user(detail.getUser().getNameEn())
                     .materialName(detail.getMaterial().getName())
-                    .qtyBalance(detail.getQtyBalance())
                     .qtyInput(detail.getQuantity())
                     .unit(detail.getMaterial().getUnit())
                     .dateInput(detail.getTransactionDate())
@@ -309,16 +343,16 @@ public class MaterialServiceImpl implements MaterialService{
                 .transactionDate(stockInRequest.dateInput())
                 .material(material)
                 .type(TransactionType.INVENTORY_IN)
-                .qtyBalance(material.getBalance() + stockInRequest.qtyInput())
+//                .qtyBalance(material.getBalance() + stockInRequest.qtyInput())
                 .user(user)
                 .build();
-        material.setBalance(material.getBalance() + stockInRequest.qtyInput());
+//        material.setBalance(material.getBalance() + stockInRequest.qtyInput());
         MaterialDetail savedMaterialDetail = materialDetailRepository.save(materialDetail);
         materialRepository.save(material);
+        updateMaterialStatus(material);
         return StockInResponse.builder()
                 .id(savedMaterialDetail.getId())
                 .materialName(material.getName())
-                .qtyBalance(savedMaterialDetail.getQtyBalance())
                 .qtyInput(savedMaterialDetail.getQuantity())
                 .build();
     }
@@ -360,12 +394,13 @@ public class MaterialServiceImpl implements MaterialService{
         PageRequest pageRequest = PageRequest.of(materialFilterRequest.pageNo() - 1, materialFilterRequest.pageSize(), sort);
         Page<Material> materials = materialRepository.findAll(spec, pageRequest);
 
+
         return materials.map(material -> MaterialResponse.builder()
                 .id(material.getId())
                 .code(material.getCode())
                 .name(material.getName())
                 .description(material.getDescription())
-                .balance(material.getBalance())
+                .balance(materialDetailRepository.sumStockQtyByType(material.getId(), TransactionType.INVENTORY_IN) - materialDetailRepository.sumStockQtyByType(material.getId(), TransactionType.INVENTORY_OUT))
                 .styles(material.getStyles().stream().map(style -> StyleLookupResponse.builder()
                         .id(style.getId())
                         .styleNo(style.getStyleNo())
@@ -375,14 +410,14 @@ public class MaterialServiceImpl implements MaterialService{
                 .image(material.getImage())
                 .size(material.getSize() == null ? null :
                         SizeLookupResponse.builder()
-                                .id(material.getSize().getId())
-                                .size(material.getSize().getSize())
-                                .build())
+                        .id(material.getSize().getId())
+                        .size(material.getSize().getSize())
+                        .build())
                 .color(material.getColor() == null ? null :
                         ColorLookupResponse.builder()
-                                .id(material.getColor().getId())
-                                .color(material.getColor().getColor())
-                                .build())
+                        .id(material.getColor().getId())
+                        .color(material.getColor().getColor())
+                        .build())
                 .totalInput(material.getMaterialDetails().stream().filter(detail -> detail.getType() == TransactionType.INVENTORY_IN).mapToDouble(MaterialDetail::getQuantity).sum())
                 .totalOutput(material.getMaterialDetails().stream().filter(detail -> detail.getType() == TransactionType.INVENTORY_OUT).mapToDouble(MaterialDetail::getQuantity).sum())
                 .build());
@@ -412,9 +447,40 @@ public class MaterialServiceImpl implements MaterialService{
         }
 
         material.setStatus(MaterialStatus.OUT_OF_STOCK);
-        material.setBalance(0.0);
+//        material.setBalance(0.0);
         Material savedMaterial = materialRepository.save(material);
 
         return materialMapper.toMaterialResponse(savedMaterial);
+    }
+
+    private double getBalance(Long materialId) {
+        Double totalIn = materialDetailRepository.sumStockQtyByType(
+                materialId,
+                TransactionType.INVENTORY_IN
+        );
+
+        Double totalOut = materialDetailRepository.sumStockQtyByType(
+                materialId,
+                TransactionType.INVENTORY_OUT
+        );
+
+        return (totalIn == null ? 0 : totalIn)
+                - (totalOut == null ? 0 : totalOut);
+    }
+
+
+    private void updateMaterialStatus(Material material) {
+
+        double balance = getBalance(material.getId());
+
+        if (balance <= 0) {
+            material.setStatus(MaterialStatus.OUT_OF_STOCK);
+        } else if (balance <= 10) {
+            material.setStatus(MaterialStatus.LOW_STOCK);
+        } else {
+            material.setStatus(MaterialStatus.AVAILABLE);
+        }
+
+        materialRepository.save(material);
     }
 }

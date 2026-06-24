@@ -26,6 +26,7 @@ public class Tv {
     // Number of workers
     private String orderNo;
     private Integer worker;
+    private Integer helper;
     private Integer orderQty;
     private Integer totalInLine;
     private Integer totalOutput;
@@ -36,6 +37,11 @@ public class Tv {
     private String styleNo;
     private LocalDate startDate;
     private LocalDate finishDate;
+
+
+    private Long styleId;
+    private Long lineId;
+
 
     // Sewing start time
     @Column(nullable = false)

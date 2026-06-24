@@ -27,5 +27,8 @@ public interface ProductionLineRepository extends JpaRepository<ProductionLine, 
     @Query("select p from ProductionLine p where p.id in ?1 and p.deletedAt is null")
     List<ProductionLine> findByIdInAndDeletedAtNull(Collection<Long> ids);
 
+    @Query("select p from ProductionLine p where p.department.processNo = ?1")
+    List<ProductionLine> findByDepartment_ProcessNo(Integer processNo);
+
 
 }

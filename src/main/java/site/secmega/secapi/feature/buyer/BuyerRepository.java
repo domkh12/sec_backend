@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import site.secmega.secapi.domain.Buyer;
 
+import java.util.List;
+
 @Repository
 public interface BuyerRepository extends JpaRepository<Buyer, Long>, JpaSpecificationExecutor<Buyer> {
     @Query("select count(b) from Buyer b")
@@ -16,6 +18,9 @@ public interface BuyerRepository extends JpaRepository<Buyer, Long>, JpaSpecific
 
     @Query("select (count(b) > 0) from Buyer b where upper(b.name) = upper(?1) and b.deletedAt is null and b.id <> ?2")
     boolean existsByNameIgnoreCaseAndDeletedAtNullAndIdNot(String name, Long id);
+
+    @Query("select b from Buyer b where b.deletedAt is null")
+    List<Buyer> findByDeletedAtNull();
 
 
 }

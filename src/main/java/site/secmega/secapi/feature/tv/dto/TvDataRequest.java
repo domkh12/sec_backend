@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 public record TvDataRequest(
         String line,
         Integer worker,
+        Integer helper,
         String orderNo,
         Integer orderQty,
         Integer totalInLine,

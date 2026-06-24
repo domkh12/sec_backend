@@ -23,7 +23,6 @@ public class MaterialDetail extends BaseEntity{
     private LocalDateTime transactionDate;
     @Enumerated(EnumType.STRING)
     private TransactionType type;
-    private Double qtyBalance;
 
     /**
      * Relationship
