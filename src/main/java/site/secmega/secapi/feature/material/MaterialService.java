@@ -13,11 +13,11 @@ public interface MaterialService {
 
     Page<MaterialResponse> findAll(MaterialFilterRequest materialFilterRequest);
 
-    StockInResponse stockIn(@Valid StockInRequest stockInRequest);
-
     Page<StockInResponse> getStockIn(Long id, StockInFilterRequest stockInFilterRequest);
 
     MaterialStatResponse getMaterialStat();
+
+    StockInResponse stockIn(@Valid StockInRequest stockInRequest);
 
     StockOutResponse stockOut(@Valid StockOutRequest stockOutRequest);
 

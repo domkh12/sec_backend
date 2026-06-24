@@ -27,5 +27,11 @@ public interface MaterialDetailRepository extends JpaRepository<MaterialDetail, 
     @Query("select m from MaterialDetail m where m.type = ?1 and m.material.id = ?2 order by m.id DESC")
     List<MaterialDetail> findByTypeAndMaterial_IdOrderByIdDesc(TransactionType type, Long id, Sort sort);
 
+    @Query("select COALESCE(SUM(m.quantity), 0.0) from MaterialDetail m where m.material.id = ?1 and m.deletedAt is null")
+    Double sumMaterial_IdAndDeletedAtNull(Long id);
+
+    @Query("select COALESCE(SUM(m.quantity), 0.0) from MaterialDetail m where m.material.id = ?1 and m.deletedAt is null and m.type = ?2")
+    Double sumStockQtyByType(Long id, TransactionType type);
+
 
 }
