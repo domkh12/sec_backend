@@ -43,5 +43,15 @@ public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long
     @Query("select COALESCE(SUM(o.goodQty), 0) from OutputDetail o where o.workOrder.mo = ?1 and o.outputDate = ?2 and o.fromLine.id = ?3")
     Integer sumOutputTodayByMOAndLine(String mo, LocalDate outputDate, Long id);
 
+    @Query("""
+            select COALESCE(SUM(o.goodQty), 0) from OutputDetail o
+            where o.outputDate between ?1 and ?2 and o.fromLine.department.processNo = ?3 and o.deletedAt is null""")
+    Integer totalInputBetweenDates(LocalDate outputDateStart, LocalDate outputDateEnd, Integer processNo);
+
+    @Query("""
+            select COALESCE(SUM(o.goodQty), 0) from OutputDetail o
+            where o.outputDate between ?1 and ?2 and o.fromLine.department.processNo = ?3 and o.deletedAt is null""")
+    Integer totalOutputSewingBetweenDates(LocalDate outputDateStart, LocalDate outputDateEnd, Integer processNo);
+
 
 }

@@ -13,6 +13,7 @@ import site.secmega.secapi.feature.style.StyleRepository;
 import site.secmega.secapi.feature.workOrder.WorkOrderRepository;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Service
@@ -27,12 +28,28 @@ public class AnalysisServiceImpl implements AnalysisService{
 
     @Override
     public AnalysisOutputResponse getAnalysis(LocalDate dateFrom, LocalDate dateTo) {
+        // Calculate the comparison period dynamically
+        long periodDays = ChronoUnit.DAYS.between(dateFrom, dateTo) + 1;
+        LocalDate compareDateFrom = dateFrom.minusDays(periodDays);
+        LocalDate compareDateTo = dateFrom.minusDays(1);
 
-        return null;
+        // Current period
+         Integer totalInput = outputDetailRepository.totalInputBetweenDates(dateFrom, dateTo, 1);
+         Integer totalOutput = outputDetailRepository.totalOutputSewingBetweenDates(dateFrom, dateTo, 2);
+
+        // Previous period
+        Integer prevTotalInput = outputDetailRepository.totalInputBetweenDates(compareDateFrom, compareDateTo, 1);
+        Integer prevTotalOutput = outputDetailRepository.totalOutputSewingBetweenDates(compareDateFrom, compareDateTo, 2);
+        return AnalysisOutputResponse.builder()
+                .totalInput(totalInput)
+                .totalOutput(totalOutput)
+                .totalInputComparison(buildComparison(totalInput, prevTotalInput))
+                .totalOutputComparison(buildComparison(totalOutput, prevTotalOutput))
+                .build();
     }
 
     @Override
-    public AnalysisOutputResponse getAnalysisOutputToday() {
+    public AnalysisOutputTodayResponse getAnalysisOutputToday() {
         LocalDate today = LocalDate.now();
         Integer totalInputToday = outputDetailRepository.totalInputByDate(today, 1);
         Integer totalOutputToday = outputDetailRepository.totalOutputSewingByDate(today, 2);
@@ -103,7 +120,7 @@ public class AnalysisServiceImpl implements AnalysisService{
                                     .build();
                         })
                         .toList();
-        return AnalysisOutputResponse.builder()
+        return AnalysisOutputTodayResponse.builder()
                 .totalInput(totalInputToday)
                 .totalOutput(totalOutputToday)
                 .totalStyleActive(totalStyleActive)
@@ -111,6 +128,25 @@ public class AnalysisServiceImpl implements AnalysisService{
                 .mo(moResponses)
                 .buyers(buyerAnalysisResponses)
                 .lineData(lineDataResponses)
+                .build();
+    }
+
+
+    private ComparisonResponse buildComparison(Integer current, Integer previous) {
+        int curr = current != null ? current : 0;
+        int prev = previous != null ? previous : 0;
+        int diff = curr - prev;
+
+        double changePercent = (prev == 0)
+                ? (curr > 0 ? 100.0 : 0.0)
+                : ((double) diff / prev) * 100;
+
+        return ComparisonResponse.builder()
+                .current(curr)
+                .previous(prev)
+                .diff(diff)
+                .changePercent(Math.round(changePercent * 100.0) / 100.0) // 2 decimal
+                .trend(diff > 0 ? "UP" : diff < 0 ? "DOWN" : "FLAT")
                 .build();
     }
 }

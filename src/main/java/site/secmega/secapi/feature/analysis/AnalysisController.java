@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import site.secmega.secapi.feature.analysis.dto.AnalysisOutputResponse;
+import site.secmega.secapi.feature.analysis.dto.AnalysisOutputTodayResponse;
 
 @RestController
 @RequestMapping("/api/v1/analysis")
@@ -33,7 +34,7 @@ public class AnalysisController {
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/output-today")
     @ResponseStatus(HttpStatus.OK)
-    AnalysisOutputResponse getAnalysisOutputToday() {
+    AnalysisOutputTodayResponse getAnalysisOutputToday() {
         return analysisService.getAnalysisOutputToday();
     }
 
