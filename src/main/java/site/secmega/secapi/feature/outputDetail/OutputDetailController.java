@@ -2,11 +2,13 @@ package site.secmega.secapi.feature.outputDetail;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import site.secmega.secapi.feature.outputDetail.dto.OutputDetailRequest;
 import site.secmega.secapi.feature.outputDetail.dto.OutputDetailResponse;
+import site.secmega.secapi.feature.outputDetail.dto.OutputFilterRequest;
 import site.secmega.secapi.feature.outputDetail.dto.QRScanRequest;
 
 import java.util.List;
@@ -29,7 +31,13 @@ public class OutputDetailController {
     @PostMapping("/qr-scan")
     @ResponseStatus(HttpStatus.CREATED)
     void qrScan(@RequestBody QRScanRequest qrScanRequest){
+    }
 
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping
+    @ResponseStatus(HttpStatus.OK)
+    Page<OutputDetailResponse> findAll(@ModelAttribute OutputFilterRequest outputFilterRequest){
+        return outputDetailService.findAll(outputFilterRequest);
     }
 
 }

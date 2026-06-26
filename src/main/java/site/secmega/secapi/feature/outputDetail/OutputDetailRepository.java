@@ -2,10 +2,12 @@ package site.secmega.secapi.feature.outputDetail;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import site.secmega.secapi.domain.OutputDetail;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long> {
@@ -53,5 +55,19 @@ public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long
             where o.outputDate between ?1 and ?2 and o.fromLine.department.processNo = ?3 and o.deletedAt is null""")
     Integer totalOutputSewingBetweenDates(LocalDate outputDateStart, LocalDate outputDateEnd, Integer processNo);
 
-
+    @Query("""
+        SELECT 
+            o.outputDate as date,
+            COALESCE(SUM(CASE WHEN d.processNo = 1 THEN o.goodQty ELSE 0 END), 0) as input,
+            COALESCE(SUM(CASE WHEN d.processNo = 2 THEN o.goodQty ELSE 0 END), 0) as output
+        FROM OutputDetail o
+        JOIN o.fromLine fl
+        JOIN fl.department d
+        WHERE o.deletedAt IS NULL
+            AND o.outputDate BETWEEN :dateFrom AND :dateTo
+        GROUP BY o.outputDate
+        ORDER BY o.outputDate ASC
+    """)
+    List<Object[]> getDailySummaryBetweenDates(@Param("dateFrom") LocalDate dateFrom,
+                                               @Param("dateTo") LocalDate dateTo);
 }

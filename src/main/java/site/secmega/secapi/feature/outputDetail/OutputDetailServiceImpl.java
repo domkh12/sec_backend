@@ -1,15 +1,23 @@
 package site.secmega.secapi.feature.outputDetail;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.*;
 import site.secmega.secapi.feature.outputDetail.dto.OutputDetailRequest;
 import site.secmega.secapi.feature.outputDetail.dto.OutputDetailResponse;
+import site.secmega.secapi.feature.outputDetail.dto.OutputFilterRequest;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
+import site.secmega.secapi.feature.productionLine.dto.ProductionLineLookupResponse;
 import site.secmega.secapi.feature.size.SizeRepository;
+import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
 import site.secmega.secapi.feature.time.TimeRepository;
+import site.secmega.secapi.feature.time.dto.TimeResponse;
 import site.secmega.secapi.feature.workOrder.WorkOrderRepository;
 import site.secmega.secapi.mapper.OutputDetailMapper;
 
@@ -27,6 +35,41 @@ public class OutputDetailServiceImpl implements OutputDetailService{
     private final OutputDetailRepository outputDetailRepository;
     private final ProductionLineRepository productionLineRepository;
     private final SizeRepository sizeRepository;
+
+    @Override
+    public Page<OutputDetailResponse> findAll(OutputFilterRequest outputFilterRequest) {
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
+        PageRequest pageRequest = PageRequest.of(outputFilterRequest.pageNo() - 1, outputFilterRequest.pageSize(), sort);
+        Page<OutputDetail> outputDetails = outputDetailRepository.findAll(pageRequest);
+
+        return new PageImpl<>(
+            outputDetails.stream().map(
+                detail -> OutputDetailResponse.builder()
+                        .id(detail.getId())
+                        .reportDate(detail.getCreatedAt())
+                        .qty(detail.getGoodQty())
+                        .size(SizeLookupResponse.builder()
+                                .id(detail.getSize().getId())
+                                .size(detail.getSize().getSize())
+                                .build())
+                        .mo(detail.getWorkOrder().getMo())
+                        .outputDate(detail.getOutputDate())
+                        .time(TimeResponse.builder()
+                                .id(detail.getId())
+                                .name(detail.getTime().getName())
+                                .build())
+                        .line(ProductionLineLookupResponse.builder()
+                                .id(detail.getFromLine().getId())
+                                .line(detail.getFromLine().getLine())
+                                .build())
+                        .build()
+            ).toList(),
+            pageRequest,
+            outputDetails.getTotalElements()
+        );
+    }
+
 
     @Override
     public List<OutputDetailResponse> createOutputDetail(List<OutputDetailRequest> outputDetailRequest) {

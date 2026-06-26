@@ -14,7 +14,11 @@ import site.secmega.secapi.feature.workOrder.WorkOrderRepository;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,23 +32,58 @@ public class AnalysisServiceImpl implements AnalysisService{
 
     @Override
     public AnalysisOutputResponse getAnalysis(LocalDate dateFrom, LocalDate dateTo) {
-        // Calculate the comparison period dynamically
         long periodDays = ChronoUnit.DAYS.between(dateFrom, dateTo) + 1;
         LocalDate compareDateFrom = dateFrom.minusDays(periodDays);
         LocalDate compareDateTo = dateFrom.minusDays(1);
 
-        // Current period
-         Integer totalInput = outputDetailRepository.totalInputBetweenDates(dateFrom, dateTo, 1);
-         Integer totalOutput = outputDetailRepository.totalOutputSewingBetweenDates(dateFrom, dateTo, 2);
+        // Get data as Object arrays
+        List<Object[]> currentData = outputDetailRepository.getDailySummaryBetweenDates(dateFrom, dateTo);
+        List<Object[]> prevData = outputDetailRepository.getDailySummaryBetweenDates(compareDateFrom, compareDateTo);
 
-        // Previous period
-        Integer prevTotalInput = outputDetailRepository.totalInputBetweenDates(compareDateFrom, compareDateTo, 1);
-        Integer prevTotalOutput = outputDetailRepository.totalOutputSewingBetweenDates(compareDateFrom, compareDateTo, 2);
+        // Process current data
+        int totalInput = 0;
+        int totalOutput = 0;
+        Map<LocalDate, LineChartDataResponse> dataMap = new LinkedHashMap<>();
+
+        for (Object[] row : currentData) {
+            LocalDate date = (LocalDate) row[0];
+            Integer input = ((Number) row[1]).intValue();
+            Integer output = ((Number) row[2]).intValue();
+
+            totalInput += input;
+            totalOutput += output;
+
+            dataMap.put(date, LineChartDataResponse.builder()
+                    .date(date)
+                    .input(input)
+                    .output(output)
+                    .build());
+        }
+
+        // Process previous data
+        int prevTotalInput = 0;
+        int prevTotalOutput = 0;
+        for (Object[] row : prevData) {
+            prevTotalInput += ((Number) row[1]).intValue();
+            prevTotalOutput += ((Number) row[2]).intValue();
+        }
+
+        // Build final response
+        List<LineChartDataResponse> data = dateFrom.datesUntil(dateTo.plusDays(1))
+                .map(date -> dataMap.getOrDefault(date,
+                        LineChartDataResponse.builder()
+                                .date(date)
+                                .input(0)
+                                .output(0)
+                                .build()))
+                .collect(Collectors.toList());
+
         return AnalysisOutputResponse.builder()
                 .totalInput(totalInput)
                 .totalOutput(totalOutput)
                 .totalInputComparison(buildComparison(totalInput, prevTotalInput))
                 .totalOutputComparison(buildComparison(totalOutput, prevTotalOutput))
+                .data(data)
                 .build();
     }
 

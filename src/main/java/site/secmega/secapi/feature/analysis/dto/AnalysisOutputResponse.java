@@ -2,6 +2,8 @@ package site.secmega.secapi.feature.analysis.dto;
 
 import lombok.Builder;
 
+import java.util.List;
+
 @Builder
 public record AnalysisOutputResponse(
         Integer totalInput,
@@ -9,6 +11,7 @@ public record AnalysisOutputResponse(
         Double defectRate,
         Double efficiency,
         ComparisonResponse totalInputComparison,
-        ComparisonResponse totalOutputComparison
+        ComparisonResponse totalOutputComparison,
+        List<LineChartDataResponse> data
 ) {
 }
