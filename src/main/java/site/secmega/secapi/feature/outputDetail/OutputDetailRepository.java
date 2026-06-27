@@ -1,6 +1,7 @@
 package site.secmega.secapi.feature.outputDetail;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -10,7 +11,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long> {
+public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long>, JpaSpecificationExecutor<OutputDetail> {
     @Query("SELECT COALESCE(SUM(o.goodQty), 0) from OutputDetail o where o.deletedAt is null")
     long sumGoodOutputQty();
 

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -39,9 +40,19 @@ public class OutputDetailServiceImpl implements OutputDetailService{
     @Override
     public Page<OutputDetailResponse> findAll(OutputFilterRequest outputFilterRequest) {
 
+        Specification<OutputDetail> spec = Specification.where((root, query, cb) -> cb.conjunction());
+
+        if (outputFilterRequest.search() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.or(
+                            cb.like(cb.lower(root.get("workOrder").get("mo")), "%" + outputFilterRequest.search().toLowerCase() + "%")
+                    )
+            );
+        }
+
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         PageRequest pageRequest = PageRequest.of(outputFilterRequest.pageNo() - 1, outputFilterRequest.pageSize(), sort);
-        Page<OutputDetail> outputDetails = outputDetailRepository.findAll(pageRequest);
+        Page<OutputDetail> outputDetails = outputDetailRepository.findAll(spec, pageRequest);
 
         return new PageImpl<>(
             outputDetails.stream().map(
