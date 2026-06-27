@@ -13,4 +13,6 @@ public interface OutputDetailService {
     List<OutputDetailResponse> createOutputDetail(@Valid List<OutputDetailRequest> outputDetailRequest);
 
     Page<OutputDetailResponse> findAll(OutputFilterRequest outputFilterRequest);
+
+    void delete(Long id);
 }

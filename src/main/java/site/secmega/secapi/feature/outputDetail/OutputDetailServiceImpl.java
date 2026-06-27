@@ -22,7 +22,6 @@ import site.secmega.secapi.feature.time.dto.TimeResponse;
 import site.secmega.secapi.feature.workOrder.WorkOrderRepository;
 import site.secmega.secapi.mapper.OutputDetailMapper;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -47,6 +46,18 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                     cb.or(
                             cb.like(cb.lower(root.get("workOrder").get("mo")), "%" + outputFilterRequest.search().toLowerCase() + "%")
                     )
+            );
+        }
+
+        if (outputFilterRequest.lineId() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("fromLine").get("id"), outputFilterRequest.lineId())
+            );
+        }
+
+        if (outputFilterRequest.sizeId() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("size").get("id"), outputFilterRequest.sizeId())
             );
         }
 
@@ -79,6 +90,16 @@ public class OutputDetailServiceImpl implements OutputDetailService{
             pageRequest,
             outputDetails.getTotalElements()
         );
+    }
+
+    @Override
+    public void delete(Long id) {
+        OutputDetail outputDetail = outputDetailRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Output not found")
+        );
+
+        outputDetail.setDeletedAt(LocalDateTime.now());
+        outputDetailRepository.save(outputDetail);
     }
 
 

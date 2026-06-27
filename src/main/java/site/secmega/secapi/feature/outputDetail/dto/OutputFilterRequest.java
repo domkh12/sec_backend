@@ -3,7 +3,9 @@ package site.secmega.secapi.feature.outputDetail.dto;
 public record OutputFilterRequest(
         Integer pageNo,
         Integer pageSize,
-        String search
+        String search,
+        Long lineId,
+        Long sizeId
 ) {
     public OutputFilterRequest{
         if (pageNo == null){
