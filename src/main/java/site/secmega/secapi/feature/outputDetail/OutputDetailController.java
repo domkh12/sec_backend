@@ -22,6 +22,13 @@ public class OutputDetailController {
     private final OutputDetailService outputDetailService;
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void update(@PathVariable Long id, @RequestParam Integer qty){
+        outputDetailService.updateQty(id, qty);
+    }
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void delete(@PathVariable Long id){

@@ -10,6 +10,8 @@ import java.util.List;
 
 public interface OutputDetailService {
 
+    void updateQty(Long id, Integer qty);
+
     List<OutputDetailResponse> createOutputDetail(@Valid List<OutputDetailRequest> outputDetailRequest);
 
     Page<OutputDetailResponse> findAll(OutputFilterRequest outputFilterRequest);

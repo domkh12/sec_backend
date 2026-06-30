@@ -57,6 +57,12 @@ public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long
     Integer totalOutputSewingBetweenDates(LocalDate outputDateStart, LocalDate outputDateEnd, Integer processNo);
 
     @Query("""
+            select COALESCE(SUM(o.goodQty), 0) from OutputDetail o
+            where o.outputDate between ?1 and ?2 and o.fromLine.department.processNo = ?3 and o.time.id = ?4""")
+    Integer totalOutputSewingBetweenDatesByTime(LocalDate outputDateStart, LocalDate outputDateEnd, Integer processNo, Long id);
+
+
+    @Query("""
         SELECT 
             o.outputDate as date,
             COALESCE(SUM(CASE WHEN d.processNo = 1 THEN o.goodQty ELSE 0 END), 0) as input,

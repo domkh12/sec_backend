@@ -16,7 +16,12 @@ import java.util.Optional;
 public interface TvDataRepository extends JpaRepository<TvData, Long> {
     boolean existsByTvAndDate(Tv tv, String date);
 
-    List<TvData> findAllByDate(String date);
+    @Query("select t from TvData t where t.date = ?1")
+    Optional<TvData> findByDate(String date);
+
+    @Query("select t from TvData t where t.date = ?1 and t.tv.name = ?2")
+    Optional<TvData> findByDateAndTv_Name(String date, String name);
+
 
     @Query("select t from TvData t where t.isToday = true")
     Optional<TvData> findByIsTodayTrue();
