@@ -7,10 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.method.P;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import site.secmega.secapi.feature.outputDetail.dto.OutputDetailRequest;
-import site.secmega.secapi.feature.outputDetail.dto.OutputDetailResponse;
-import site.secmega.secapi.feature.outputDetail.dto.OutputFilterRequest;
-import site.secmega.secapi.feature.outputDetail.dto.QRScanRequest;
+import site.secmega.secapi.feature.outputDetail.dto.*;
 
 import java.util.List;
 
@@ -20,6 +17,13 @@ import java.util.List;
 public class OutputDetailController {
 
     private final OutputDetailService outputDetailService;
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/last48hrs")
+    @ResponseStatus(HttpStatus.OK)
+    List<OutputLast48Hrs> outputLast48Hrs(){
+        return outputDetailService.outputLast48Hrs();
+    }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @PatchMapping("/{id}")

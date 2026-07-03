@@ -77,4 +77,50 @@ public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long
     """)
     List<Object[]> getDailySummaryBetweenDates(@Param("dateFrom") LocalDate dateFrom,
                                                @Param("dateTo") LocalDate dateTo);
+
+    @Query("""
+        SELECT COALESCE(SUM(od.goodQty), 0)
+        FROM OutputDetail od
+        WHERE od.outputDate BETWEEN :startDate AND :endDate
+          AND od.fromLine.department.processNo = :processNo
+          AND od.fromLine.id = :lineId
+          AND od.time.id = :timeId
+          AND od.deletedAt IS NULL
+    """)
+        Integer totalOutputSewingBetweenDatesByTimeAndLine(
+                LocalDate startDate,
+                LocalDate endDate,
+                Integer processNo,
+                Long timeId,
+                Long lineId
+        );
+
+    @Query(value = """
+        WITH hour_buckets AS (
+            SELECT
+                h.hour_ago,
+                date_trunc('hour', CURRENT_TIMESTAMP AT TIME ZONE 'Asia/Bangkok') - (h.hour_ago * INTERVAL '1 hour') AS bucket_start
+            FROM generate_series(0, 47) AS h(hour_ago)
+        ),
+        output_by_time AS (
+            SELECT
+                od.good_qty,
+                od.output_date + split_part(t.name, '-', 1)::time AS output_hour
+            FROM output_details od
+            JOIN times t ON t.id = od.time_id
+            JOIN production_lines fl ON fl.id = od.from_line_id
+            JOIN departments d ON d.id = fl.department_id
+            WHERE od.deleted_at IS NULL
+                AND t.deleted_at IS NULL
+                AND d.process_no = 2
+        )
+        SELECT hb.hour_ago, COALESCE(SUM(obt.good_qty), 0) AS output
+        FROM hour_buckets hb
+        LEFT JOIN output_by_time obt
+            ON obt.output_hour >= hb.bucket_start
+            AND obt.output_hour < hb.bucket_start + INTERVAL '1 hour'
+        GROUP BY hb.hour_ago
+        ORDER BY hb.hour_ago DESC
+    """, nativeQuery = true)
+    List<Object[]> outputLast48Hrs();
 }

@@ -22,5 +22,10 @@ public interface BuyerRepository extends JpaRepository<Buyer, Long>, JpaSpecific
     @Query("select b from Buyer b where b.deletedAt is null")
     List<Buyer> findByDeletedAtNull();
 
+    @Query("""
+            select b from Buyer b inner join b.purchaseOrders.workOrders workOrders
+            where b.deletedAt is null and workOrders.isActive = true""")
+    List<Buyer> findByDeletedAtNullAndPurchaseOrders_WorkOrders_IsActiveTrue();
+
 
 }

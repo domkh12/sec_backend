@@ -11,6 +11,8 @@ public record OutputDetailRequest(
         Long sizeId,
         @NotNull(message = "From Line cannot be null")
         Long fromLineId,
+        Long defectTypeId,
+        Integer defectQty,
         Long toLineId,
         String mo,
         Integer goodQty,

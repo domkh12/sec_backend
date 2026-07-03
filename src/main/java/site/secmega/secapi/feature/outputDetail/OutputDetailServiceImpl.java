@@ -9,12 +9,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.*;
+import site.secmega.secapi.feature.defectDetail.DefectDetailRepository;
+import site.secmega.secapi.feature.defectType.DefectTypeRepository;
+import site.secmega.secapi.feature.message.dto.MessageRequest;
 import site.secmega.secapi.feature.outputDetail.dto.OutputDetailRequest;
 import site.secmega.secapi.feature.outputDetail.dto.OutputDetailResponse;
 import site.secmega.secapi.feature.outputDetail.dto.OutputFilterRequest;
+import site.secmega.secapi.feature.outputDetail.dto.OutputLast48Hrs;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineLookupResponse;
 import site.secmega.secapi.feature.size.SizeRepository;
@@ -41,12 +46,30 @@ public class OutputDetailServiceImpl implements OutputDetailService{
     private final ProductionLineRepository productionLineRepository;
     private final SizeRepository sizeRepository;
     private final TvDataRepository tvDataRepository;
+    private final SimpMessagingTemplate messagingTemplate;
+    private final DefectDetailRepository defectDetailRepository;
+    private final DefectTypeRepository defectTypeRepository;
+
+    @Override
+    public List<OutputLast48Hrs> outputLast48Hrs() {
+        return outputDetailRepository.outputLast48Hrs().stream()
+                .map(row -> new OutputLast48Hrs(
+                        ((Number) row[0]).intValue(),
+                        ((Number) row[1]).intValue()
+                ))
+                .toList();
+    }
 
     @Override
     public void updateQty(Long id, Integer qty) {
         OutputDetail outputDetail = outputDetailRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Output not found"));
         outputDetail.setGoodQty(qty);
         outputDetailRepository.save(outputDetail);
+
+         updateTvDataForSewing(
+            outputDetail.getFromLine().getId(),
+            outputDetail.getOutputDate()
+        );
     }
 
     @Override
@@ -115,8 +138,13 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Output not found")
         );
 
+         Long lineId = outputDetail.getFromLine().getId();
+    LocalDate outputDate = outputDetail.getOutputDate();
+
         outputDetail.setDeletedAt(LocalDateTime.now());
         outputDetailRepository.save(outputDetail);
+
+        updateTvDataForSewing(lineId, outputDate);
     }
 
 
@@ -124,10 +152,11 @@ public class OutputDetailServiceImpl implements OutputDetailService{
     public List<OutputDetailResponse> createOutputDetail(List<OutputDetailRequest> outputDetailRequest) {
 
         outputDetailRequest.forEach(od -> {
-            OutputDetail outputDetail = outputDetailMapper.fromOutputDetailRequest(od);
             Time time = timeRepository.findById(od.timeId()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Time not found")
             );
+            OutputDetail outputDetail = outputDetailMapper.fromOutputDetailRequest(od);
+
             outputDetail.setTime(time);
 
             WorkOrder workOrder = workOrderRepository.findByMo(od.mo()).orElseThrow(
@@ -147,61 +176,92 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                 outputDetail.setToLine(toLine);
             }
 
-            Size size = sizeRepository.findById(od.sizeId()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Size not found")
-            );
-            outputDetail.setSize(size);
-            outputDetailRepository.save(outputDetail);
+            if(od.sizeId() != null){
+                Size size = sizeRepository.findById(od.sizeId()).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Size not found")
+                );
+                outputDetail.setSize(size);
+                outputDetailRepository.save(outputDetail);   
+            }
+            
+
+            if (od.defectTypeId() != null){
+                DefectType df = defectTypeRepository.findByIdAndDeletedAtNull(od.defectTypeId()).orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Defect type not found")
+                );
+                DefectDetail defectDetail = new DefectDetail();
+                defectDetail.setDefectType(df);
+                defectDetail.setTime(time);
+                defectDetail.setDefectQty(od.defectQty());
+                defectDetail.setProductionLine(fromLine);
+                defectDetail.setWorkOrder(workOrder);
+                defectDetail.setDefectDate(od.outputDate());
+                defectDetailRepository.save(defectDetail);
+            }
+
         });
 
         // logic update qty in TV
-        Long lineId = outputDetailRequest.get(0).fromLineId();
-
-        ProductionLine productionLine = productionLineRepository.findById(lineId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Line not found!")
-         );
-        String lineName = productionLine.getLine();
-
-        LocalDate outputDate = outputDetailRequest.get(0).outputDate();
-        Integer processNo = productionLine.getDepartment().getProcessNo();
-        TvData tvData = tvDataRepository.findByDateAndTv_Name(outputDate.toString(), lineName).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TV Data not found")
+         
+        updateTvDataForSewing(
+        outputDetailRequest.get(0).fromLineId(),
+        outputDetailRequest.get(0).outputDate()
         );
 
-        List<Time> times = timeRepository.findAll();
-
-        times.forEach(time -> {
-            Integer qty = outputDetailRepository.totalOutputSewingBetweenDatesByTime(outputDate,outputDate,processNo,time.getId());
-            // set qty to h8, h9, h10, h11, h13, h14, h15, h16, h17, h18
-            // but name of my time is 7:00-8:00
-            if (time.getName().equals("07:00-08:00")) {
-                tvData.setH8(qty);
-            } else if (time.getName().equals("08:00-09:00")) {
-                tvData.setH9(qty);
-            } else if (time.getName().equals("09:00-10:00")) {
-                tvData.setH10(qty);
-            } else if (time.getName().equals("10:00-11:00")) {
-                tvData.setH11(qty);
-            } else if (time.getName().equals("12:00-13:00")) {
-                tvData.setH13(qty);
-            } else if (time.getName().equals("13:00-14:00")) {
-                tvData.setH14(qty);
-            } else if (time.getName().equals("14:00-15:00")) {
-                tvData.setH15(qty);
-            } else if (time.getName().equals("15:00-16:00")) {
-                tvData.setH16(qty);
-            } else if (time.getName().equals("16:00-17:00")) {
-                tvData.setH17(qty);
-            } else if (time.getName().equals("17:00-18:00")) {
-                tvData.setH18(qty);
-            }
-            tvDataRepository.save(tvData);
-        });
-
-        log.info("Line name: {}", lineName);
-
         return null;
+        
 
+    }
+
+    private void updateTvDataForSewing(Long lineId, LocalDate outputDate) {
+
+        ProductionLine productionLine = productionLineRepository.findById(lineId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Line not found!"));
+
+        if (productionLine.getDepartment() == null
+                || productionLine.getDepartment().getProcessNo() == null
+                || productionLine.getDepartment().getProcessNo() != 2) {
+            return;
+        }
+
+        String lineName = productionLine.getLine();
+        Integer processNo = productionLine.getDepartment().getProcessNo();
+
+        TvData tvData = tvDataRepository.findByDateAndTv_Name(outputDate.toString(), lineName)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TV Data not found"));
+
+        for (Time time : timeRepository.findAll()) {
+            Integer qty = outputDetailRepository.totalOutputSewingBetweenDatesByTimeAndLine(
+                    outputDate,
+                    outputDate,
+                    processNo,
+                    time.getId(),
+                    lineId
+            );
+
+            switch (time.getName()) {
+                case "07:00-08:00" -> tvData.setH8(qty);
+                case "08:00-09:00" -> tvData.setH9(qty);
+                case "09:00-10:00" -> tvData.setH10(qty);
+                case "10:00-11:00" -> tvData.setH11(qty);
+                case "12:00-13:00" -> tvData.setH13(qty);
+                case "13:00-14:00" -> tvData.setH14(qty);
+                case "14:00-15:00" -> tvData.setH15(qty);
+                case "15:00-16:00" -> tvData.setH16(qty);
+                case "16:00-17:00" -> tvData.setH17(qty);
+                case "17:00-18:00" -> tvData.setH18(qty);
+            }
+        }
+
+        tvDataRepository.save(tvData);
+
+        messagingTemplate.convertAndSend(
+                "/topic/messages/tv-data-update",
+                MessageRequest.builder()
+                        .message("update")
+                        .isUpdate(true)
+                        .build()
+        );
     }
 
 }

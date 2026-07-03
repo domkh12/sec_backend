@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import site.secmega.secapi.domain.DefectType;
 
+import java.util.Optional;
+
 @Repository
 public interface DefectTypeRepository extends JpaRepository<DefectType, Long>, JpaSpecificationExecutor<DefectType> {
     @Query("select (count(d) > 0) from DefectType d where upper(d.name) = upper(?1) and d.deletedAt is null")
@@ -15,6 +17,9 @@ public interface DefectTypeRepository extends JpaRepository<DefectType, Long>, J
             select (count(d) > 0) from DefectType d
             where upper(d.name) = upper(?1) and d.deletedAt is null and d.id <> ?2""")
     boolean existsByNameIgnoreCaseAndDeletedAtNullAndIdNot(String name, Long id);
+
+    @Query("select d from DefectType d where d.id = ?1 and d.deletedAt is null")
+    Optional<DefectType> findByIdAndDeletedAtNull(Long id);
 
 
 }

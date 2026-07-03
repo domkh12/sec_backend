@@ -5,10 +5,13 @@ import org.springframework.data.domain.Page;
 import site.secmega.secapi.feature.outputDetail.dto.OutputDetailRequest;
 import site.secmega.secapi.feature.outputDetail.dto.OutputDetailResponse;
 import site.secmega.secapi.feature.outputDetail.dto.OutputFilterRequest;
+import site.secmega.secapi.feature.outputDetail.dto.OutputLast48Hrs;
 
 import java.util.List;
 
 public interface OutputDetailService {
+
+    List<OutputLast48Hrs> outputLast48Hrs();
 
     void updateQty(Long id, Integer qty);
 
@@ -17,4 +20,5 @@ public interface OutputDetailService {
     Page<OutputDetailResponse> findAll(OutputFilterRequest outputFilterRequest);
 
     void delete(Long id);
+
 }

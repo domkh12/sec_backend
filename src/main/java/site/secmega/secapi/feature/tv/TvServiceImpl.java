@@ -209,7 +209,7 @@ public class TvServiceImpl implements TvService{
 
         LocalDate now = LocalDate.now();
         LocalDate startDate = tv.getStartDate();
-        Long days = (startDate == null) ? null : ChronoUnit.DAYS.between(startDate, now);
+        Long days = (startDate == null) ? null : ChronoUnit.DAYS.between(startDate, now) + 1;
 
         List<DailyRecord> dailyRecords = tv.getTvDatas().stream()
                 .sorted(Comparator.comparing(TvData::getDate).reversed())

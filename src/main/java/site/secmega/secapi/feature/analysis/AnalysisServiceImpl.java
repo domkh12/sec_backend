@@ -8,6 +8,7 @@ import site.secmega.secapi.feature.analysis.dto.*;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
 import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
 import site.secmega.secapi.feature.outputDetail.OutputDetailRepository;
+import site.secmega.secapi.feature.analysis.dto.OutputLast48Hrs;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.style.StyleRepository;
 import site.secmega.secapi.feature.workOrder.WorkOrderRepository;
@@ -17,7 +18,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -113,7 +113,7 @@ public class AnalysisServiceImpl implements AnalysisService{
                                 .build())
                         .build()
         ).toList();
-        List<BuyerAnalysisResponse> buyerAnalysisResponses = buyerRepository.findByDeletedAtNull().stream().map(buyer ->
+        List<BuyerAnalysisResponse> buyerAnalysisResponses = buyerRepository.findByDeletedAtNullAndPurchaseOrders_WorkOrders_IsActiveTrue().stream().map(buyer ->
                 BuyerAnalysisResponse.builder()
                         .id(buyer.getId())
                         .name(buyer.getName())
@@ -168,6 +168,16 @@ public class AnalysisServiceImpl implements AnalysisService{
                 .buyers(buyerAnalysisResponses)
                 .lineData(lineDataResponses)
                 .build();
+    }
+
+    @Override
+    public List<OutputLast48Hrs> outputLast48Hrs() {
+        return outputDetailRepository.outputLast48Hrs().stream()
+                .map(row -> new OutputLast48Hrs(
+                        ((Number) row[0]).intValue(),
+                        ((Number) row[1]).intValue()
+                ))
+                .toList();
     }
 
 
