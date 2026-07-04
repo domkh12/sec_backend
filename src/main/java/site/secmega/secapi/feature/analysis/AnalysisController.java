@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import site.secmega.secapi.feature.analysis.dto.AnalysisDefectResponse;
 import site.secmega.secapi.feature.analysis.dto.AnalysisOutputResponse;
 import site.secmega.secapi.feature.analysis.dto.AnalysisOutputTodayResponse;
 import site.secmega.secapi.feature.analysis.dto.OutputLast48Hrs;
@@ -22,6 +23,13 @@ import site.secmega.secapi.feature.analysis.dto.OutputLast48Hrs;
 public class AnalysisController {
 
     private final AnalysisService analysisService;
+
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @GetMapping("/defect-today")
+    @ResponseStatus(HttpStatus.OK)
+    AnalysisDefectResponse defectToday(){
+        return analysisService.defectToday();
+    }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     @GetMapping("/last48hrs")

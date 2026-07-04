@@ -3,6 +3,7 @@ package site.secmega.secapi.feature.analysis;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import site.secmega.secapi.domain.ProductionLine;
 import site.secmega.secapi.domain.WorkOrder;
 import site.secmega.secapi.feature.analysis.dto.*;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
@@ -15,6 +16,7 @@ import site.secmega.secapi.feature.workOrder.WorkOrderRepository;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,6 +31,22 @@ public class AnalysisServiceImpl implements AnalysisService{
     private final StyleRepository styleRepository;
     private final BuyerRepository buyerRepository;
     private final ProductionLineRepository productionLineRepository;
+
+    @Override
+    public AnalysisDefectResponse defectToday() {
+        LocalDate today = LocalDate.now();
+        List<ProductionLine> productionLines = productionLineRepository.findByDeletedAtNullAndDepartment_ProcessNo(2);
+        List<LineDefectResponse> lineDefectResponses = productionLines.stream().map(pl -> {
+            return LineDefectResponse.builder()
+                    .line(pl.getLine())
+                    .build();
+        }).toList();
+        return AnalysisDefectResponse.builder()
+                .updatedAt(today.toString())
+                .targetDefectRate(2.5)
+                .lines(lineDefectResponses)
+                .build();
+    }
 
     @Override
     public AnalysisOutputResponse getAnalysis(LocalDate dateFrom, LocalDate dateTo) {

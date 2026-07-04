@@ -7,7 +7,6 @@ import java.time.LocalDate;
 public record OutputDetailRequest(
         @NotNull(message = "Time cannot be null")
         Long timeId,
-        @NotNull(message = "Size cannot be null")
         Long sizeId,
         @NotNull(message = "From Line cannot be null")
         Long fromLineId,

@@ -1,5 +1,6 @@
 package site.secmega.secapi.feature.analysis;
 
+import site.secmega.secapi.feature.analysis.dto.AnalysisDefectResponse;
 import site.secmega.secapi.feature.analysis.dto.AnalysisOutputResponse;
 import site.secmega.secapi.feature.analysis.dto.AnalysisOutputTodayResponse;
 import site.secmega.secapi.feature.analysis.dto.OutputLast48Hrs;
@@ -13,4 +14,6 @@ public interface AnalysisService {
     AnalysisOutputTodayResponse getAnalysisOutputToday();
 
     List<OutputLast48Hrs> outputLast48Hrs();
+
+    AnalysisDefectResponse defectToday();
 }
