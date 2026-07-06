@@ -3,11 +3,15 @@ package site.secmega.secapi.feature.analysis;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import site.secmega.secapi.domain.DefectType;
 import site.secmega.secapi.domain.ProductionLine;
 import site.secmega.secapi.domain.WorkOrder;
 import site.secmega.secapi.feature.analysis.dto.*;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
 import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
+import site.secmega.secapi.feature.defectDetail.DefectDetailRepository;
+import site.secmega.secapi.feature.defectType.DefectTypeRepository;
+import site.secmega.secapi.feature.defectType.dto.DefectTypeWithQtyResponse;
 import site.secmega.secapi.feature.outputDetail.OutputDetailRepository;
 import site.secmega.secapi.feature.analysis.dto.OutputLast48Hrs;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
@@ -16,7 +20,6 @@ import site.secmega.secapi.feature.workOrder.WorkOrderRepository;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,14 +34,42 @@ public class AnalysisServiceImpl implements AnalysisService{
     private final StyleRepository styleRepository;
     private final BuyerRepository buyerRepository;
     private final ProductionLineRepository productionLineRepository;
+    private final DefectDetailRepository defectDetailRepository;
+    private final DefectTypeRepository defectTypeRepository;
 
     @Override
     public AnalysisDefectResponse defectToday() {
         LocalDate today = LocalDate.now();
         List<ProductionLine> productionLines = productionLineRepository.findByDeletedAtNullAndDepartment_ProcessNo(2);
         List<LineDefectResponse> lineDefectResponses = productionLines.stream().map(pl -> {
+            List<WorkOrder> mo = workOrderRepository.findByDeletedAtNullAndIsActiveTrueAndProductionLines_Id(pl.getId());
+
+
+
+            List<MosResponse> mosResponses = mo.stream().map(
+                    mos -> {
+                        List<DefectType> defectTypes = defectTypeRepository.findByDeletedAtNullAndDefectDetails_WorkOrder_IsActiveTrueAndDefectDetails_WorkOrder_Mo(mos.getMo());
+                        List<DefectTypeWithQtyResponse> defectTypeWithQtyResponses = defectTypes.stream().map(
+                                defectType -> DefectTypeWithQtyResponse.builder()
+                                        .id(defectType.getId())
+                                        .type(defectType.getName())
+                                        .qty(1)
+                                        .build()
+                        ).toList();
+                        return MosResponse.builder()
+                                .mo(mos.getMo())
+                                .buyer(mos.getPurchaseOrder().getBuyer().getName())
+                                .style(mos.getPurchaseOrder().getStyle().getStyleNo())
+                                .output(outputDetailRepository.totalOutputTodayByMO(mos.getMo(), today, 2))
+                                .defect(defectDetailRepository.totalDefectByMO(today, mos.getMo(), 2))
+                                .defectTypes(defectTypeWithQtyResponses)
+                                .build();
+                    }
+            ).toList();
+
             return LineDefectResponse.builder()
                     .line(pl.getLine())
+                    .mos(mosResponses)
                     .build();
         }).toList();
         return AnalysisDefectResponse.builder()
