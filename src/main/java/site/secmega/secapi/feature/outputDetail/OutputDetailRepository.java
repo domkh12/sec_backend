@@ -29,8 +29,17 @@ public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long
 
     @Query("""
             select COALESCE(SUM(o.goodQty), 0) from OutputDetail o
-            where o.workOrder.mo = ?1 and o.outputDate = ?2 and o.fromLine.department.processNo = ?3""")
+            where o.deletedAt is null and o.workOrder.mo = ?1 and o.outputDate = ?2 and o.fromLine.department.processNo = ?3""")
     Integer totalOutputTodayByMO(String mo, LocalDate outputDate, Integer processNo);
+
+    @Query("""
+            select COALESCE(SUM(o.goodQty), 0) from OutputDetail o
+            where o.deletedAt is null and o.workOrder.mo = ?1 and o.outputDate = ?2 and o.fromLine.id = ?3""")
+    Integer totalOutputTodayByMOAndLineId(String mo, LocalDate outputDate, Long id);
+
+    @Query("select COALESCE(SUM(o.goodQty), 0) from OutputDetail o where o.deletedAt is null and o.outputDate = ?1 and o.time.id = ?2")
+    Integer totalOutputByTimeId(LocalDate outputDate, Long id);
+
 
     @Query("""
             select COALESCE(SUM(o.goodQty), 0) from OutputDetail o
@@ -60,6 +69,7 @@ public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long
             select COALESCE(SUM(o.goodQty), 0) from OutputDetail o
             where o.outputDate between ?1 and ?2 and o.fromLine.department.processNo = ?3 and o.time.id = ?4""")
     Integer totalOutputSewingBetweenDatesByTime(LocalDate outputDateStart, LocalDate outputDateEnd, Integer processNo, Long id);
+
 
 
     @Query("""

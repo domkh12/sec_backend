@@ -47,6 +47,10 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long>, Jpa
     @Query("select COALESCE(SUM(w.qty), 0) from WorkOrder w where w.isActive = true")
     Integer sumByIsActiveTrue();
 
+    @Query("""
+            select w from WorkOrder w inner join w.productionLines productionLines
+            where w.deletedAt is null and w.isActive = true and productionLines.id = ?1""")
+    List<WorkOrder> findByDeletedAtNullAndIsActiveTrueAndProductionLines_Id(Long id);
 
 
 }
