@@ -6,11 +6,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import site.secmega.secapi.base.StyleStatus;
+import site.secmega.secapi.domain.ProductionLine;
 import site.secmega.secapi.domain.Style;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface StyleRepository extends JpaRepository<Style, Long>, JpaSpecificationExecutor<Style> {
@@ -34,6 +36,11 @@ public interface StyleRepository extends JpaRepository<Style, Long>, JpaSpecific
     and s.deletedAt is null
     """)
     Integer countStylesWithOutputDetailsToday(@Param("date") LocalDate date);
+
+    @Query("""
+            select s from Style s inner join s.purchaseOrders.workOrders workOrders
+            where s.deletedAt is null and workOrders.isActive = true and s.purchaseOrders.workOrders.productionLines = ?1""")
+    Optional<Style> findByDeletedAtNullAndPurchaseOrders_WorkOrders_IsActiveTrueAndPurchaseOrders_WorkOrders_ProductionLines(ProductionLine productionLines);
 
 
 }

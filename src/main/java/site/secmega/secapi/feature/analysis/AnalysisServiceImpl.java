@@ -4,6 +4,7 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 import site.secmega.secapi.domain.ProductionLine;
+import site.secmega.secapi.domain.Style;
 import site.secmega.secapi.domain.WorkOrder;
 import site.secmega.secapi.feature.analysis.dto.*;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
@@ -37,6 +38,7 @@ public class AnalysisServiceImpl implements AnalysisService{
         LocalDate today = LocalDate.now();
         List<ProductionLine> productionLines = productionLineRepository.findByDeletedAtNullAndDepartment_ProcessNo(2);
         List<LineDefectResponse> lineDefectResponses = productionLines.stream().map(pl -> {
+
             return LineDefectResponse.builder()
                     .line(pl.getLine())
                     .build();

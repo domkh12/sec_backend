@@ -28,4 +28,5 @@ public interface BuyerRepository extends JpaRepository<Buyer, Long>, JpaSpecific
     List<Buyer> findByDeletedAtNullAndPurchaseOrders_WorkOrders_IsActiveTrue();
 
 
+
 }
