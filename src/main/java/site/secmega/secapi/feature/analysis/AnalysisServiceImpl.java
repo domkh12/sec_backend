@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
 import site.secmega.secapi.domain.DefectType;
 import site.secmega.secapi.domain.ProductionLine;
+import site.secmega.secapi.domain.Time;
 import site.secmega.secapi.domain.WorkOrder;
 import site.secmega.secapi.feature.analysis.dto.*;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
@@ -16,6 +17,7 @@ import site.secmega.secapi.feature.outputDetail.OutputDetailRepository;
 import site.secmega.secapi.feature.analysis.dto.OutputLast48Hrs;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.style.StyleRepository;
+import site.secmega.secapi.feature.time.TimeRepository;
 import site.secmega.secapi.feature.workOrder.WorkOrderRepository;
 
 import java.time.LocalDate;
@@ -36,6 +38,7 @@ public class AnalysisServiceImpl implements AnalysisService{
     private final ProductionLineRepository productionLineRepository;
     private final DefectDetailRepository defectDetailRepository;
     private final DefectTypeRepository defectTypeRepository;
+    private final TimeRepository timeRepository;
 
     @Override
     public AnalysisDefectResponse defectToday() {
@@ -44,24 +47,25 @@ public class AnalysisServiceImpl implements AnalysisService{
         List<LineDefectResponse> lineDefectResponses = productionLines.stream().map(pl -> {
             List<WorkOrder> mo = workOrderRepository.findByDeletedAtNullAndIsActiveTrueAndProductionLines_Id(pl.getId());
 
-
-
             List<MosResponse> mosResponses = mo.stream().map(
                     mos -> {
                         List<DefectType> defectTypes = defectTypeRepository.findByDeletedAtNullAndDefectDetails_WorkOrder_IsActiveTrueAndDefectDetails_WorkOrder_Mo(mos.getMo());
                         List<DefectTypeWithQtyResponse> defectTypeWithQtyResponses = defectTypes.stream().map(
-                                defectType -> DefectTypeWithQtyResponse.builder()
-                                        .id(defectType.getId())
-                                        .type(defectType.getName())
-                                        .qty(1)
-                                        .build()
+                                defectType -> {
+                                    Integer defectQty = defectDetailRepository.totalDefectByMoAndDefectTypeId(today, mos.getMo(), pl.getId(), defectType.getId());
+                                    return DefectTypeWithQtyResponse.builder()
+                                            .id(defectType.getId())
+                                            .type(defectType.getName())
+                                            .qty(defectQty)
+                                            .build();
+                                }
                         ).toList();
                         return MosResponse.builder()
                                 .mo(mos.getMo())
                                 .buyer(mos.getPurchaseOrder().getBuyer().getName())
                                 .style(mos.getPurchaseOrder().getStyle().getStyleNo())
-                                .output(outputDetailRepository.totalOutputTodayByMO(mos.getMo(), today, 2))
-                                .defect(defectDetailRepository.totalDefectByMO(today, mos.getMo(), 2))
+                                .output(outputDetailRepository.totalOutputTodayByMOAndLineId(mos.getMo(), today, pl.getId()))
+                                .defect(defectDetailRepository.totalDefectByMO(today, mos.getMo(), pl.getId()))
                                 .defectTypes(defectTypeWithQtyResponses)
                                 .build();
                     }
@@ -72,10 +76,20 @@ public class AnalysisServiceImpl implements AnalysisService{
                     .mos(mosResponses)
                     .build();
         }).toList();
+
+        List<Time> times = timeRepository.findByDeletedAtNull();
+        List<HourlyDefectResponse> hourlyDefectResponses = times.stream().map(time -> {
+            return HourlyDefectResponse.builder()
+                    .hour(time.getName())
+                    .output(outputDetailRepository.totalOutputByTimeId(today, time.getId()))
+                    .defect(defectDetailRepository.totalDefectQtyTodayByTimeId(today, time.getId()))
+                    .build();
+        }).toList();
         return AnalysisDefectResponse.builder()
                 .updatedAt(today.toString())
                 .targetDefectRate(2.5)
                 .lines(lineDefectResponses)
+                .hourlyTrend(hourlyDefectResponses)
                 .build();
     }
 

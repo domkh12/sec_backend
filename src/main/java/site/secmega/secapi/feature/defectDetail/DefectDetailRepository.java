@@ -9,10 +9,20 @@ import java.time.LocalDate;
 
 @Repository
 public interface DefectDetailRepository extends JpaRepository<DefectDetail, Long> {
+
     @Query("""
             select COALESCE(SUM(d.defectQty), 0) from DefectDetail d
-            where d.deletedAt is null and d.defectDate = ?1 and d.workOrder.mo = ?2 and d.productionLine.department.processNo = ?3""")
-    Integer totalDefectByMO(LocalDate defectDate, String mo, Integer processNo);
+            where d.deletedAt is null and d.defectDate = ?1 and d.workOrder.mo = ?2 and d.productionLine.id = ?3""")
+    Integer totalDefectByMO(LocalDate defectDate, String mo, Long id);
+
+    @Query("select COALESCE(SUM(d.defectQty), 0) from DefectDetail d where d.deletedAt is null and d.defectDate = ?1 and d.time.id = ?2")
+    Integer totalDefectQtyTodayByTimeId(LocalDate defectDate, Long id);
+
+
+    @Query("""
+            select COALESCE(SUM(d.defectQty), 0) from DefectDetail d
+            where d.deletedAt is null and d.defectDate = ?1 and d.workOrder.mo = ?2 and d.productionLine.id = ?3 and d.defectType.id = ?4""")
+    Integer totalDefectByMoAndDefectTypeId(LocalDate defectDate, String mo, Long id, Long id1);
 
 
 }

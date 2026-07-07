@@ -33,4 +33,5 @@ public interface DefectTypeRepository extends JpaRepository<DefectType, Long>, J
     List<DefectType> findByDeletedAtNullAndDefectDetails_WorkOrder_IsActiveTrueAndDefectDetails_WorkOrder_Mo(String mo);
 
 
+
 }

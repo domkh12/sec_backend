@@ -8,6 +8,7 @@ import java.util.List;
 public record AnalysisDefectResponse(
         String updatedAt,
         Double targetDefectRate,
-        List<LineDefectResponse> lines
+        List<LineDefectResponse> lines,
+        List<HourlyDefectResponse> hourlyTrend
 ) {
 }
