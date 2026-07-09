@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository;
 import site.secmega.secapi.domain.DefectDetail;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Repository
 public interface DefectDetailRepository extends JpaRepository<DefectDetail, Long> {
@@ -24,5 +25,16 @@ public interface DefectDetailRepository extends JpaRepository<DefectDetail, Long
             where d.deletedAt is null and d.defectDate = ?1 and d.workOrder.mo = ?2 and d.productionLine.id = ?3 and d.defectType.id = ?4""")
     Integer totalDefectByMoAndDefectTypeId(LocalDate defectDate, String mo, Long id, Long id1);
 
+    @Query("""
+            select
+                d.defectDate as date,
+                COALESCE(SUM(d.defectQty), 0) as defect
+            from DefectDetail d
+            where d.deletedAt is null
+                and d.defectDate between ?1 and ?2
+            group by d.defectDate
+            order by d.defectDate asc
+            """)
+    List<Object[]> getDailyDefectSummaryBetweenDates(LocalDate dateFrom, LocalDate dateTo);
 
 }
