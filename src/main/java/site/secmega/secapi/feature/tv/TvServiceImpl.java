@@ -179,8 +179,8 @@ public class TvServiceImpl implements TvService{
         tvDataRepository.save(tvData);
 
         messagingTemplate.convertAndSend("/topic/messages/tv-data-update", MessageRequest.builder()
-                        .message("update")
-                        .isUpdate(true)
+                .message("update")
+                .isUpdate(true)
                 .build());
 
         return TvDataResponse.builder()
@@ -215,6 +215,7 @@ public class TvServiceImpl implements TvService{
                 .sorted(Comparator.comparing(TvData::getDate).reversed())
                 .limit(3)
                 .map(tvData -> DailyRecord.builder()
+                        .id(tvData.getId())
                         .h8(tvData.getH8())
                         .h9(tvData.getH9())
                         .h10(tvData.getH10())

@@ -38,7 +38,6 @@ public class Tv {
     private LocalDate startDate;
     private LocalDate finishDate;
 
-
     // Sewing start time
     @Column(nullable = false)
     private LocalDateTime createdAt;
