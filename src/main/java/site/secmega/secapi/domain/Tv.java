@@ -24,19 +24,19 @@ public class Tv {
 
     private String line;
     // Number of workers
-    private String orderNo;
-    private Integer worker;
-    private Integer helper;
-    private Integer orderQty;
-    private Integer totalInLine;
-    private Integer totalOutput;
-    private Integer orderInline;
-    private Integer balanceInLine;
-    private Integer qcRepairBack;
-    private Integer balanceDay;
-    private String styleNo;
-    private LocalDate startDate;
-    private LocalDate finishDate;
+//    private String orderNo;
+//    private Integer worker;
+//    private Integer helper;
+//    private Integer orderQty;
+//    private Integer totalInLine;
+//    private Integer totalOutput;
+//    private Integer orderInline;
+//    private Integer balanceInLine;
+//    private Integer qcRepairBack;
+//    private Integer balanceDay;
+//    private String styleNo;
+//    private LocalDate startDate;
+//    private LocalDate finishDate;
 
     // Sewing start time
     @Column(nullable = false)
@@ -58,7 +58,8 @@ public class Tv {
     private Integer dh17;
     private Integer dh18;
 
+
     @OneToMany(mappedBy = "tv")
-    private List<TvData> tvDatas;
+    private List<TvOrder> tvOrders;
 
 }

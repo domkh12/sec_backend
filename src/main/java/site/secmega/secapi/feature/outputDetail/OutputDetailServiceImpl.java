@@ -215,53 +215,53 @@ public class OutputDetailServiceImpl implements OutputDetailService{
 
     private void updateTvDataForSewing(Long lineId, LocalDate outputDate) {
 
-        ProductionLine productionLine = productionLineRepository.findById(lineId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Line not found!"));
-
-        if (productionLine.getDepartment() == null
-                || productionLine.getDepartment().getProcessNo() == null
-                || productionLine.getDepartment().getProcessNo() != 2) {
-            return;
-        }
-
-        String lineName = productionLine.getLine();
-        Integer processNo = productionLine.getDepartment().getProcessNo();
-
-        TvData tvData = tvDataRepository.findByDateAndTv_Name(outputDate.toString(), lineName)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TV Data not found"));
-
-        for (Time time : timeRepository.findAll()) {
-            Integer qty = outputDetailRepository.totalOutputSewingBetweenDatesByTimeAndLine(
-                    outputDate,
-                    outputDate,
-                    processNo,
-                    time.getId(),
-                    lineId
-            );
-
-            switch (time.getName()) {
-                case "07:00-08:00" -> tvData.setH8(qty);
-                case "08:00-09:00" -> tvData.setH9(qty);
-                case "09:00-10:00" -> tvData.setH10(qty);
-                case "10:00-11:00" -> tvData.setH11(qty);
-                case "12:00-13:00" -> tvData.setH13(qty);
-                case "13:00-14:00" -> tvData.setH14(qty);
-                case "14:00-15:00" -> tvData.setH15(qty);
-                case "15:00-16:00" -> tvData.setH16(qty);
-                case "16:00-17:00" -> tvData.setH17(qty);
-                case "17:00-18:00" -> tvData.setH18(qty);
-            }
-        }
-
-        tvDataRepository.save(tvData);
-
-        messagingTemplate.convertAndSend(
-                "/topic/messages/tv-data-update",
-                MessageRequest.builder()
-                        .message("update")
-                        .isUpdate(true)
-                        .build()
-        );
+//        ProductionLine productionLine = productionLineRepository.findById(lineId)
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Line not found!"));
+//
+//        if (productionLine.getDepartment() == null
+//                || productionLine.getDepartment().getProcessNo() == null
+//                || productionLine.getDepartment().getProcessNo() != 2) {
+//            return;
+//        }
+//
+//        String lineName = productionLine.getLine();
+//        Integer processNo = productionLine.getDepartment().getProcessNo();
+//
+//        TvData tvData = tvDataRepository.findByDateAndTv_Name(outputDate.toString(), lineName)
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TV Data not found"));
+//
+//        for (Time time : timeRepository.findAll()) {
+//            Integer qty = outputDetailRepository.totalOutputSewingBetweenDatesByTimeAndLine(
+//                    outputDate,
+//                    outputDate,
+//                    processNo,
+//                    time.getId(),
+//                    lineId
+//            );
+//
+//            switch (time.getName()) {
+//                case "07:00-08:00" -> tvData.setH8(qty);
+//                case "08:00-09:00" -> tvData.setH9(qty);
+//                case "09:00-10:00" -> tvData.setH10(qty);
+//                case "10:00-11:00" -> tvData.setH11(qty);
+//                case "12:00-13:00" -> tvData.setH13(qty);
+//                case "13:00-14:00" -> tvData.setH14(qty);
+//                case "14:00-15:00" -> tvData.setH15(qty);
+//                case "15:00-16:00" -> tvData.setH16(qty);
+//                case "16:00-17:00" -> tvData.setH17(qty);
+//                case "17:00-18:00" -> tvData.setH18(qty);
+//            }
+//        }
+//
+//        tvDataRepository.save(tvData);
+//
+//        messagingTemplate.convertAndSend(
+//                "/topic/messages/tv-data-update",
+//                MessageRequest.builder()
+//                        .message("update")
+//                        .isUpdate(true)
+//                        .build()
+//        );
     }
 
 }

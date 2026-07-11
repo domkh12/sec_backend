@@ -52,4 +52,5 @@ public class ProductionLine extends BaseEntity{
 
     @ManyToMany(mappedBy = "productionLines")
     private List<WorkOrder> workOrders;
+
 }

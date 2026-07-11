@@ -16,4 +16,6 @@ public interface TvService {
     List<TvGeneralResponse> getTvGeneralData();
 
     TvDataResponse createDataTv(String name);
+
+    TvDataResponse createNewStyle(String name);
 }

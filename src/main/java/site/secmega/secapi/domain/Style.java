@@ -35,4 +35,7 @@ public class Style extends BaseEntity{
 
     @ManyToMany(mappedBy = "styles")
     private List<Material> materials;
+
+    @OneToMany(mappedBy = "style")
+    private List<TvOrder> tvOrders;
 }

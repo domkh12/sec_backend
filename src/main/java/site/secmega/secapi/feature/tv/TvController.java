@@ -30,6 +30,13 @@ public class TvController {
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PostMapping("/data/{name}/style")
+    @ResponseStatus(HttpStatus.CREATED)
+    TvDataResponse createNewStyle(@PathVariable String name){
+        return tvService.createNewStyle(name);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PutMapping("/data")
     @ResponseStatus(HttpStatus.CREATED)
     TvDataResponse updateDataTv(@RequestBody TvDataRequest tvDataRequest){

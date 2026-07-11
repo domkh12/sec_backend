@@ -23,8 +23,6 @@ public class TvData {
     private String date;
     private Integer dTarget;
     private Boolean isToday;
-    private LocalDate startDate;
-    private String orderNo;
 
     // Hourly outputs (8:00 — 18:00)
     private Integer h8;
@@ -51,5 +49,5 @@ public class TvData {
     private Integer dh18;
 
     @ManyToOne
-    private Tv tv;
+    private TvOrder tvOrder;
 }

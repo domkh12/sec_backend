@@ -14,23 +14,23 @@ import java.util.Optional;
 
 @Repository
 public interface TvDataRepository extends JpaRepository<TvData, Long> {
-    boolean existsByTvAndDate(Tv tv, String date);
-
-    @Query("select t from TvData t where t.date = ?1")
-    Optional<TvData> findByDate(String date);
-
-    @Query("select t from TvData t where t.date = ?1 and t.tv.name = ?2")
-    Optional<TvData> findByDateAndTv_Name(String date, String name);
-
-
-    @Query("select t from TvData t where t.isToday = true")
-    Optional<TvData> findByIsTodayTrue();
-
-    @Query("select t from TvData t where t.isToday = true and t.tv.id = ?1")
-    Optional<TvData> findByIsTodayTrueAndTv_Id(Long id);
-
-    @Modifying
-    @Transactional
-    @Query("UPDATE TvData t SET t.isToday = false WHERE t.tv = :tv")
-    void clearIsTodayByTv(@Param("tv") Tv tv);
+//    boolean existsByTvAndDate(Tv tv, String date);
+//
+//    @Query("select t from TvData t where t.date = ?1")
+//    Optional<TvData> findByDate(String date);
+//
+//    @Query("select t from TvData t where t.date = ?1 and t.tv.name = ?2")
+//    Optional<TvData> findByDateAndTv_Name(String date, String name);
+//
+//
+//    @Query("select t from TvData t where t.isToday = true")
+//    Optional<TvData> findByIsTodayTrue();
+//
+//    @Query("select t from TvData t where t.isToday = true and t.tv.id = ?1")
+//    Optional<TvData> findByIsTodayTrueAndTv_Id(Long id);
+//
+//    @Modifying
+//    @Transactional
+//    @Query("UPDATE TvData t SET t.isToday = false WHERE t.tv = :tv")
+//    void clearIsTodayByTv(@Param("tv") Tv tv);
 }
