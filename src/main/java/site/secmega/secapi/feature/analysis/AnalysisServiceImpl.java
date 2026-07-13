@@ -226,7 +226,7 @@ public class AnalysisServiceImpl implements AnalysisService{
                 .totalInput(totalInputToday)
                 .totalOutput(totalOutputToday)
                 .totalStyleActive(totalStyleActive)
-                .totalBalance(totalBalance)
+                .totalBalance(totalBalance < 0 ? 0 : totalBalance)
                 .mo(moResponses)
                 .buyers(buyerAnalysisResponses)
                 .lineData(lineDataResponses)
