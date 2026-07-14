@@ -346,11 +346,11 @@ public class initData {
         tv.setCreatedAt(LocalDateTime.now());
         tvRepository.save(tv);
         Tv tv1 = new Tv();
-        tv1.setName("Sawing1");
+        tv1.setName("Sewing-L1");
         tv1.setCreatedAt(LocalDateTime.now());
         tvRepository.save(tv1);
         Tv tv2 = new Tv();
-        tv2.setName("Sawing2");
+        tv2.setName("Sewing-L2");
         tv2.setCreatedAt(LocalDateTime.now());
         tvRepository.save(tv2);
     }

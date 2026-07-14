@@ -28,6 +28,7 @@ import java.util.stream.Stream;
 @Slf4j
 public class TvServiceImpl implements TvService{
 
+    private final TvOrderRepository tvOrderRepository;
     private final TvRepository tvRepository;
     private final TvMapper tvMapper;
     private final TvDataRepository tvDataRepository;
@@ -248,11 +249,30 @@ public class TvServiceImpl implements TvService{
 
     @Override
     public TvDataResponse getDataByTvName(String name) {
-//        ;Tv tv = tvRepository.findByName(name).orElseThrow(
-//                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv not found!")
-//        );
-//
-//        LocalDate now = LocalDate.now();
+        Tv tv = tvRepository.findByName(name).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv not found!")
+        );
+
+        LocalDate now = LocalDate.now();
+
+        List<TvOrderResponse> tvOrderResponses = tvOrderRepository.findByTv_Name(name).stream().map(
+            tvOrder -> TvOrderResponse.builder()
+                    .orderNo(tvOrder.getOrderNo())
+                    .status(tvOrder.getStatus())
+                    .orderQty(tvOrder.getOrderQty())
+                    .totalInLine(tvOrder.getTotalInLine())
+                    .totalOutput(tvOrder.getTotalOutput())
+                    .orderInline(tvOrder.getOrderInline())
+                    .balanceInLine(tvOrder.getBalanceInLine())
+                    .qcRepairBack(tvOrder.getQcRepairBack())
+                    .balanceDay(tvOrder.getBalanceDay())
+                    .input(tvOrder.getInput())
+                    .wHour(tvOrder.getWHour())
+                    .hTarg(tvOrder.getHTarg())
+                    .startDate(tvOrder.getStartDate())
+                    .finishDate(tvOrder.getFinishDate())
+                    .build()
+        ).toList();
 //        LocalDate startDate = tv.getStartDate();
 //        Long days = (startDate == null) ? null : ChronoUnit.DAYS.between(startDate, now) + 1;
 //
@@ -295,28 +315,13 @@ public class TvServiceImpl implements TvService{
 //                .h18(latest.getDh18())
 //                .build();
 //
-//        return TvDataResponse.builder()
-//                .line(tv.getLine())
-//                .worker(tv.getWorker())
-//                .helper(tv.getHelper())
-//                .day(days)
-//                .orderNo(tv.getOrderNo())
-//                .totalInLine(tv.getTotalInLine())
-//                .balanceInLine(tv.getBalanceInLine())
-//                .orderQty(tv.getOrderQty())
-//                .totalOutput(tv.getTotalOutput())
-//                .qcRepairBack(tv.getQcRepairBack())
-//                .orderInline(tv.getOrderInline())
-//                .balanceDay(tv.getBalanceDay())
-//                .wHour(tv.getWHour())
-//                .hTarg(tv.getHTarg())
-//                .input(tv.getInput())
-//                .dailyRecords(dailyRecords)
-//                .defects(defects)
-//                .startDate(tv.getStartDate())
-//                .finishDate(tv.getFinishDate())
-//                .build();
-        return null;
+        return TvDataResponse.builder()
+                .id(tv.getId())
+                .line(tv.getLine())
+                .worker(tv.getWorker())
+                .helper(tv.getHelper())
+                .orders(tvOrderResponses)
+                .build();
     }
 
     @Override

@@ -21,7 +21,7 @@ public class TvOrder {
     private Long id;
 
     private String orderNo;
-    private String orderQty;
+    private Integer orderQty;
     private String status;
     private Integer totalInLine;
     private Integer totalOutput;

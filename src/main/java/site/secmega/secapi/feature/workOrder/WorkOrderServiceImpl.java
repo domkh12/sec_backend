@@ -242,7 +242,11 @@ public class WorkOrderServiceImpl implements WorkOrderService{
         if (workOrderFilterRequest.search() != null){
             String searchTerm = "%" + workOrderFilterRequest.search().toLowerCase() + "%";
             spec = spec.and((root, query, cb) ->
-                    cb.like(cb.lower(root.get("mo")), searchTerm)
+                    cb.or(
+                        cb.like(cb.lower(root.get("mo")), searchTerm),
+                        cb.like(cb.lower(root.get("purchaseOrder").get("po")), searchTerm),
+                        cb.like(cb.lower(root.get("purchaseOrder").get("style").get("styleNo")), searchTerm)
+                    )
             );
         }
 

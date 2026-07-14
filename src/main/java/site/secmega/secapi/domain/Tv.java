@@ -25,8 +25,8 @@ public class Tv {
     private String line;
     // Number of workers
 //    private String orderNo;
-//    private Integer worker;
-//    private Integer helper;
+    private Integer worker;
+    private Integer helper;
 //    private Integer orderQty;
 //    private Integer totalInLine;
 //    private Integer totalOutput;
