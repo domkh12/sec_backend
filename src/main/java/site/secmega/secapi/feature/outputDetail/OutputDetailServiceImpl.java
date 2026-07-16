@@ -13,6 +13,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.*;
+import site.secmega.secapi.feature.buyer.dto.BuyerLookupResponse;
 import site.secmega.secapi.feature.defectDetail.DefectDetailRepository;
 import site.secmega.secapi.feature.defectType.DefectTypeRepository;
 import site.secmega.secapi.feature.message.dto.MessageRequest;
@@ -22,8 +23,10 @@ import site.secmega.secapi.feature.outputDetail.dto.OutputFilterRequest;
 import site.secmega.secapi.feature.outputDetail.dto.OutputLast48Hrs;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineLookupResponse;
+import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderLookupResponse;
 import site.secmega.secapi.feature.size.SizeRepository;
 import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
+import site.secmega.secapi.feature.style.dto.StyleLookupResponse;
 import site.secmega.secapi.feature.time.TimeRepository;
 import site.secmega.secapi.feature.time.dto.TimeResponse;
 import site.secmega.secapi.feature.tv.TvDataRepository;
@@ -84,7 +87,9 @@ public class OutputDetailServiceImpl implements OutputDetailService{
         if (outputFilterRequest.search() != null) {
             spec = spec.and((root, query, cb) ->
                     cb.or(
-                            cb.like(cb.lower(root.get("workOrder").get("mo")), "%" + outputFilterRequest.search().toLowerCase() + "%")
+                            cb.like(cb.lower(root.get("workOrder").get("mo")), "%" + outputFilterRequest.search().toLowerCase() + "%"),
+                            cb.like(cb.lower(root.get("workOrder").get("purchaseOrder").get("po")), "%" + outputFilterRequest.search().toLowerCase() + "%"),
+                            cb.like(cb.lower(root.get("workOrder").get("purchaseOrder").get("style").get("styleNo")), "%" + outputFilterRequest.search().toLowerCase() + "%")
                     )
             );
         }
@@ -125,6 +130,19 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                                 .id(detail.getFromLine().getId())
                                 .line(detail.getFromLine().getLine())
                                 .build())
+                        .purchaseOrder(PurchaseOrderLookupResponse.builder()
+                                .id(detail.getWorkOrder().getPurchaseOrder().getId())
+                                .po(detail.getWorkOrder().getPurchaseOrder().getPo())
+                                .build())
+                        .style(StyleLookupResponse.builder()
+                                .id(detail.getWorkOrder().getPurchaseOrder().getStyle().getId())
+                                .styleNo(detail.getWorkOrder().getPurchaseOrder().getStyle().getStyleNo())
+                                .build())
+                        .buyer(BuyerLookupResponse.builder()
+                                .id(detail.getWorkOrder().getPurchaseOrder().getBuyer().getId())
+                                .name(detail.getWorkOrder().getPurchaseOrder().getBuyer().getName())
+                                .build())
+
                         .build()
             ).toList(),
             pageRequest,

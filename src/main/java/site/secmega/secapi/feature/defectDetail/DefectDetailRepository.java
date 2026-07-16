@@ -1,6 +1,7 @@
 package site.secmega.secapi.feature.defectDetail;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import site.secmega.secapi.domain.DefectDetail;
@@ -9,7 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Repository
-public interface DefectDetailRepository extends JpaRepository<DefectDetail, Long> {
+public interface DefectDetailRepository extends JpaRepository<DefectDetail, Long>, JpaSpecificationExecutor<DefectDetail> {
 
     @Query("""
             select COALESCE(SUM(d.defectQty), 0) from DefectDetail d
@@ -36,5 +37,7 @@ public interface DefectDetailRepository extends JpaRepository<DefectDetail, Long
             order by d.defectDate asc
             """)
     List<Object[]> getDailyDefectSummaryBetweenDates(LocalDate dateFrom, LocalDate dateTo);
+
+
 
 }

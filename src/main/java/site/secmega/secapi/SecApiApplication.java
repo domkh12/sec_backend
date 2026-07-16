@@ -11,7 +11,7 @@ import java.util.TimeZone;
 @EnableSpringDataWebSupport(pageSerializationMode = EnableSpringDataWebSupport.PageSerializationMode.VIA_DTO)
 @SpringBootApplication
 @EnableScheduling
-public class    SecApiApplication {
+public class SecApiApplication {
 
     @PostConstruct
     public void init(){

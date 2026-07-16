@@ -15,6 +15,13 @@ public class TvController {
 
     private final TvService tvService;
 
+     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PostMapping("/orders")
+    @ResponseStatus(HttpStatus.CREATED)
+    TvDataResponse createOrder(@RequestParam String tvName, @RequestParam Long styleId){
+        return tvService.createOrder(tvName, styleId);
+    }
+
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_VIEWER')")
     @GetMapping("/tv-general")
     @ResponseStatus(HttpStatus.OK)
@@ -25,8 +32,8 @@ public class TvController {
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/data/{name}")
     @ResponseStatus(HttpStatus.CREATED)
-    TvDataResponse createDataTv(@PathVariable String name){
-        return tvService.createDataTv(name);
+    TvDataResponse createDataTv(@PathVariable String name, @RequestParam Long tvOrderId){
+        return tvService.createDataTv(name, tvOrderId);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")

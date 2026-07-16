@@ -87,7 +87,7 @@ public class AnalysisServiceImpl implements AnalysisService{
         }).toList();
         return AnalysisDefectResponse.builder()
                 .updatedAt(today.toString())
-                .targetDefectRate(2.5)
+                .targetDefectRate(3.0)
                 .lines(lineDefectResponses)
                 .hourlyTrend(hourlyDefectResponses)
                 .build();
