@@ -39,7 +39,6 @@ public class DefectDetailServiceImpl implements DefectDetailService {
             String searchTerm = "%" + defectDetailFilterRequest.search().toLowerCase() + "%";
             spec = spec.and((root, query, cb) -> 
                             cb.or(
-                                cb.like(cb.lower(root.get("name")), searchTerm),
                                 cb.like(cb.lower(root.get("workOrder").get("mo")), searchTerm),
                                 cb.like(cb.lower(root.get("workOrder").get("purchaseOrder").get("po")), searchTerm),
                                 cb.like(cb.lower(root.get("workOrder").get("purchaseOrder").get("style").get("styleNo")), searchTerm)

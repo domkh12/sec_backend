@@ -17,7 +17,7 @@ public class DefectDetailController {
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     Page<DefectDetailResponse> findAll(@ModelAttribute DefectDetailFilterRequest defectDetailFilterRequest){
         return defectDetailService.findAll(defectDetailFilterRequest);
     }
