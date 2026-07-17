@@ -37,10 +37,5 @@ public interface StyleRepository extends JpaRepository<Style, Long>, JpaSpecific
     """)
     Integer countStylesWithOutputDetailsToday(@Param("date") LocalDate date);
 
-    @Query("""
-            select s from Style s inner join s.purchaseOrders.workOrders workOrders
-            where s.deletedAt is null and workOrders.isActive = true and s.purchaseOrders.workOrders.productionLines = ?1""")
-    Optional<Style> findByDeletedAtNullAndPurchaseOrders_WorkOrders_IsActiveTrueAndPurchaseOrders_WorkOrders_ProductionLines(ProductionLine productionLines);
-
 
 }

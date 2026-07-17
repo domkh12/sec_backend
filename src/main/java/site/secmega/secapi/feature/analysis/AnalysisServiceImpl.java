@@ -49,7 +49,7 @@ public class AnalysisServiceImpl implements AnalysisService{
 
             List<MosResponse> mosResponses = mo.stream().map(
                     mos -> {
-                        List<DefectType> defectTypes = defectTypeRepository.findByDeletedAtNullAndDefectDetails_WorkOrder_IsActiveTrueAndDefectDetails_WorkOrder_Mo(mos.getMo());
+                        List<DefectType> defectTypes = defectTypeRepository.findDefectByMoActive(mos.getMo());
                         List<DefectTypeWithQtyResponse> defectTypeWithQtyResponses = defectTypes.stream().map(
                                 defectType -> {
                                     Integer defectQty = defectDetailRepository.totalDefectByMoAndDefectTypeId(today, mos.getMo(), pl.getId(), defectType.getId());

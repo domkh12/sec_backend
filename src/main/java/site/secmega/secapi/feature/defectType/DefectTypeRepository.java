@@ -30,7 +30,7 @@ public interface DefectTypeRepository extends JpaRepository<DefectType, Long>, J
     @Query("""
             select d from DefectType d inner join d.defectDetails defectDetails
             where d.deletedAt is null and defectDetails.workOrder.isActive = true and defectDetails.workOrder.mo = ?1""")
-    List<DefectType> findByDeletedAtNullAndDefectDetails_WorkOrder_IsActiveTrueAndDefectDetails_WorkOrder_Mo(String mo);
+    List<DefectType> findDefectByMoActive(String mo);
 
 
 
