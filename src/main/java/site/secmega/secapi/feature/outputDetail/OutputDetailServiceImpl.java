@@ -13,6 +13,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.*;
+import site.secmega.secapi.feature.buyer.dto.BuyerLookupResponse;
 import site.secmega.secapi.feature.defectDetail.DefectDetailRepository;
 import site.secmega.secapi.feature.defectType.DefectTypeRepository;
 import site.secmega.secapi.feature.message.dto.MessageRequest;
@@ -22,8 +23,10 @@ import site.secmega.secapi.feature.outputDetail.dto.OutputFilterRequest;
 import site.secmega.secapi.feature.outputDetail.dto.OutputLast48Hrs;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineLookupResponse;
+import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderLookupResponse;
 import site.secmega.secapi.feature.size.SizeRepository;
 import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
+import site.secmega.secapi.feature.style.dto.StyleLookupResponse;
 import site.secmega.secapi.feature.time.TimeRepository;
 import site.secmega.secapi.feature.time.dto.TimeResponse;
 import site.secmega.secapi.feature.tv.TvDataRepository;
@@ -84,7 +87,9 @@ public class OutputDetailServiceImpl implements OutputDetailService{
         if (outputFilterRequest.search() != null) {
             spec = spec.and((root, query, cb) ->
                     cb.or(
-                            cb.like(cb.lower(root.get("workOrder").get("mo")), "%" + outputFilterRequest.search().toLowerCase() + "%")
+                            cb.like(cb.lower(root.get("workOrder").get("mo")), "%" + outputFilterRequest.search().toLowerCase() + "%"),
+                            cb.like(cb.lower(root.get("workOrder").get("purchaseOrder").get("po")), "%" + outputFilterRequest.search().toLowerCase() + "%"),
+                            cb.like(cb.lower(root.get("workOrder").get("purchaseOrder").get("style").get("styleNo")), "%" + outputFilterRequest.search().toLowerCase() + "%")
                     )
             );
         }
@@ -125,6 +130,19 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                                 .id(detail.getFromLine().getId())
                                 .line(detail.getFromLine().getLine())
                                 .build())
+                        .purchaseOrder(PurchaseOrderLookupResponse.builder()
+                                .id(detail.getWorkOrder().getPurchaseOrder().getId())
+                                .po(detail.getWorkOrder().getPurchaseOrder().getPo())
+                                .build())
+                        .style(StyleLookupResponse.builder()
+                                .id(detail.getWorkOrder().getPurchaseOrder().getStyle().getId())
+                                .styleNo(detail.getWorkOrder().getPurchaseOrder().getStyle().getStyleNo())
+                                .build())
+                        .buyer(BuyerLookupResponse.builder()
+                                .id(detail.getWorkOrder().getPurchaseOrder().getBuyer().getId())
+                                .name(detail.getWorkOrder().getPurchaseOrder().getBuyer().getName())
+                                .build())
+
                         .build()
             ).toList(),
             pageRequest,
@@ -216,53 +234,53 @@ public class OutputDetailServiceImpl implements OutputDetailService{
 
     private void updateTvDataForSewing(Long lineId, LocalDate outputDate) {
 
-        ProductionLine productionLine = productionLineRepository.findById(lineId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Line not found!"));
-
-        if (productionLine.getDepartment() == null
-                || productionLine.getDepartment().getProcessNo() == null
-                || productionLine.getDepartment().getProcessNo() != 2) {
-            return;
-        }
-
-        String lineName = productionLine.getLine();
-        Integer processNo = productionLine.getDepartment().getProcessNo();
-
-        TvData tvData = tvDataRepository.findByDateAndTv_Name(outputDate.toString(), lineName)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TV Data not found"));
-
-        for (Time time : timeRepository.findAll()) {
-            Integer qty = outputDetailRepository.totalOutputSewingBetweenDatesByTimeAndLine(
-                    outputDate,
-                    outputDate,
-                    processNo,
-                    time.getId(),
-                    lineId
-            );
-
-            switch (time.getName()) {
-                case "07:00-08:00" -> tvData.setH8(qty);
-                case "08:00-09:00" -> tvData.setH9(qty);
-                case "09:00-10:00" -> tvData.setH10(qty);
-                case "10:00-11:00" -> tvData.setH11(qty);
-                case "12:00-13:00" -> tvData.setH13(qty);
-                case "13:00-14:00" -> tvData.setH14(qty);
-                case "14:00-15:00" -> tvData.setH15(qty);
-                case "15:00-16:00" -> tvData.setH16(qty);
-                case "16:00-17:00" -> tvData.setH17(qty);
-                case "17:00-18:00" -> tvData.setH18(qty);
-            }
-        }
-
-        tvDataRepository.save(tvData);
-
-        messagingTemplate.convertAndSend(
-                "/topic/messages/tv-data-update",
-                MessageRequest.builder()
-                        .message("update")
-                        .isUpdate(true)
-                        .build()
-        );
+//        ProductionLine productionLine = productionLineRepository.findById(lineId)
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Line not found!"));
+//
+//        if (productionLine.getDepartment() == null
+//                || productionLine.getDepartment().getProcessNo() == null
+//                || productionLine.getDepartment().getProcessNo() != 2) {
+//            return;
+//        }
+//
+//        String lineName = productionLine.getLine();
+//        Integer processNo = productionLine.getDepartment().getProcessNo();
+//
+//        TvData tvData = tvDataRepository.findByDateAndTv_Name(outputDate.toString(), lineName)
+//                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TV Data not found"));
+//
+//        for (Time time : timeRepository.findAll()) {
+//            Integer qty = outputDetailRepository.totalOutputSewingBetweenDatesByTimeAndLine(
+//                    outputDate,
+//                    outputDate,
+//                    processNo,
+//                    time.getId(),
+//                    lineId
+//            );
+//
+//            switch (time.getName()) {
+//                case "07:00-08:00" -> tvData.setH8(qty);
+//                case "08:00-09:00" -> tvData.setH9(qty);
+//                case "09:00-10:00" -> tvData.setH10(qty);
+//                case "10:00-11:00" -> tvData.setH11(qty);
+//                case "12:00-13:00" -> tvData.setH13(qty);
+//                case "13:00-14:00" -> tvData.setH14(qty);
+//                case "14:00-15:00" -> tvData.setH15(qty);
+//                case "15:00-16:00" -> tvData.setH16(qty);
+//                case "16:00-17:00" -> tvData.setH17(qty);
+//                case "17:00-18:00" -> tvData.setH18(qty);
+//            }
+//        }
+//
+//        tvDataRepository.save(tvData);
+//
+//        messagingTemplate.convertAndSend(
+//                "/topic/messages/tv-data-update",
+//                MessageRequest.builder()
+//                        .message("update")
+//                        .isUpdate(true)
+//                        .build()
+//        );
     }
 
 }

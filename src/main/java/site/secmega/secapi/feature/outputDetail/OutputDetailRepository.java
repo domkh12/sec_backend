@@ -70,8 +70,6 @@ public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long
             where o.outputDate between ?1 and ?2 and o.fromLine.department.processNo = ?3 and o.time.id = ?4""")
     Integer totalOutputSewingBetweenDatesByTime(LocalDate outputDateStart, LocalDate outputDateEnd, Integer processNo, Long id);
 
-
-
     @Query("""
         SELECT 
             o.outputDate as date,

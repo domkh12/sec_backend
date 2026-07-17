@@ -167,7 +167,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                 .totalMO(totalMO)
                 .totalWorkOrderQty(totalWorkOrderQty)
                 .totalOutput(totalOutput)
-                .totalBalance(totalWorkOrderQty - totalOutput)
+                .totalBalance((totalWorkOrderQty - totalOutput) < 0 ? 0 : (totalWorkOrderQty - totalOutput))
                 .build();
     }
 
@@ -242,7 +242,11 @@ public class WorkOrderServiceImpl implements WorkOrderService{
         if (workOrderFilterRequest.search() != null){
             String searchTerm = "%" + workOrderFilterRequest.search().toLowerCase() + "%";
             spec = spec.and((root, query, cb) ->
-                    cb.like(cb.lower(root.get("mo")), searchTerm)
+                    cb.or(
+                        cb.like(cb.lower(root.get("mo")), searchTerm),
+                        cb.like(cb.lower(root.get("purchaseOrder").get("po")), searchTerm),
+                        cb.like(cb.lower(root.get("purchaseOrder").get("style").get("styleNo")), searchTerm)
+                    )
             );
         }
 
@@ -293,14 +297,13 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                             .color(colorResp)
                             .sizes(sizeResps)
                             .lines(lineResps)
-                            .balance(output)
                             .qty(w.getQty())
                             .startDate(w.getStartDate())
                             .endDate(w.getEndDate())
                             .status(w.getStatus())
                             .image(w.getImage())
                             .output(output)
-                            .balance(w.getQty() - output)
+                            .balance((w.getQty() - output) < 0 ? 0 : (w.getQty() - output))
                             .isActive(w.getIsActive())
                             .build();
                 })
