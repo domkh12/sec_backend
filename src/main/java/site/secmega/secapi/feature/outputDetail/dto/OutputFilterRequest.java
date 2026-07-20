@@ -1,11 +1,15 @@
 package site.secmega.secapi.feature.outputDetail.dto;
 
+import java.time.LocalDate;
+
 public record OutputFilterRequest(
         Integer pageNo,
         Integer pageSize,
         String search,
         Long lineId,
-        Long sizeId
+        Long sizeId,
+        Long buyerId,
+        LocalDate reportDate
 ) {
     public OutputFilterRequest{
         if (pageNo == null){

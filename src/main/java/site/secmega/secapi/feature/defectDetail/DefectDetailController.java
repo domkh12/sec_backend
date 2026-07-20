@@ -16,6 +16,13 @@ public class DefectDetailController {
     private final DefectDetailService defectDetailService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    void deleteDefect(@PathVariable Long id){
+        defectDetailService.deleteDefect(id);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     Page<DefectDetailResponse> findAll(@ModelAttribute DefectDetailFilterRequest defectDetailFilterRequest){

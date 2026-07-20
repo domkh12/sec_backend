@@ -93,6 +93,18 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                     )
             );
         }
+        
+        if(outputFilterRequest.buyerId() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("workOrder").get("purchaseOrder").get("buyer").get("id"), outputFilterRequest.buyerId())
+            );
+        }
+
+        if (outputFilterRequest.reportDate() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("outputDate"), outputFilterRequest.reportDate())
+            );
+        }
 
         if (outputFilterRequest.lineId() != null) {
             spec = spec.and((root, query, cb) ->

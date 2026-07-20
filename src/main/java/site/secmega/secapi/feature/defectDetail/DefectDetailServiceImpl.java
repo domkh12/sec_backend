@@ -20,24 +20,37 @@ import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderLookupResponse
 import site.secmega.secapi.feature.style.dto.StyleLookupResponse;
 import site.secmega.secapi.feature.time.dto.TimeResponse;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class DefectDetailServiceImpl implements DefectDetailService {
 
     private final DefectDetailRepository defectDetailRepository;
-    
+
+    @Override
+    public void deleteDefect(Long id) {
+        DefectDetail defectDetail = defectDetailRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Defect Detail not found!")
+        );
+
+        defectDetail.setDeletedAt(LocalDateTime.now());
+        defectDetailRepository.save(defectDetail);
+
+    }
+
     @Override
     public Page<DefectDetailResponse> findAll(DefectDetailFilterRequest defectDetailFilterRequest) {
 
         if(defectDetailFilterRequest.pageNo() <= 0)  throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page no and Page size must be greater than 0");
-     
+
         if(defectDetailFilterRequest.pageSize() <= 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page no and Page size must be greater than 0");
 
         Specification<DefectDetail> spec = Specification.where((root, query, cb) -> cb.conjunction());
 
         if (defectDetailFilterRequest.search() != null){
             String searchTerm = "%" + defectDetailFilterRequest.search().toLowerCase() + "%";
-            spec = spec.and((root, query, cb) -> 
+            spec = spec.and((root, query, cb) ->
                             cb.or(
                                 cb.like(cb.lower(root.get("workOrder").get("mo")), searchTerm),
                                 cb.like(cb.lower(root.get("workOrder").get("purchaseOrder").get("po")), searchTerm),
@@ -45,42 +58,83 @@ public class DefectDetailServiceImpl implements DefectDetailService {
                             )
                            );
         }
-        
+
+        if (defectDetailFilterRequest.buyerId() != null){
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("workOrder").get("purchaseOrder").get("buyer").get("id"), defectDetailFilterRequest.buyerId()));
+        }
+
+        if (defectDetailFilterRequest.lineId() != null){
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("productionLine").get("id"), defectDetailFilterRequest.lineId()));
+        }
+
+        if (defectDetailFilterRequest.reportDate() != null){
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("defectDate"), defectDetailFilterRequest.reportDate()));
+        }
+
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         PageRequest pageRequest = PageRequest.of(defectDetailFilterRequest.pageNo() - 1, defectDetailFilterRequest.pageSize(), sort);
         Page<DefectDetail> defectDetails = defectDetailRepository.findAll(spec, pageRequest);
-        
+
 
         return new PageImpl<>(
-                defectDetails.stream().map(defectDetail ->
-                        DefectDetailResponse.builder()
-                                .id(defectDetail.getId())
-                                .reportDate(defectDetail.getCreatedAt())
-                                .mo(defectDetail.getWorkOrder().getMo())
-                                .defectDate(defectDetail.getDefectDate())
-                                .defectQty(defectDetail.getDefectQty())
-                                .style(StyleLookupResponse.builder()
-                                        .id(defectDetail.getWorkOrder().getPurchaseOrder().getStyle().getId())
-                                        .styleNo(defectDetail.getWorkOrder().getPurchaseOrder().getStyle().getStyleNo())
-                                        .build())
-                                .line(ProductionLineLookupResponse.builder()
-                                        .id(defectDetail.getProductionLine().getId())
-                                        .line(defectDetail.getProductionLine().getLine())
-                                        .build())
-                                .purchaseOrder(PurchaseOrderLookupResponse.builder()
-                                        .id(defectDetail.getWorkOrder().getPurchaseOrder().getId())
-                                        .po(defectDetail.getWorkOrder().getPurchaseOrder().getPo())
-                                        .build())
-                                .buyer(BuyerLookupResponse.builder()
-                                        .id(defectDetail.getWorkOrder().getPurchaseOrder().getBuyer().getId())
-                                        .name(defectDetail.getWorkOrder().getPurchaseOrder().getBuyer().getName())
-                                        .build())
-                                .time(TimeResponse.builder()
-                                        .id(defectDetail.getTime().getId())
-                                        .name(defectDetail.getTime().getName())
-                                        .build())
-                                .build()
-                ).toList(),
+                defectDetails.stream()
+                        .map(defectDetail -> {
+                            var workOrder = defectDetail.getWorkOrder();
+                            var purchaseOrder = workOrder.getPurchaseOrder();
+                            var buyer = purchaseOrder.getBuyer();
+
+                            return DefectDetailResponse.builder()
+                                    .id(defectDetail.getId())
+                                    .reportDate(defectDetail.getCreatedAt())
+                                    .mo(workOrder.getMo())
+                                    .defectDate(defectDetail.getDefectDate())
+                                    .defectQty(defectDetail.getDefectQty())
+
+                                    .style(
+                                            purchaseOrder.getStyle() != null
+                                                    ? StyleLookupResponse.builder()
+                                                    .id(purchaseOrder.getStyle().getId())
+                                                    .styleNo(purchaseOrder.getStyle().getStyleNo())
+                                                    .build()
+                                                    : null
+                                    )
+
+                                    .line(
+                                            defectDetail.getProductionLine() != null
+                                                    ? ProductionLineLookupResponse.builder()
+                                                    .id(defectDetail.getProductionLine().getId())
+                                                    .line(defectDetail.getProductionLine().getLine())
+                                                    .build()
+                                                    : null
+                                    )
+
+                                    .purchaseOrder(
+                                            PurchaseOrderLookupResponse.builder()
+                                                    .id(purchaseOrder.getId())
+                                                    .po(purchaseOrder.getPo())
+                                                    .build()
+                                    )
+
+                                    .buyer(
+                                            buyer != null
+                                                    ? BuyerLookupResponse.builder()
+                                                    .id(buyer.getId())
+                                                    .name(buyer.getName())
+                                                    .build()
+                                                    : null
+                                    )
+
+                                    .time(
+                                            defectDetail.getTime() != null
+                                                    ? TimeResponse.builder()
+                                                    .id(defectDetail.getTime().getId())
+                                                    .name(defectDetail.getTime().getName())
+                                                    .build()
+                                                    : null
+                                    )
+                                    .build();
+                        })
+                        .toList(),
                 pageRequest,
                 defectDetails.getTotalElements()
         );
