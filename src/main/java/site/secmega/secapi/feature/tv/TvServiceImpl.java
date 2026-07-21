@@ -111,10 +111,6 @@ public class TvServiceImpl implements TvService{
     public TvDataResponse createDataTv(String name, Long tvOrderId) {
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-        Tv tv = tvRepository.findByName(name).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv not found!")
-        );
-
         TvOrder tvOrder = tvOrderRepository.findById(tvOrderId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv Order not found!")
         );
@@ -128,6 +124,7 @@ public class TvServiceImpl implements TvService{
                     .date(today)
                     .isToday(true)
                     .tvOrder(tvOrder)
+                    .dTarget(tvOrder.getTv().getHTarg() * tvOrder.getTv().getWHour())
                     .build();
 
             tvDataRepository.save(tvData); // ✅ save new record
@@ -137,22 +134,6 @@ public class TvServiceImpl implements TvService{
                     .isUpdate(true)
                     .build());
 
-//            return TvDataResponse.builder()
-//                    .line(tv.getLine())
-//                    .worker(tv.getWorker())
-//                    .helper(tv.getHelper())
-//                    .orderNo(tv.getOrderNo())
-//                    .totalInLine(tv.getTotalInLine())
-//                    .balanceInLine(tv.getBalanceInLine())
-//                    .orderQty(tv.getOrderQty())
-//                    .totalOutput(tv.getTotalOutput())
-//                    .qcRepairBack(tv.getQcRepairBack())
-//                    .orderInline(tv.getOrderInline())
-//                    .balanceDay(tv.getBalanceDay())
-//                    .wHour(tv.getWHour())
-//                    .hTarg(tv.getHTarg())
-//                    .input(tv.getInput())
-//                    .build();
             return null;
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Today data already exists");
@@ -218,7 +199,6 @@ public class TvServiceImpl implements TvService{
         tvOrder.setOrderNo(style.getStyleNo());
         tvOrder.setOrderInline(0);
         tvOrder.setOrderQty(0);
-        tvOrder.setBalanceDay(0);
         tvOrder.setBalanceInLine(0);
         tvOrder.setStartDate(null);
         tvOrder.setFinishDate(null);
@@ -246,6 +226,24 @@ public class TvServiceImpl implements TvService{
         tv.setHelper(tvDataRequest.helper());
         tv.setWorker(tvDataRequest.worker());
         Tv savedTv = tvRepository.save(tv);
+
+        TvOrder tvOrder = tvOrderRepository.findById(tvDataRequest.tvOrderId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv Order not found!")
+        );
+        tvOrder.setHTarg(tvDataRequest.hTarg());
+        tvOrder.setWHour(tvDataRequest.wHour());
+        tvOrder.setStartDate(tvDataRequest.startDate());
+        tvOrder.setFinishDate(tvDataRequest.finishDate());
+        tvOrder.setStatus(tvDataRequest.status());
+        tvOrder.setOrderQty(tvDataRequest.orderQty());
+        tvOrder.setOrderInline(tvDataRequest.totalInLine());
+        tvOrder.setTotalOutput(tvDataRequest.totalOutput());
+        tvOrder.setTotalInLine(tvDataRequest.totalInLine());
+        tvOrder.setBalanceInLine(tvDataRequest.balanceInLine());
+        tvOrder.setOrderInline(tvDataRequest.orderInline());
+        tvOrder.setQcRepairBack(tvDataRequest.qcRepairBack());
+        tvOrder.setInput(tvDataRequest.input());
+        tvOrderRepository.save(tvOrder);
 
 //        // Tv Data update
 //        TvData tvData = tvDataRepository.findByIsTodayTrueAndTv_Id(tv.getId()).orElseThrow(
@@ -297,9 +295,9 @@ public class TvServiceImpl implements TvService{
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv not found!")
         );
 
-        LocalDate now = LocalDate.now();
-
-        List<TvOrderResponse> tvOrderResponses = tvOrderRepository.findByTv_Name(name).stream().map(
+        List<TvOrderResponse> tvOrderResponses = tvOrderRepository.findByTv_Name(name).stream()
+                .sorted(Comparator.comparing(TvOrder::getId).reversed())
+                .map(
             tvOrder -> {
 
                 List<DailyRecord> dailyRecords = tvOrder.getTvDatas().stream()
@@ -322,6 +320,11 @@ public class TvServiceImpl implements TvService{
                             .isToday(tvData.getIsToday())
                             .build()).toList();
 
+                long balanceDay = 0;
+                if (tvOrder.getFinishDate() != null){
+                    balanceDay = ChronoUnit.DAYS.between(LocalDate.now(), tvOrder.getFinishDate());
+                }
+
                 return TvOrderResponse.builder()
                         .id(tvOrder.getId())
                         .orderNo(tvOrder.getStyle().getStyleNo())
@@ -332,7 +335,7 @@ public class TvServiceImpl implements TvService{
                         .orderInline(tvOrder.getOrderInline())
                         .balanceInLine(tvOrder.getBalanceInLine())
                         .qcRepairBack(tvOrder.getQcRepairBack())
-                        .balanceDay(tvOrder.getBalanceDay())
+                        .balanceDay((int) balanceDay)
                         .input(tvOrder.getInput())
                         .wHour(tvOrder.getWHour())
                         .hTarg(tvOrder.getHTarg())
@@ -342,30 +345,7 @@ public class TvServiceImpl implements TvService{
                         .build();
             }
         ).toList();
-//        LocalDate startDate = tv.getStartDate();
-//        Long days = (startDate == null) ? null : ChronoUnit.DAYS.between(startDate, now) + 1;
-//
 
-//
-//        List<TvData> sortedDatas = tv.getTvDatas().stream()
-//                .sorted(Comparator.comparing(TvData::getDate).reversed())
-//                .toList();
-//
-//        TvData latest   = sortedDatas.size() > 0 ? sortedDatas.get(0) : TvData.builder().build();
-//
-//        Defect defects = Defect.builder()
-//                .h8(latest.getDh8())
-//                .h9(latest.getDh9())
-//                .h10(latest.getDh10())
-//                .h11(latest.getDh11())
-//                .h13(latest.getDh13())
-//                .h14(latest.getDh14())
-//                .h15(latest.getDh15())
-//                .h16(latest.getDh16())
-//                .h17(latest.getDh17())
-//                .h18(latest.getDh18())
-//                .build();
-//
         return TvDataResponse.builder()
                 .id(tv.getId())
                 .line(tv.getLine())

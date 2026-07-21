@@ -28,7 +28,6 @@ public class TvOrder {
     private Integer orderInline;
     private Integer balanceInLine;
     private Integer qcRepairBack;
-    private Integer balanceDay;
     private Integer input;
     private Integer wHour;
     private Integer hTarg;
