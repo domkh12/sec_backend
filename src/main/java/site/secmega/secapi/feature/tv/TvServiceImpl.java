@@ -43,12 +43,17 @@ public class TvServiceImpl implements TvService{
 
     @Override
     public List<TvGeneralResponse> getTvGeneralData() {
-//        Sort sort = Sort.by(Sort.Direction.ASC, "line");
-//        List<Tv> tvs = tvRepository.findByNameNotOrderByLineAsc("General", sort);
-//        LocalDate now = LocalDate.now();
-//
-//        return tvs.stream()
-//                .map(tv -> {
+        Sort sort = Sort.by(Sort.Direction.ASC, "line");
+        List<Tv> tvs = tvRepository.findByNameNotOrderByLineAsc("General", sort);
+        LocalDate now = LocalDate.now();
+
+        return tvs.stream()
+                .map(tv -> {
+                    return TvGeneralResponse.builder()
+                            .line(tv.getName().substring(tv.getName().length() - 1, tv.getName().length()))
+                            .worker(tv.getWorker())
+                            .helper(tv.getHelper())
+                            .build();
 //                    LocalDate startDate = tv.getStartDate();
 //                    Long days = (startDate == null) ? null : ChronoUnit.DAYS.between(startDate, now) + 1;
 //
@@ -102,9 +107,8 @@ public class TvServiceImpl implements TvService{
 //                            .yFinish(yesterdayTotal)
 //                            .defects(todayDefectTotal)
 //                            .build();
-//                })
-//                .toList();
-        return null;
+                })
+                .toList();
     }
 
     @Override
@@ -243,33 +247,32 @@ public class TvServiceImpl implements TvService{
         tvOrder.setOrderInline(tvDataRequest.orderInline());
         tvOrder.setQcRepairBack(tvDataRequest.qcRepairBack());
         tvOrder.setInput(tvDataRequest.input());
-        tvOrderRepository.save(tvOrder);
+         tvOrderRepository.save(tvOrder);
 
-//        // Tv Data update
-//        TvData tvData = tvDataRepository.findByIsTodayTrueAndTv_Id(tv.getId()).orElseThrow(
-//                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Today True not found!")
-//        );
-//
-//        tvMapper.updateTvDataFromTvDataRequest(tvDataRequest, tvData);
-//        tvData.setDTarget(tvDataRequest.dTarg());
-//        tvData.setOrderNo(tvDataRequest.orderNo());
-//        tvData.setDh8(tvDataRequest.dh8());
-//        tvData.setDh9(tvDataRequest.dh9());
-//        tvData.setDh10(tvDataRequest.dh10());
-//        tvData.setDh11(tvDataRequest.dh11());
-//        tvData.setDh13(tvDataRequest.dh13());
-//        tvData.setDh14(tvDataRequest.dh14());
-//        tvData.setDh15(tvDataRequest.dh15());
-//        tvData.setDh16(tvDataRequest.dh16());
-//        tvData.setDh17(tvDataRequest.dh17());
-//        tvData.setDh18(tvDataRequest.dh18());
-//        tvDataRepository.save(tvData);
-//
-//        messagingTemplate.convertAndSend("/topic/messages/tv-data-update", MessageRequest.builder()
-//                .message("update")
-//                .isUpdate(true)
-//                .build());
-//
+        // Tv Data update
+        TvData tvData = tvDataRepository.findByIsTodayTrueAndTvOrder_Id(tvDataRequest.tvOrderId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Today True not found!")
+        );
+
+        tvMapper.updateTvDataFromTvDataRequest(tvDataRequest, tvData);
+        tvData.setDTarget(tv.getWHour() * tv.getHTarg());
+        tvData.setDh8(tvDataRequest.dh8());
+        tvData.setDh9(tvDataRequest.dh9());
+        tvData.setDh10(tvDataRequest.dh10());
+        tvData.setDh11(tvDataRequest.dh11());
+        tvData.setDh13(tvDataRequest.dh13());
+        tvData.setDh14(tvDataRequest.dh14());
+        tvData.setDh15(tvDataRequest.dh15());
+        tvData.setDh16(tvDataRequest.dh16());
+        tvData.setDh17(tvDataRequest.dh17());
+        tvData.setDh18(tvDataRequest.dh18());
+        tvDataRepository.save(tvData);
+
+        messagingTemplate.convertAndSend("/topic/messages/tv-data-update", MessageRequest.builder()
+                .message("update")
+                .isUpdate(true)
+                .build());
+
 //        return TvDataResponse.builder()
 //                .line(savedTv.getLine())
 //                .worker(savedTv.getWorker())

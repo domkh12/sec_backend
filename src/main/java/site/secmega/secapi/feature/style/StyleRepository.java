@@ -11,6 +11,7 @@ import site.secmega.secapi.domain.Style;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface StyleRepository extends JpaRepository<Style, Long>, JpaSpecificationExecutor<Style> {
@@ -34,6 +35,9 @@ public interface StyleRepository extends JpaRepository<Style, Long>, JpaSpecific
     and s.deletedAt is null
     """)
     Integer countStylesWithOutputDetailsToday(@Param("date") LocalDate date);
+
+    @Query("select s from Style s inner join s.purchaseOrders.workOrders workOrders where workOrders.mo = ?1")
+    Optional<Style> findByPurchaseOrders_WorkOrders_Mo(String mo);
 
 
 }
