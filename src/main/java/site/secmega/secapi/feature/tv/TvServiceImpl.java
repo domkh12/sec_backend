@@ -49,6 +49,16 @@ public class TvServiceImpl implements TvService{
 
         return tvs.stream()
                 .map(tv -> {
+                    List<TvGeneralResponse> tvGeneralResponses = tv.getTvOrders().stream().map(
+                            tvOrder -> {
+                                TvData tvData = tvDataRepository.findByIsTodayTrueAndTvOrder_Id(tvOrder.getId()).orElseThrow(
+                                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv Data not found")
+                                );
+                                return TvGeneralResponse.builder()
+                                        .
+                                        .build();
+                            }
+                    ).toList();
                     return TvGeneralResponse.builder()
                             .line(tv.getName().substring(tv.getName().length() - 1, tv.getName().length()))
                             .worker(tv.getWorker())
