@@ -46,23 +46,49 @@ public class TvServiceImpl implements TvService{
         Sort sort = Sort.by(Sort.Direction.ASC, "line");
         List<Tv> tvs = tvRepository.findByNameNotOrderByLineAsc("General", sort);
         LocalDate now = LocalDate.now();
-
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
         return tvs.stream()
                 .map(tv -> {
-                    List<TvGeneralResponse> tvGeneralResponses = tv.getTvOrders().stream().map(
-                            tvOrder -> {
-                                TvData tvData = tvDataRepository.findByIsTodayTrueAndTvOrder_Id(tvOrder.getId()).orElseThrow(
-                                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv Data not found")
-                                );
-                                return TvGeneralResponse.builder()
-                                        .
-                                        .build();
-                            }
+
+                    List<TvGeneralStyleResponse> tvGeneralResponses = tv.getTvOrders().stream().filter(tvOrder -> tvOrder.getTv().equals(tv) && tvOrder.getStatus().equals("ACTIVE")).map(
+                             tvOrder -> {
+                                 long balanceDay = 0;
+                                 if (tvOrder.getFinishDate() != null){
+                                     balanceDay = ChronoUnit.DAYS.between(tvOrder.getStartDate(), LocalDate.now());
+                                 }
+
+                                 List<TvData> sortedDatas = tvOrder.getTvDatas().stream()
+                                    .sorted(Comparator.comparing(TvData::getDate).reversed())
+                                    .toList();
+
+                                 TvData latest    = sortedDatas.size() > 0 ? sortedDatas.get(0) : TvData.builder().build();
+                                 return TvGeneralStyleResponse.builder()
+                                         .orderNo(tvOrder.getStyle().getStyleNo())
+                                         .sewStart(tvOrder.getStartDate() != null
+                                                 ? tvOrder.getStartDate().format(formatter)
+                                                 : null)
+                                         .tarH(tvOrder.getHTarg())
+                                         .tarDay(tvOrder.getHTarg() * tvOrder.getWHour())
+                                         .wHour(tvOrder.getWHour())
+                                         .day((int) balanceDay + 1)
+                                         .h8(latest.getH8())
+                                         .h9(latest.getH9())
+                                         .h10(latest.getH10())
+                                         .h11(latest.getH11())
+                                         .h13(latest.getH13())
+                                         .h14(latest.getH14())
+                                         .h15(latest.getH15())
+                                         .h16(latest.getH16())
+                                         .h17(latest.getH17())
+                                         .h18(latest.getH18())
+                                         .build();
+                             }
                     ).toList();
                     return TvGeneralResponse.builder()
                             .line(tv.getName().substring(tv.getName().length() - 1, tv.getName().length()))
                             .worker(tv.getWorker())
                             .helper(tv.getHelper())
+                            .styles(tvGeneralResponses)
                             .build();
 //                    LocalDate startDate = tv.getStartDate();
 //                    Long days = (startDate == null) ? null : ChronoUnit.DAYS.between(startDate, now) + 1;
@@ -207,6 +233,10 @@ public class TvServiceImpl implements TvService{
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Style not found")
         );
 
+        if (tvOrderRepository.existsByTv_IdAndStyle_Id(tv.getId(), style.getId())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Tv Order already exist!");
+        }
+
         TvOrder tvOrder = new TvOrder();
         tvOrder.setStyle(style);
         tvOrder.setTv(tv);
@@ -225,6 +255,10 @@ public class TvServiceImpl implements TvService{
         tvOrder.setWHour(0);
 
         tvOrderRepository.save(tvOrder);
+        messagingTemplate.convertAndSend("/topic/messages/tv-data-update", MessageRequest.builder()
+                .message("update")
+                .isUpdate(true)
+                .build());
         return null;
     }
 

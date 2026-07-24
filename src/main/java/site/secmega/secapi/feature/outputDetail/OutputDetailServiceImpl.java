@@ -264,7 +264,7 @@ public class OutputDetailServiceImpl implements OutputDetailService{
         Integer processNo = productionLine.getDepartment().getProcessNo();
 
         TvData tvData = tvDataRepository.findByDateAndTvOrder_Tv_NameAndTvOrder_Style_Id(outputDate.toString(), lineName, style.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TV Data not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TV Order not found"));
 
         for (Time time : timeRepository.findAll()) {
             Integer qty = outputDetailRepository.totalOutputSewingBetweenDatesByTimeAndLine(
