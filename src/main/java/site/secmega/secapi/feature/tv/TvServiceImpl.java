@@ -42,6 +42,21 @@ public class TvServiceImpl implements TvService{
 
 
     @Override
+    public void updateTvOrderStatus(List<TvOrderStatusRequest> tvOrderStatusRequests) {
+        tvOrderStatusRequests.forEach(
+                tvOrder -> {
+                    TvOrder tvOrder1 = tvOrderRepository.findById(tvOrder.id()).orElseThrow();
+                    tvOrder1.setStatus(tvOrder.status());
+                    tvOrderRepository.save(tvOrder1);
+                }
+        );
+        messagingTemplate.convertAndSend("/topic/messages/tv-data-update", MessageRequest.builder()
+                .message("update")
+                .isUpdate(true)
+                .build());
+    }
+
+    @Override
     public List<TvGeneralResponse> getTvGeneralData() {
         Sort sort = Sort.by(Sort.Direction.ASC, "line");
         List<Tv> tvs = tvRepository.findByNameNotOrderByLineAsc("General", sort);
@@ -62,6 +77,13 @@ public class TvServiceImpl implements TvService{
                                     .toList();
 
                                  TvData latest    = sortedDatas.size() > 0 ? sortedDatas.get(0) : TvData.builder().build();
+
+                                int todayDefectTotal = Stream.of(
+                                        latest.getDh8(), latest.getDh9(), latest.getDh10(), latest.getDh11(),
+                                        latest.getDh13(), latest.getDh14(), latest.getDh15(), latest.getDh16(),
+                                        latest.getDh17(), latest.getDh18()
+                                    ).mapToInt(h -> h != null ? h : 0).sum();
+
                                  return TvGeneralStyleResponse.builder()
                                          .orderNo(tvOrder.getStyle().getStyleNo())
                                          .sewStart(tvOrder.getStartDate() != null
@@ -81,6 +103,7 @@ public class TvServiceImpl implements TvService{
                                          .h16(latest.getH16())
                                          .h17(latest.getH17())
                                          .h18(latest.getH18())
+                                         .defects(todayDefectTotal)
                                          .build();
                              }
                     ).toList();
@@ -112,11 +135,7 @@ public class TvServiceImpl implements TvService{
 //                            latest.getH17(), latest.getH18()
 //                    ).mapToInt(h -> h != null ? h : 0).sum();
 //
-//                    int todayDefectTotal = Stream.of(
-//                            latest.getDh8(), latest.getDh9(), latest.getDh10(), latest.getDh11(),
-//                            latest.getDh13(), latest.getDh14(), latest.getDh15(), latest.getDh16(),
-//                            latest.getDh17(), latest.getDh18()
-//                    ).mapToInt(h -> h != null ? h : 0).sum();
+
 //
 //                    return TvGeneralResponse.builder()
 //                            .line(tv.getLine())

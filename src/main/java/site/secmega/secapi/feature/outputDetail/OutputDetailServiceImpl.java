@@ -245,6 +245,63 @@ public class OutputDetailServiceImpl implements OutputDetailService{
         return null;
     }
 
+    private void updateTvDataDefect(Long lineId, LocalDate outputDate, String mo) {
+
+        ProductionLine productionLine = productionLineRepository.findById(lineId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Line not found!"));
+
+        Style style = styleRepository.findByPurchaseOrders_WorkOrders_Mo(mo).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Style not found")
+        );
+
+        if (productionLine.getDepartment() == null
+                || productionLine.getDepartment().getProcessNo() == null
+                || productionLine.getDepartment().getProcessNo() != 2) {
+            return;
+        }
+
+        String lineName = productionLine.getLine();
+        Integer processNo = productionLine.getDepartment().getProcessNo();
+
+        TvData tvData = tvDataRepository.findByDateAndTvOrder_Tv_NameAndTvOrder_Style_Id(outputDate.toString(), lineName, style.getId())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TV Order not found"));
+
+
+        for (Time time : timeRepository.findAll()) {
+            Integer qty = outputDetailRepository.totalOutputSewingBetweenDatesByTimeAndLine(
+                    outputDate,
+                    outputDate,
+                    processNo,
+                    time.getId(),
+                    lineId
+            );
+
+            switch (time.getName()) {
+                case "07:00-08:00" -> tvData.setDh8(qty);
+                case "08:00-09:00" -> tvData.setDh9(qty);
+                case "09:00-10:00" -> tvData.setDh10(qty);
+                case "10:00-11:00" -> tvData.setDh11(qty);
+                case "12:00-13:00" -> tvData.setDh13(qty);
+                case "13:00-14:00" -> tvData.setDh14(qty);
+                case "14:00-15:00" -> tvData.setDh15(qty);
+                case "15:00-16:00" -> tvData.setDh16(qty);
+                case "16:00-17:00" -> tvData.setDh17(qty);
+                case "17:00-18:00" -> tvData.setDh18(qty);
+            }
+        }
+
+        tvDataRepository.save(tvData);
+
+        messagingTemplate.convertAndSend(
+                "/topic/messages/tv-data-update",
+                MessageRequest.builder()
+                        .message("update")
+                        .isUpdate(true)
+                        .build()
+        );
+
+    }
+
     private void updateTvDataForSewing(Long lineId, LocalDate outputDate, String mo) {
 
        ProductionLine productionLine = productionLineRepository.findById(lineId)

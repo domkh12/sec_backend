@@ -12,6 +12,7 @@ public record TvGeneralStyleResponse(
         Integer tarDay,
         Integer yFinish,
         Integer defects,
+        Integer finish,
         Integer h8,
         Integer h9,
         Integer h10,
