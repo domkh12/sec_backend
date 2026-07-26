@@ -162,7 +162,7 @@ public class AnalysisServiceImpl implements AnalysisService{
         List<MoResponse> moResponses = workOrderRepository.findByIsActive(true).stream().map(
                 wo -> MoResponse.builder()
                         .mo(wo.getMo())
-                        .buyer(wo.getPurchaseOrder().getBuyer().getName())
+                        .buyer(wo.getPurchaseOrder().getBuyer() != null ? wo.getPurchaseOrder().getBuyer().getName() : null)
                         .outputQty(outputDetailRepository.totalOutputTodayByMO(wo.getMo(), today, 2))
                         .inputQty(outputDetailRepository.totalOutputTodayByMO(wo.getMo(), today, 1))
                         .sizeOutputs(wo.getSizes().stream().map(size -> SizeOutput.builder()
@@ -177,13 +177,14 @@ public class AnalysisServiceImpl implements AnalysisService{
                         .build()
         ).toList();
         List<BuyerAnalysisResponse> buyerAnalysisResponses = buyerRepository.findByDeletedAtNullAndPurchaseOrders_WorkOrders_IsActiveTrue().stream().map(buyer ->
+                buyer != null ? (
                 BuyerAnalysisResponse.builder()
                         .id(buyer.getId())
                         .name(buyer.getName())
                         .mos((int) buyer.getPurchaseOrders().stream().flatMap(po -> po.getWorkOrders().stream()).filter(wo -> wo.getIsActive()).count())
                         .outputQty(buyer.getPurchaseOrders().stream().flatMap(po -> po.getWorkOrders().stream()).filter(wo -> wo.getIsActive()).mapToInt(wo -> outputDetailRepository.totalOutputTodayByMO(wo.getMo(), today, 2)).sum())
                         .inputQty(buyer.getPurchaseOrders().stream().flatMap(po -> po.getWorkOrders().stream()).filter(wo -> wo.getIsActive()).mapToInt(wo -> outputDetailRepository.totalOutputTodayByMO(wo.getMo(), today, 1)).sum())
-                        .build()
+                        .build()): null
                 ).toList();
         List<LineDataResponse> lineDataResponses =
                 productionLineRepository.findByDepartment_ProcessNo(2)
@@ -195,12 +196,15 @@ public class AnalysisServiceImpl implements AnalysisService{
                                     .filter(WorkOrder::getIsActive)
                                     .toList();
 
-                            String buyer = activeWos.isEmpty()
-                                    ? null
-                                    : activeWos.getFirst()
-                                    .getPurchaseOrder()
-                                    .getBuyer()
-                                    .getName();
+                            String buyer = null;
+
+                            if (!activeWos.isEmpty()) {
+                                var purchaseOrder = activeWos.getFirst().getPurchaseOrder();
+
+                                if (purchaseOrder != null && purchaseOrder.getBuyer() != null) {
+                                    buyer = purchaseOrder.getBuyer().getName();
+                                }
+                            }
 
                             return LineDataResponse.builder()
                                     .x(line.getLine())

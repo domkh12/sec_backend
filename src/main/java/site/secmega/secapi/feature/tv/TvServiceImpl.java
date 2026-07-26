@@ -42,13 +42,77 @@ public class TvServiceImpl implements TvService{
 
 
     @Override
+    public void updateTvOrderStatus(List<TvOrderStatusRequest> tvOrderStatusRequests) {
+        tvOrderStatusRequests.forEach(
+                tvOrder -> {
+                    TvOrder tvOrder1 = tvOrderRepository.findById(tvOrder.id()).orElseThrow();
+                    tvOrder1.setStatus(tvOrder.status());
+                    tvOrderRepository.save(tvOrder1);
+                }
+        );
+        messagingTemplate.convertAndSend("/topic/messages/tv-data-update", MessageRequest.builder()
+                .message("update")
+                .isUpdate(true)
+                .build());
+    }
+
+    @Override
     public List<TvGeneralResponse> getTvGeneralData() {
-//        Sort sort = Sort.by(Sort.Direction.ASC, "line");
-//        List<Tv> tvs = tvRepository.findByNameNotOrderByLineAsc("General", sort);
-//        LocalDate now = LocalDate.now();
-//
-//        return tvs.stream()
-//                .map(tv -> {
+        Sort sort = Sort.by(Sort.Direction.ASC, "line");
+        List<Tv> tvs = tvRepository.findByNameNotOrderByLineAsc("General", sort);
+        LocalDate now = LocalDate.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
+        return tvs.stream()
+                .map(tv -> {
+
+                    List<TvGeneralStyleResponse> tvGeneralResponses = tv.getTvOrders().stream().filter(tvOrder -> tvOrder.getTv().equals(tv) && tvOrder.getStatus().equals("ACTIVE")).map(
+                             tvOrder -> {
+                                 long balanceDay = 0;
+                                 if (tvOrder.getFinishDate() != null){
+                                     balanceDay = ChronoUnit.DAYS.between(tvOrder.getStartDate(), LocalDate.now());
+                                 }
+
+                                 List<TvData> sortedDatas = tvOrder.getTvDatas().stream()
+                                    .sorted(Comparator.comparing(TvData::getDate).reversed())
+                                    .toList();
+
+                                 TvData latest    = sortedDatas.size() > 0 ? sortedDatas.get(0) : TvData.builder().build();
+
+                                int todayDefectTotal = Stream.of(
+                                        latest.getDh8(), latest.getDh9(), latest.getDh10(), latest.getDh11(),
+                                        latest.getDh13(), latest.getDh14(), latest.getDh15(), latest.getDh16(),
+                                        latest.getDh17(), latest.getDh18()
+                                    ).mapToInt(h -> h != null ? h : 0).sum();
+
+                                 return TvGeneralStyleResponse.builder()
+                                         .orderNo(tvOrder.getStyle().getStyleNo())
+                                         .sewStart(tvOrder.getStartDate() != null
+                                                 ? tvOrder.getStartDate().format(formatter)
+                                                 : null)
+                                         .tarH(tvOrder.getHTarg())
+                                         .tarDay(tvOrder.getHTarg() * tvOrder.getWHour())
+                                         .wHour(tvOrder.getWHour())
+                                         .day((int) balanceDay + 1)
+                                         .h8(latest.getH8())
+                                         .h9(latest.getH9())
+                                         .h10(latest.getH10())
+                                         .h11(latest.getH11())
+                                         .h13(latest.getH13())
+                                         .h14(latest.getH14())
+                                         .h15(latest.getH15())
+                                         .h16(latest.getH16())
+                                         .h17(latest.getH17())
+                                         .h18(latest.getH18())
+                                         .defects(todayDefectTotal)
+                                         .build();
+                             }
+                    ).toList();
+                    return TvGeneralResponse.builder()
+                            .line(tv.getName().substring(tv.getName().length() - 1, tv.getName().length()))
+                            .worker(tv.getWorker())
+                            .helper(tv.getHelper())
+                            .styles(tvGeneralResponses)
+                            .build();
 //                    LocalDate startDate = tv.getStartDate();
 //                    Long days = (startDate == null) ? null : ChronoUnit.DAYS.between(startDate, now) + 1;
 //
@@ -71,11 +135,7 @@ public class TvServiceImpl implements TvService{
 //                            latest.getH17(), latest.getH18()
 //                    ).mapToInt(h -> h != null ? h : 0).sum();
 //
-//                    int todayDefectTotal = Stream.of(
-//                            latest.getDh8(), latest.getDh9(), latest.getDh10(), latest.getDh11(),
-//                            latest.getDh13(), latest.getDh14(), latest.getDh15(), latest.getDh16(),
-//                            latest.getDh17(), latest.getDh18()
-//                    ).mapToInt(h -> h != null ? h : 0).sum();
+
 //
 //                    return TvGeneralResponse.builder()
 //                            .line(tv.getLine())
@@ -102,18 +162,13 @@ public class TvServiceImpl implements TvService{
 //                            .yFinish(yesterdayTotal)
 //                            .defects(todayDefectTotal)
 //                            .build();
-//                })
-//                .toList();
-        return null;
+                })
+                .toList();
     }
 
     @Override
     public TvDataResponse createDataTv(String name, Long tvOrderId) {
         String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-
-        Tv tv = tvRepository.findByName(name).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv not found!")
-        );
 
         TvOrder tvOrder = tvOrderRepository.findById(tvOrderId).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv Order not found!")
@@ -128,6 +183,7 @@ public class TvServiceImpl implements TvService{
                     .date(today)
                     .isToday(true)
                     .tvOrder(tvOrder)
+                    .dTarget(tvOrder.getTv().getHTarg() * tvOrder.getTv().getWHour())
                     .build();
 
             tvDataRepository.save(tvData); // ✅ save new record
@@ -137,22 +193,6 @@ public class TvServiceImpl implements TvService{
                     .isUpdate(true)
                     .build());
 
-//            return TvDataResponse.builder()
-//                    .line(tv.getLine())
-//                    .worker(tv.getWorker())
-//                    .helper(tv.getHelper())
-//                    .orderNo(tv.getOrderNo())
-//                    .totalInLine(tv.getTotalInLine())
-//                    .balanceInLine(tv.getBalanceInLine())
-//                    .orderQty(tv.getOrderQty())
-//                    .totalOutput(tv.getTotalOutput())
-//                    .qcRepairBack(tv.getQcRepairBack())
-//                    .orderInline(tv.getOrderInline())
-//                    .balanceDay(tv.getBalanceDay())
-//                    .wHour(tv.getWHour())
-//                    .hTarg(tv.getHTarg())
-//                    .input(tv.getInput())
-//                    .build();
             return null;
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Today data already exists");
@@ -212,13 +252,16 @@ public class TvServiceImpl implements TvService{
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Style not found")
         );
 
+        if (tvOrderRepository.existsByTv_IdAndStyle_Id(tv.getId(), style.getId())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Tv Order already exist!");
+        }
+
         TvOrder tvOrder = new TvOrder();
         tvOrder.setStyle(style);
         tvOrder.setTv(tv);
         tvOrder.setOrderNo(style.getStyleNo());
         tvOrder.setOrderInline(0);
         tvOrder.setOrderQty(0);
-        tvOrder.setBalanceDay(0);
         tvOrder.setBalanceInLine(0);
         tvOrder.setStartDate(null);
         tvOrder.setFinishDate(null);
@@ -231,6 +274,10 @@ public class TvServiceImpl implements TvService{
         tvOrder.setWHour(0);
 
         tvOrderRepository.save(tvOrder);
+        messagingTemplate.convertAndSend("/topic/messages/tv-data-update", MessageRequest.builder()
+                .message("update")
+                .isUpdate(true)
+                .build());
         return null;
     }
 
@@ -247,31 +294,48 @@ public class TvServiceImpl implements TvService{
         tv.setWorker(tvDataRequest.worker());
         Tv savedTv = tvRepository.save(tv);
 
-//        // Tv Data update
-//        TvData tvData = tvDataRepository.findByIsTodayTrueAndTv_Id(tv.getId()).orElseThrow(
-//                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Today True not found!")
-//        );
-//
-//        tvMapper.updateTvDataFromTvDataRequest(tvDataRequest, tvData);
-//        tvData.setDTarget(tvDataRequest.dTarg());
-//        tvData.setOrderNo(tvDataRequest.orderNo());
-//        tvData.setDh8(tvDataRequest.dh8());
-//        tvData.setDh9(tvDataRequest.dh9());
-//        tvData.setDh10(tvDataRequest.dh10());
-//        tvData.setDh11(tvDataRequest.dh11());
-//        tvData.setDh13(tvDataRequest.dh13());
-//        tvData.setDh14(tvDataRequest.dh14());
-//        tvData.setDh15(tvDataRequest.dh15());
-//        tvData.setDh16(tvDataRequest.dh16());
-//        tvData.setDh17(tvDataRequest.dh17());
-//        tvData.setDh18(tvDataRequest.dh18());
-//        tvDataRepository.save(tvData);
-//
-//        messagingTemplate.convertAndSend("/topic/messages/tv-data-update", MessageRequest.builder()
-//                .message("update")
-//                .isUpdate(true)
-//                .build());
-//
+        TvOrder tvOrder = tvOrderRepository.findById(tvDataRequest.tvOrderId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv Order not found!")
+        );
+        tvOrder.setHTarg(tvDataRequest.hTarg());
+        tvOrder.setWHour(tvDataRequest.wHour());
+        tvOrder.setStartDate(tvDataRequest.startDate());
+        tvOrder.setFinishDate(tvDataRequest.finishDate());
+        tvOrder.setStatus(tvDataRequest.status());
+        tvOrder.setOrderQty(tvDataRequest.orderQty());
+        tvOrder.setOrderInline(tvDataRequest.totalInLine());
+        tvOrder.setTotalOutput(tvDataRequest.totalOutput());
+        tvOrder.setTotalInLine(tvDataRequest.totalInLine());
+        tvOrder.setBalanceInLine(tvDataRequest.balanceInLine());
+        tvOrder.setOrderInline(tvDataRequest.orderInline());
+        tvOrder.setQcRepairBack(tvDataRequest.qcRepairBack());
+        tvOrder.setInput(tvDataRequest.input());
+         tvOrderRepository.save(tvOrder);
+
+        // Tv Data update
+        TvData tvData = tvDataRepository.findByIsTodayTrueAndTvOrder_Id(tvDataRequest.tvOrderId()).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Today True not found!")
+        );
+
+        tvMapper.updateTvDataFromTvDataRequest(tvDataRequest, tvData);
+        tvData.setDTarget(tv.getWHour() * tv.getHTarg());
+        tvData.setDh8(tvDataRequest.dh8());
+        tvData.setDh9(tvDataRequest.dh9());
+        tvData.setDh10(tvDataRequest.dh10());
+        tvData.setDh11(tvDataRequest.dh11());
+        tvData.setDh13(tvDataRequest.dh13());
+        tvData.setDh14(tvDataRequest.dh14());
+        tvData.setDh15(tvDataRequest.dh15());
+        tvData.setDh16(tvDataRequest.dh16());
+        tvData.setDh17(tvDataRequest.dh17());
+        tvData.setDh18(tvDataRequest.dh18());
+        tvDataRepository.save(tvData);
+
+        messagingTemplate.convertAndSend("/topic/messages/tv-data-update", MessageRequest.builder()
+                .message("update")
+                .isUpdate(true)
+                .build());
+
 //        return TvDataResponse.builder()
 //                .line(savedTv.getLine())
 //                .worker(savedTv.getWorker())
@@ -297,9 +361,9 @@ public class TvServiceImpl implements TvService{
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv not found!")
         );
 
-        LocalDate now = LocalDate.now();
-
-        List<TvOrderResponse> tvOrderResponses = tvOrderRepository.findByTv_Name(name).stream().map(
+        List<TvOrderResponse> tvOrderResponses = tvOrderRepository.findByTv_Name(name).stream()
+                .sorted(Comparator.comparing(TvOrder::getId).reversed())
+                .map(
             tvOrder -> {
 
                 List<DailyRecord> dailyRecords = tvOrder.getTvDatas().stream()
@@ -322,6 +386,11 @@ public class TvServiceImpl implements TvService{
                             .isToday(tvData.getIsToday())
                             .build()).toList();
 
+                long balanceDay = 0;
+                if (tvOrder.getFinishDate() != null){
+                    balanceDay = ChronoUnit.DAYS.between(LocalDate.now(), tvOrder.getFinishDate());
+                }
+
                 return TvOrderResponse.builder()
                         .id(tvOrder.getId())
                         .orderNo(tvOrder.getStyle().getStyleNo())
@@ -332,7 +401,7 @@ public class TvServiceImpl implements TvService{
                         .orderInline(tvOrder.getOrderInline())
                         .balanceInLine(tvOrder.getBalanceInLine())
                         .qcRepairBack(tvOrder.getQcRepairBack())
-                        .balanceDay(tvOrder.getBalanceDay())
+                        .balanceDay((int) balanceDay)
                         .input(tvOrder.getInput())
                         .wHour(tvOrder.getWHour())
                         .hTarg(tvOrder.getHTarg())
@@ -342,30 +411,7 @@ public class TvServiceImpl implements TvService{
                         .build();
             }
         ).toList();
-//        LocalDate startDate = tv.getStartDate();
-//        Long days = (startDate == null) ? null : ChronoUnit.DAYS.between(startDate, now) + 1;
-//
 
-//
-//        List<TvData> sortedDatas = tv.getTvDatas().stream()
-//                .sorted(Comparator.comparing(TvData::getDate).reversed())
-//                .toList();
-//
-//        TvData latest   = sortedDatas.size() > 0 ? sortedDatas.get(0) : TvData.builder().build();
-//
-//        Defect defects = Defect.builder()
-//                .h8(latest.getDh8())
-//                .h9(latest.getDh9())
-//                .h10(latest.getDh10())
-//                .h11(latest.getDh11())
-//                .h13(latest.getDh13())
-//                .h14(latest.getDh14())
-//                .h15(latest.getDh15())
-//                .h16(latest.getDh16())
-//                .h17(latest.getDh17())
-//                .h18(latest.getDh18())
-//                .build();
-//
         return TvDataResponse.builder()
                 .id(tv.getId())
                 .line(tv.getLine())

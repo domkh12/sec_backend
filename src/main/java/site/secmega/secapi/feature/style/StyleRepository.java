@@ -37,5 +37,8 @@ public interface StyleRepository extends JpaRepository<Style, Long>, JpaSpecific
     """)
     Integer countStylesWithOutputDetailsToday(@Param("date") LocalDate date);
 
+    @Query("select s from Style s inner join s.purchaseOrders.workOrders workOrders where workOrders.mo = ?1")
+    Optional<Style> findByPurchaseOrders_WorkOrders_Mo(String mo);
+
 
 }

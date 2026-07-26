@@ -15,7 +15,14 @@ public class TvController {
 
     private final TvService tvService;
 
-     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PatchMapping("/orders")
+    @ResponseStatus(HttpStatus.CREATED)
+    void updateTvOrderStatus(@RequestBody List<TvOrderStatusRequest> tvOrderStatusRequests){
+        tvService.updateTvOrderStatus(tvOrderStatusRequests);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/orders")
     @ResponseStatus(HttpStatus.CREATED)
     TvDataResponse createOrder(@RequestParam String tvName, @RequestParam Long styleId){

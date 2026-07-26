@@ -75,7 +75,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                                     .id(w.getPurchaseOrder().getId())
                                     .po(w.getPurchaseOrder().getPo())
                                     .build())
-                            .style(w.getPurchaseOrder().getStyle().getStyleNo())
+                            .style(w.getPurchaseOrder().getStyle() != null ? w.getPurchaseOrder().getStyle().getStyleNo() : null)
                             .color(colorResp)
                             .sizes(sizeResps)
                             .qty(w.getQty())

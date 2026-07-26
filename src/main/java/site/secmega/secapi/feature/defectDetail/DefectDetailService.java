@@ -8,4 +8,5 @@ public interface DefectDetailService {
 
     Page<DefectDetailResponse> findAll(DefectDetailFilterRequest defectDetailFilterRequest);
 
+    void deleteDefect(Long id);
 }
