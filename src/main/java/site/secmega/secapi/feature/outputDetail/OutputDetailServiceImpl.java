@@ -184,12 +184,6 @@ public class OutputDetailServiceImpl implements OutputDetailService{
 
     @Override
     public List<OutputDetailResponse> createOutputDetail(List<OutputDetailRequest> outputDetailRequest) {
-        // logic update qty in TV
-
-        updateTvDataForSewing(
-                outputDetailRequest.get(0).fromLineId(),
-                outputDetailRequest.get(0).outputDate()
-        );
 
         outputDetailRequest.forEach(od -> {
             Time time = timeRepository.findById(od.timeId()).orElseThrow(

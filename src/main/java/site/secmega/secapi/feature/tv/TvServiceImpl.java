@@ -183,7 +183,7 @@ public class TvServiceImpl implements TvService{
                     .date(today)
                     .isToday(true)
                     .tvOrder(tvOrder)
-                    .dTarget(tvOrder.getTv().getHTarg() * tvOrder.getTv().getWHour())
+                    .dTarget(Objects.isNull(tvOrder.getTv().getHTarg()) || Objects.isNull(tvOrder.getTv().getWHour()) ? null : tvOrder.getTv().getHTarg() * tvOrder.getTv().getWHour())
                     .build();
 
             tvDataRepository.save(tvData); // ✅ save new record
@@ -253,7 +253,7 @@ public class TvServiceImpl implements TvService{
         );
 
         if (tvOrderRepository.existsByTv_IdAndStyle_Id(tv.getId(), style.getId())){
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Tv Order already exist!");
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Style already exist!");
         }
 
         TvOrder tvOrder = new TvOrder();
