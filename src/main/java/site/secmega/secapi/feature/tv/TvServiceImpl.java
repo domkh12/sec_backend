@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collector;
 import java.util.stream.Stream;
 
 @Service
@@ -40,6 +41,15 @@ public class TvServiceImpl implements TvService{
     private final AuthUtil authUtil;
     private final StyleRepository styleRepository;
 
+
+    @Override
+    public void updateTvOrderIsNewStyle(Long id, Boolean isNewStyle) {
+        TvOrder tvOrder = tvOrderRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv order not found")
+        );
+        tvOrder.setIsNewStyle(isNewStyle);
+        tvOrderRepository.save(tvOrder);
+    }
 
     @Override
     public void updateTvOrderStatus(List<TvOrderStatusRequest> tvOrderStatusRequests) {
@@ -335,23 +345,6 @@ public class TvServiceImpl implements TvService{
                 .message("update")
                 .isUpdate(true)
                 .build());
-
-//        return TvDataResponse.builder()
-//                .line(savedTv.getLine())
-//                .worker(savedTv.getWorker())
-//                .helper(savedTv.getHelper())
-//                .orderNo(savedTv.getOrderNo())
-//                .totalInLine(savedTv.getTotalInLine())
-//                .balanceInLine(savedTv.getBalanceInLine())
-//                .orderQty(savedTv.getOrderQty())
-//                .totalOutput(savedTv.getTotalOutput())
-//                .qcRepairBack(savedTv.getQcRepairBack())
-//                .orderInline(savedTv.getOrderInline())
-//                .balanceDay(savedTv.getBalanceDay())
-//                .wHour(savedTv.getWHour())
-//                .hTarg(savedTv.getHTarg())
-//                .input(savedTv.getInput())
-//                .build();
         return null;
     }
 
@@ -386,6 +379,23 @@ public class TvServiceImpl implements TvService{
                             .isToday(tvData.getIsToday())
                             .build()).toList();
 
+                Defect defect = tvOrder.getTvDatas().stream()
+                        .filter(tvData -> Boolean.TRUE.equals(tvData.getIsToday()))
+                        .map(tvData -> Defect.builder()
+                                .h8(tvData.getDh8())
+                                .h9(tvData.getDh9())
+                                .h10(tvData.getDh10())
+                                .h11(tvData.getDh11())
+                                .h13(tvData.getDh13())
+                                .h14(tvData.getDh14())
+                                .h15(tvData.getDh15())
+                                .h16(tvData.getDh16())
+                                .h17(tvData.getDh17())
+                                .h18(tvData.getDh18())
+                                .build()
+                        )
+                        .findFirst()
+                        .orElse(null);
                 long balanceDay = 0;
                 if (tvOrder.getFinishDate() != null){
                     balanceDay = ChronoUnit.DAYS.between(LocalDate.now(), tvOrder.getFinishDate());
@@ -394,6 +404,7 @@ public class TvServiceImpl implements TvService{
                 return TvOrderResponse.builder()
                         .id(tvOrder.getId())
                         .orderNo(tvOrder.getStyle().getStyleNo())
+                        .isNewStyle(tvOrder.getIsNewStyle())
                         .status(tvOrder.getStatus())
                         .orderQty(tvOrder.getOrderQty())
                         .totalInLine(tvOrder.getTotalInLine())
@@ -408,6 +419,7 @@ public class TvServiceImpl implements TvService{
                         .startDate(tvOrder.getStartDate())
                         .finishDate(tvOrder.getFinishDate())
                         .dailyRecords(dailyRecords)
+                        .defects(defect)
                         .build();
             }
         ).toList();

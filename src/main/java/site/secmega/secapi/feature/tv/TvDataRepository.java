@@ -49,5 +49,10 @@ public interface TvDataRepository extends JpaRepository<TvData, Long> {
     @Query("select t from TvData t where t.date = ?1 and t.tvOrder.tv.name = ?2 and t.tvOrder.style.id = ?3")
     Optional<TvData> findByDateAndTvOrder_Tv_NameAndTvOrder_Style_Id(String date, String name, Long id);
 
+    @Query("""
+            select (count(t) > 0) from TvData t
+            where t.date = ?1 and t.isToday = true and t.tvOrder.tv.name = ?2 and t.tvOrder.style.id = ?3""")
+    boolean existByDateAndLineAndStyle(String date, String name, Long id);
+
 
 }

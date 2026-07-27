@@ -31,11 +31,13 @@ import site.secmega.secapi.feature.style.dto.StyleLookupResponse;
 import site.secmega.secapi.feature.time.TimeRepository;
 import site.secmega.secapi.feature.time.dto.TimeResponse;
 import site.secmega.secapi.feature.tv.TvDataRepository;
+import site.secmega.secapi.feature.tv.TvRepository;
 import site.secmega.secapi.feature.workOrder.WorkOrderRepository;
 import site.secmega.secapi.mapper.OutputDetailMapper;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Service
@@ -54,6 +56,7 @@ public class OutputDetailServiceImpl implements OutputDetailService{
     private final DefectDetailRepository defectDetailRepository;
     private final DefectTypeRepository defectTypeRepository;
     private final StyleRepository styleRepository;
+    private final TvRepository tvRepository;
 
     @Override
     public List<OutputLast48Hrs> outputLast48Hrs() {
@@ -186,6 +189,7 @@ public class OutputDetailServiceImpl implements OutputDetailService{
     public List<OutputDetailResponse> createOutputDetail(List<OutputDetailRequest> outputDetailRequest) {
 
         outputDetailRequest.forEach(od -> {
+
             Time time = timeRepository.findById(od.timeId()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Time not found")
             );
@@ -202,6 +206,10 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "From Line not found!")
             );
             outputDetail.setFromLine(fromLine);
+
+            if (!tvDataRepository.existByDateAndLineAndStyle(od.outputDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), fromLine.getLine(), workOrder.getPurchaseOrder().getStyle().getId())){
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "TV didn't have date today");
+            }
 
             if (od.toLineId() != null) {
                 ProductionLine toLine = productionLineRepository.findById(od.toLineId()).orElseThrow(
@@ -231,6 +239,11 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                 defectDetail.setWorkOrder(workOrder);
                 defectDetail.setDefectDate(od.outputDate());
                 defectDetailRepository.save(defectDetail);
+                updateTvDataDefect(
+                        outputDetailRequest.get(0).fromLineId(),
+                        outputDetailRequest.get(0).outputDate(),
+                        outputDetailRequest.get(0).mo()
+                );
             }
 
         });
@@ -262,18 +275,20 @@ public class OutputDetailServiceImpl implements OutputDetailService{
 
         String lineName = productionLine.getLine();
         Integer processNo = productionLine.getDepartment().getProcessNo();
+        Long styleId = style.getId();
 
         TvData tvData = tvDataRepository.findByDateAndTvOrder_Tv_NameAndTvOrder_Style_Id(outputDate.toString(), lineName, style.getId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TV Order not found"));
 
 
         for (Time time : timeRepository.findAll()) {
-            Integer qty = outputDetailRepository.totalOutputSewingBetweenDatesByTimeAndLine(
+            Integer qty = defectDetailRepository.sumDefectByLineAndTime(
                     outputDate,
                     outputDate,
                     processNo,
                     time.getId(),
-                    lineId
+                    lineId,
+                    styleId
             );
 
             switch (time.getName()) {
@@ -319,18 +334,21 @@ public class OutputDetailServiceImpl implements OutputDetailService{
 
         String lineName = productionLine.getLine();
         Integer processNo = productionLine.getDepartment().getProcessNo();
+        Long styleId = style.getId();
 
         TvData tvData = tvDataRepository.findByDateAndTvOrder_Tv_NameAndTvOrder_Style_Id(outputDate.toString(), lineName, style.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "TV Order not found"));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Date not found"));
 
         for (Time time : timeRepository.findAll()) {
             Integer qty = outputDetailRepository.totalOutputSewingBetweenDatesByTimeAndLine(
                     outputDate,
                     outputDate,
                     processNo,
+                    lineId,
                     time.getId(),
-                    lineId
+                    styleId
             );
+            log.info(time.getName(),qty);
 
             switch (time.getName()) {
                 case "07:00-08:00" -> tvData.setH8(qty);

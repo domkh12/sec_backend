@@ -16,6 +16,14 @@ public class TvController {
     private final TvService tvService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PatchMapping("/orders/{id}/styles")
+    @ResponseStatus(HttpStatus.CREATED)
+    void updateTvOrderIsNewStyle(@PathVariable Long id, @RequestParam Boolean isNewStyle){
+        tvService.updateTvOrderIsNewStyle(id, isNewStyle);
+    }
+
+
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PatchMapping("/orders")
     @ResponseStatus(HttpStatus.CREATED)
     void updateTvOrderStatus(@RequestBody List<TvOrderStatusRequest> tvOrderStatusRequests){

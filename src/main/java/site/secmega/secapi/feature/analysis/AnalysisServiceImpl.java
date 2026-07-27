@@ -25,6 +25,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,7 +64,7 @@ public class AnalysisServiceImpl implements AnalysisService{
                         return MosResponse.builder()
                                 .mo(mos.getMo())
                                 .buyer(mos.getPurchaseOrder().getBuyer().getName())
-                                .style(mos.getPurchaseOrder().getStyle().getStyleNo())
+                                .style(Objects.isNull(mos.getPurchaseOrder().getStyle()) ? null : mos.getPurchaseOrder().getStyle().getStyleNo())
                                 .output(outputDetailRepository.totalOutputTodayByMOAndLineId(mos.getMo(), today, pl.getId()))
                                 .defect(defectDetailRepository.totalDefectByMO(today, mos.getMo(), pl.getId()))
                                 .defectTypes(defectTypeWithQtyResponses)

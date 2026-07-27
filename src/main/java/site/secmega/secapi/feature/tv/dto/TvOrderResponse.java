@@ -10,6 +10,7 @@ import java.util.List;
 public record TvOrderResponse(
         Long id,
         String orderNo,
+        Boolean isNewStyle,
         String status,
         Integer orderQty,
         Integer totalInLine,

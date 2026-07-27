@@ -47,10 +47,15 @@ public interface DefectDetailRepository extends JpaRepository<DefectDetail, Long
             where d.defectDate = ?1 and d.productionLine.line = ?2 and d.workOrder.purchaseOrder.style.id = ?3""")
     Optional<DefectDetail> findByDefectDateAndProductionLine_LineAndWorkOrder_PurchaseOrder_Style_Id(LocalDate defectDate, String line, Long id);
 
+//    @Query("""
+//            select COALESCE(SUM(d.defectQty), 0) from DefectDetail d
+//            where d.defectDate between ?1 and ?2 and d.productionLine.department.processNo = ?3 and d.time.id = ?4 and d.productionLine.id = ?5""")
+//    Integer sumDefectByLineAndTime(LocalDate defectDateStart, LocalDate defectDateEnd, Integer processNo, Long id, Long id1);
+
     @Query("""
             select COALESCE(SUM(d.defectQty), 0) from DefectDetail d
-            where d.defectDate between ?1 and ?2 and d.productionLine.department.processNo = ?3 and d.time.id = ?4 and d.productionLine.id = ?5""")
-    Integer sumDefectByLineAndTime(LocalDate defectDateStart, LocalDate defectDateEnd, Integer processNo, Long id, Long id1);
+            where d.defectDate between ?1 and ?2 and d.productionLine.department.processNo = ?3 and d.time.id = ?4 and d.productionLine.id = ?5 and d.workOrder.purchaseOrder.style.id = ?6 and d.deletedAt is null""")
+    Integer sumDefectByLineAndTime(LocalDate defectDateStart, LocalDate defectDateEnd, Integer processNo, Long id, Long id1, Long id2);
 
 
 }

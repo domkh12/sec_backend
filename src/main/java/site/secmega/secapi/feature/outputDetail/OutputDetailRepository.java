@@ -86,22 +86,32 @@ public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long
     List<Object[]> getDailySummaryBetweenDates(@Param("dateFrom") LocalDate dateFrom,
                                                @Param("dateTo") LocalDate dateTo);
 
+//    @Query("""
+//        SELECT COALESCE(SUM(od.goodQty), 0)
+//        FROM OutputDetail od
+//        WHERE od.outputDate BETWEEN :startDate AND :endDate
+//          AND od.fromLine.department.processNo = :processNo
+//          AND od.fromLine.id = :lineId
+//          AND od.time.id = :timeId
+//          AND od.deletedAt IS NULL
+//    """)
+//        Integer totalOutputSewingBetweenDatesByTimeAndLine(
+//                LocalDate startDate,
+//                LocalDate endDate,
+//                Integer processNo,
+//                Long timeId,
+//                Long lineId
+//        );
+
     @Query("""
-        SELECT COALESCE(SUM(od.goodQty), 0)
-        FROM OutputDetail od
-        WHERE od.outputDate BETWEEN :startDate AND :endDate
-          AND od.fromLine.department.processNo = :processNo
-          AND od.fromLine.id = :lineId
-          AND od.time.id = :timeId
-          AND od.deletedAt IS NULL
-    """)
-        Integer totalOutputSewingBetweenDatesByTimeAndLine(
-                LocalDate startDate,
-                LocalDate endDate,
-                Integer processNo,
-                Long timeId,
-                Long lineId
-        );
+            select COALESCE(SUM(o.goodQty), 0) from OutputDetail o
+            where o.outputDate between ?1 
+                        and ?2 and o.fromLine.department.processNo = ?3 
+                                    and o.fromLine.id = ?4 and o.time.id = ?5 
+                                                and o.deletedAt is null and 
+                                                            o.workOrder.purchaseOrder.style.id = ?6""")
+    Integer totalOutputSewingBetweenDatesByTimeAndLine(LocalDate outputDateStart, LocalDate outputDateEnd, Integer processNo, Long id, Long id1, Long id2);
+
 
     @Query(value = """
         WITH hour_buckets AS (
@@ -131,4 +141,8 @@ public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long
         ORDER BY hb.hour_ago DESC
     """, nativeQuery = true)
     List<Object[]> outputLast48Hrs();
+
+
+
+
 }

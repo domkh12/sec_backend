@@ -34,4 +34,5 @@ public interface DefectTypeRepository extends JpaRepository<DefectType, Long>, J
 
 
 
+
 }
