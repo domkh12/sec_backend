@@ -63,15 +63,6 @@ public class MaterialServiceImpl implements MaterialService{
     @Value("${materialStockOutExcel.template.path}")
     String stockOutExcelTemplatePath;
 
-    @Transactional
-    @Override
-    public void deleteStockIn(Long id) {
-        MaterialDetail materialDetail = materialDetailRepository.findById(id).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND)
-        );
-        materialDetailRepository.delete(materialDetail);
-    }
-
     @Override
     public void updateStockIn(Long id, UpdateStockInQtyRequest updateStockInQtyRequest) {
         MaterialDetail materialDetail = materialDetailRepository.findById(id).orElseThrow(

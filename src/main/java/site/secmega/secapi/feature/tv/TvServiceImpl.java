@@ -146,7 +146,12 @@ public class TvServiceImpl implements TvService{
                                  int todayDefectTotal = calculateDefectTotal(todayData);
 
                                  return TvGeneralStyleResponse.builder()
-                                         .orderNo(tvOrder.getStyle().getStyleNo())
+                                         .orderNo(
+                                                 tvOrder.getStyle().getStyleNo()
+                                                         + (tvOrder.getRemark() == null
+                                                         ? ""
+                                                         : tvOrder.getRemark())
+                                         )
                                          .sewStart(tvOrder.getStartDate() != null
                                                  ? tvOrder.getStartDate().format(formatter)
                                                  : null)
@@ -322,6 +327,7 @@ public class TvServiceImpl implements TvService{
         tvOrder.setBalanceInLine(tvDataRequest.balanceInLine());
         tvOrder.setOrderInline(tvDataRequest.orderInline());
         tvOrder.setQcRepairBack(tvDataRequest.qcRepairBack());
+        tvOrder.setRemark(tvDataRequest.remark());
         tvOrder.setInput(tvDataRequest.input());
          tvOrderRepository.save(tvOrder);
 
@@ -411,8 +417,14 @@ public class TvServiceImpl implements TvService{
 
                 return TvOrderResponse.builder()
                         .id(tvOrder.getId())
-                        .orderNo(tvOrder.getStyle().getStyleNo())
+                        .orderNo(
+                                tvOrder.getStyle().getStyleNo()
+                                        + (tvOrder.getRemark() == null
+                                        ? ""
+                                        : tvOrder.getRemark())
+                        )
                         .isNewStyle(tvOrder.getIsNewStyle())
+                        .remark(tvOrder.getRemark())
                         .day((int) day + 1)
                         .status(tvOrder.getStatus())
                         .orderQty(tvOrder.getOrderQty())

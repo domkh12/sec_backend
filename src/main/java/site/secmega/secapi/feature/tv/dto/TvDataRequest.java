@@ -16,6 +16,7 @@ public record TvDataRequest(
         Integer qcRepairBack,
         Integer balanceDay,
         String tvName,
+        String remark,
         Long tvOrderId,
         Integer hTarg,
         Integer wHour,

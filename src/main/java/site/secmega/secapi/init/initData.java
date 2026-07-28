@@ -40,7 +40,7 @@ public class initData {
     private final BuyerRepository buyerRepository;
     private final TimeRepository timeRepository;
 
-    @PostConstruct
+//    @PostConstruct
     public void init(){
         try {
             initDefectTypeData();

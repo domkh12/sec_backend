@@ -34,6 +34,7 @@ public class TvOrder {
     private LocalDate startDate;
     private LocalDate finishDate;
     private Boolean isNewStyle;
+    private String remark;
 
     // -- Relationship
     @ManyToOne

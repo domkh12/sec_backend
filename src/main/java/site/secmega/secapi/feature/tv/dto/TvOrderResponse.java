@@ -13,6 +13,7 @@ public record TvOrderResponse(
         Boolean isNewStyle,
         Integer day,
         String status,
+        String remark,
         Integer orderQty,
         Integer totalInLine,
         Integer totalOutput,
