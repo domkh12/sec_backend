@@ -23,4 +23,6 @@ public interface TvRepository extends JpaRepository<Tv, Long> {
     @Query("select t from Tv t where t.name <> ?1 order by t.line")
     List<Tv> findByNameNotOrderByLineAsc(String name, Sort sort);
 
+
+
 }

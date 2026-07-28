@@ -4,6 +4,7 @@ import lombok.Builder;
 
 @Builder
 public record DailyRecord(
+    Long id,
     String date,
     Integer dTarg,
     Integer h8,

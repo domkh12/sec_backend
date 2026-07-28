@@ -3,17 +3,30 @@ package site.secmega.secapi.feature.analysis;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import site.secmega.secapi.domain.DefectType;
+import site.secmega.secapi.domain.ProductionLine;
+import site.secmega.secapi.domain.Time;
 import site.secmega.secapi.domain.WorkOrder;
 import site.secmega.secapi.feature.analysis.dto.*;
 import site.secmega.secapi.feature.buyer.BuyerRepository;
 import site.secmega.secapi.feature.color.dto.ColorLookupResponse;
+import site.secmega.secapi.feature.defectDetail.DefectDetailRepository;
+import site.secmega.secapi.feature.defectType.DefectTypeRepository;
+import site.secmega.secapi.feature.defectType.dto.DefectTypeWithQtyResponse;
 import site.secmega.secapi.feature.outputDetail.OutputDetailRepository;
+import site.secmega.secapi.feature.analysis.dto.OutputLast48Hrs;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.style.StyleRepository;
+import site.secmega.secapi.feature.time.TimeRepository;
 import site.secmega.secapi.feature.workOrder.WorkOrderRepository;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,15 +37,122 @@ public class AnalysisServiceImpl implements AnalysisService{
     private final StyleRepository styleRepository;
     private final BuyerRepository buyerRepository;
     private final ProductionLineRepository productionLineRepository;
+    private final DefectDetailRepository defectDetailRepository;
+    private final DefectTypeRepository defectTypeRepository;
+    private final TimeRepository timeRepository;
 
     @Override
-    public AnalysisOutputResponse getAnalysis(LocalDate dateFrom, LocalDate dateTo) {
+    public AnalysisDefectResponse defectToday() {
+        LocalDate today = LocalDate.now();
+        List<ProductionLine> productionLines = productionLineRepository.findByDeletedAtNullAndDepartment_ProcessNo(2);
+        List<LineDefectResponse> lineDefectResponses = productionLines.stream().map(pl -> {
+            List<WorkOrder> mo = workOrderRepository.findByDeletedAtNullAndIsActiveTrueAndProductionLines_Id(pl.getId());
 
-        return null;
+            List<MosResponse> mosResponses = mo.stream().map(
+                    mos -> {
+                        List<DefectType> defectTypes = defectTypeRepository.findDefectByMoActive(mos.getMo());
+                        List<DefectTypeWithQtyResponse> defectTypeWithQtyResponses = defectTypes.stream().map(
+                                defectType -> {
+                                    Integer defectQty = defectDetailRepository.totalDefectByMoAndDefectTypeId(today, mos.getMo(), pl.getId(), defectType.getId());
+                                    return DefectTypeWithQtyResponse.builder()
+                                            .id(defectType.getId())
+                                            .type(defectType.getName())
+                                            .qty(defectQty)
+                                            .build();
+                                }
+                        ).toList();
+                        return MosResponse.builder()
+                                .mo(mos.getMo())
+                                .buyer(mos.getPurchaseOrder().getBuyer().getName())
+                                .style(Objects.isNull(mos.getPurchaseOrder().getStyle()) ? null : mos.getPurchaseOrder().getStyle().getStyleNo())
+                                .output(outputDetailRepository.totalOutputTodayByMOAndLineId(mos.getMo(), today, pl.getId()))
+                                .defect(defectDetailRepository.totalDefectByMO(today, mos.getMo(), pl.getId()))
+                                .defectTypes(defectTypeWithQtyResponses)
+                                .build();
+                    }
+            ).toList();
+
+            return LineDefectResponse.builder()
+                    .line(pl.getLine())
+                    .mos(mosResponses)
+                    .build();
+        }).toList();
+
+        List<Time> times = timeRepository.findByDeletedAtNull();
+        List<HourlyDefectResponse> hourlyDefectResponses = times.stream().map(time -> {
+            return HourlyDefectResponse.builder()
+                    .hour(time.getName())
+                    .output(outputDetailRepository.totalOutputByTimeId(today, time.getId()))
+                    .defect(defectDetailRepository.totalDefectQtyTodayByTimeId(today, time.getId()))
+                    .build();
+        }).toList();
+        return AnalysisDefectResponse.builder()
+                .updatedAt(today.toString())
+                .targetDefectRate(3.0)
+                .lines(lineDefectResponses)
+                .hourlyTrend(hourlyDefectResponses)
+                .build();
     }
 
     @Override
-    public AnalysisOutputResponse getAnalysisOutputToday() {
+    public AnalysisOutputResponse getAnalysis(LocalDate dateFrom, LocalDate dateTo) {
+        long periodDays = ChronoUnit.DAYS.between(dateFrom, dateTo) + 1;
+        LocalDate compareDateFrom = dateFrom.minusDays(periodDays);
+        LocalDate compareDateTo = dateFrom.minusDays(1);
+
+        // Get data as Object arrays
+        List<Object[]> currentData = outputDetailRepository.getDailySummaryBetweenDates(dateFrom, dateTo);
+        List<Object[]> prevData = outputDetailRepository.getDailySummaryBetweenDates(compareDateFrom, compareDateTo);
+
+        // Process current data
+        int totalInput = 0;
+        int totalOutput = 0;
+        Map<LocalDate, LineChartDataResponse> dataMap = new LinkedHashMap<>();
+
+        for (Object[] row : currentData) {
+            LocalDate date = (LocalDate) row[0];
+            Integer input = ((Number) row[1]).intValue();
+            Integer output = ((Number) row[2]).intValue();
+
+            totalInput += input;
+            totalOutput += output;
+
+            dataMap.put(date, LineChartDataResponse.builder()
+                    .date(date)
+                    .input(input)
+                    .output(output)
+                    .build());
+        }
+
+        // Process previous data
+        int prevTotalInput = 0;
+        int prevTotalOutput = 0;
+        for (Object[] row : prevData) {
+            prevTotalInput += ((Number) row[1]).intValue();
+            prevTotalOutput += ((Number) row[2]).intValue();
+        }
+
+        // Build final response
+        List<LineChartDataResponse> data = dateFrom.datesUntil(dateTo.plusDays(1))
+                .map(date -> dataMap.getOrDefault(date,
+                        LineChartDataResponse.builder()
+                                .date(date)
+                                .input(0)
+                                .output(0)
+                                .build()))
+                .collect(Collectors.toList());
+
+        return AnalysisOutputResponse.builder()
+                .totalInput(totalInput)
+                .totalOutput(totalOutput)
+                .totalInputComparison(buildComparison(totalInput, prevTotalInput))
+                .totalOutputComparison(buildComparison(totalOutput, prevTotalOutput))
+                .data(data)
+                .build();
+    }
+
+    @Override
+    public AnalysisOutputTodayResponse getAnalysisOutputToday() {
         LocalDate today = LocalDate.now();
         Integer totalInputToday = outputDetailRepository.totalInputByDate(today, 1);
         Integer totalOutputToday = outputDetailRepository.totalOutputSewingByDate(today, 2);
@@ -43,7 +163,7 @@ public class AnalysisServiceImpl implements AnalysisService{
         List<MoResponse> moResponses = workOrderRepository.findByIsActive(true).stream().map(
                 wo -> MoResponse.builder()
                         .mo(wo.getMo())
-                        .buyer(wo.getPurchaseOrder().getBuyer().getName())
+                        .buyer(wo.getPurchaseOrder().getBuyer() != null ? wo.getPurchaseOrder().getBuyer().getName() : null)
                         .outputQty(outputDetailRepository.totalOutputTodayByMO(wo.getMo(), today, 2))
                         .inputQty(outputDetailRepository.totalOutputTodayByMO(wo.getMo(), today, 1))
                         .sizeOutputs(wo.getSizes().stream().map(size -> SizeOutput.builder()
@@ -57,14 +177,15 @@ public class AnalysisServiceImpl implements AnalysisService{
                                 .build())
                         .build()
         ).toList();
-        List<BuyerAnalysisResponse> buyerAnalysisResponses = buyerRepository.findByDeletedAtNull().stream().map(buyer ->
+        List<BuyerAnalysisResponse> buyerAnalysisResponses = buyerRepository.findByDeletedAtNullAndPurchaseOrders_WorkOrders_IsActiveTrue().stream().map(buyer ->
+                buyer != null ? (
                 BuyerAnalysisResponse.builder()
                         .id(buyer.getId())
                         .name(buyer.getName())
                         .mos((int) buyer.getPurchaseOrders().stream().flatMap(po -> po.getWorkOrders().stream()).filter(wo -> wo.getIsActive()).count())
                         .outputQty(buyer.getPurchaseOrders().stream().flatMap(po -> po.getWorkOrders().stream()).filter(wo -> wo.getIsActive()).mapToInt(wo -> outputDetailRepository.totalOutputTodayByMO(wo.getMo(), today, 2)).sum())
                         .inputQty(buyer.getPurchaseOrders().stream().flatMap(po -> po.getWorkOrders().stream()).filter(wo -> wo.getIsActive()).mapToInt(wo -> outputDetailRepository.totalOutputTodayByMO(wo.getMo(), today, 1)).sum())
-                        .build()
+                        .build()): null
                 ).toList();
         List<LineDataResponse> lineDataResponses =
                 productionLineRepository.findByDepartment_ProcessNo(2)
@@ -76,12 +197,15 @@ public class AnalysisServiceImpl implements AnalysisService{
                                     .filter(WorkOrder::getIsActive)
                                     .toList();
 
-                            String buyer = activeWos.isEmpty()
-                                    ? null
-                                    : activeWos.getFirst()
-                                    .getPurchaseOrder()
-                                    .getBuyer()
-                                    .getName();
+                            String buyer = null;
+
+                            if (!activeWos.isEmpty()) {
+                                var purchaseOrder = activeWos.getFirst().getPurchaseOrder();
+
+                                if (purchaseOrder != null && purchaseOrder.getBuyer() != null) {
+                                    buyer = purchaseOrder.getBuyer().getName();
+                                }
+                            }
 
                             return LineDataResponse.builder()
                                     .x(line.getLine())
@@ -103,14 +227,43 @@ public class AnalysisServiceImpl implements AnalysisService{
                                     .build();
                         })
                         .toList();
-        return AnalysisOutputResponse.builder()
+        return AnalysisOutputTodayResponse.builder()
                 .totalInput(totalInputToday)
                 .totalOutput(totalOutputToday)
                 .totalStyleActive(totalStyleActive)
-                .totalBalance(totalBalance)
+                .totalBalance(totalBalance < 0 ? 0 : totalBalance)
                 .mo(moResponses)
                 .buyers(buyerAnalysisResponses)
                 .lineData(lineDataResponses)
+                .build();
+    }
+
+    @Override
+    public List<OutputLast48Hrs> outputLast48Hrs() {
+        return outputDetailRepository.outputLast48Hrs().stream()
+                .map(row -> new OutputLast48Hrs(
+                        ((Number) row[0]).intValue(),
+                        ((Number) row[1]).intValue()
+                ))
+                .toList();
+    }
+
+
+    private ComparisonResponse buildComparison(Integer current, Integer previous) {
+        int curr = current != null ? current : 0;
+        int prev = previous != null ? previous : 0;
+        int diff = curr - prev;
+
+        double changePercent = (prev == 0)
+                ? (curr > 0 ? 100.0 : 0.0)
+                : ((double) diff / prev) * 100;
+
+        return ComparisonResponse.builder()
+                .current(curr)
+                .previous(prev)
+                .diff(diff)
+                .changePercent(Math.round(changePercent * 100.0) / 100.0) // 2 decimal
+                .trend(diff > 0 ? "UP" : diff < 0 ? "DOWN" : "FLAT")
                 .build();
     }
 }

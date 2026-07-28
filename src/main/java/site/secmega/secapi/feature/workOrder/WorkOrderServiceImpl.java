@@ -75,7 +75,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                                     .id(w.getPurchaseOrder().getId())
                                     .po(w.getPurchaseOrder().getPo())
                                     .build())
-                            .style(w.getPurchaseOrder().getStyle().getStyleNo())
+                            .style(w.getPurchaseOrder().getStyle() != null ? w.getPurchaseOrder().getStyle().getStyleNo() : null)
                             .color(colorResp)
                             .sizes(sizeResps)
                             .qty(w.getQty())
@@ -162,12 +162,14 @@ public class WorkOrderServiceImpl implements WorkOrderService{
         long totalMO = workOrderRepository.countFirstBy();
         long totalWorkOrderQty = workOrderRepository.countByDeletedAtNull();
         long totalOutput = outputDetailRepository.sumGoodOutputQty();
+        long totalWorkOrderQtyActive = workOrderRepository.countByDeletedAtNullAndIsActiveTrue();
+        long totalOutputActive = outputDetailRepository.sumGoodOutputQtyActive();
 
         return WorkOrderStatResponse.builder()
                 .totalMO(totalMO)
-                .totalWorkOrderQty(totalWorkOrderQty)
-                .totalOutput(totalOutput)
-                .totalBalance(totalWorkOrderQty - totalOutput)
+                .totalWorkOrderQty(totalWorkOrderQtyActive)
+                .totalOutput(totalOutputActive)
+                .totalBalance((totalWorkOrderQtyActive - totalOutputActive) < 0 ? 0 : (totalWorkOrderQtyActive - totalOutputActive))
                 .build();
     }
 
@@ -242,7 +244,11 @@ public class WorkOrderServiceImpl implements WorkOrderService{
         if (workOrderFilterRequest.search() != null){
             String searchTerm = "%" + workOrderFilterRequest.search().toLowerCase() + "%";
             spec = spec.and((root, query, cb) ->
-                    cb.like(cb.lower(root.get("mo")), searchTerm)
+                    cb.or(
+                        cb.like(cb.lower(root.get("mo")), searchTerm),
+                        cb.like(cb.lower(root.get("purchaseOrder").get("po")), searchTerm),
+                        cb.like(cb.lower(root.get("purchaseOrder").get("style").get("styleNo")), searchTerm)
+                    )
             );
         }
 
@@ -293,14 +299,13 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                             .color(colorResp)
                             .sizes(sizeResps)
                             .lines(lineResps)
-                            .balance(output)
                             .qty(w.getQty())
                             .startDate(w.getStartDate())
                             .endDate(w.getEndDate())
                             .status(w.getStatus())
                             .image(w.getImage())
                             .output(output)
-                            .balance(w.getQty() - output)
+                            .balance((w.getQty() - output) < 0 ? 0 : (w.getQty() - output))
                             .isActive(w.getIsActive())
                             .build();
                 })

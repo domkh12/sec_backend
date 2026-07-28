@@ -49,5 +49,5 @@ public class TvData {
     private Integer dh18;
 
     @ManyToOne
-    private Tv tv;
+    private TvOrder tvOrder;
 }

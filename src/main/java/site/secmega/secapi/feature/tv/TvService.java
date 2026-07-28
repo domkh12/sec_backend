@@ -5,6 +5,8 @@ import site.secmega.secapi.feature.tv.dto.*;
 import java.util.List;
 
 public interface TvService {
+    void updateTvOrderIsNewStyle(Long id, Boolean isNewStyle);
+
     TvResponse create(TvRequest tvRequest);
 
     List<TvResponse> findTv();
@@ -15,5 +17,11 @@ public interface TvService {
 
     List<TvGeneralResponse> getTvGeneralData();
 
-    TvDataResponse createDataTv(String name);
+    TvDataResponse createDataTv(String name, Long tvOrderId);
+
+    TvDataResponse createNewStyle(String name);
+
+    TvDataResponse createOrder(String tvName, Long styleId);
+
+    void updateTvOrderStatus(List<TvOrderStatusRequest> tvOrderStatusRequests);
 }

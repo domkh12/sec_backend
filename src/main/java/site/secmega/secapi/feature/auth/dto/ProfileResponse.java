@@ -10,8 +10,6 @@ import java.time.LocalDate;
 public record ProfileResponse(
         Long id,
         String username,
-        String firstName,
-        String lastName,
         String phoneNumber,
         @JsonFormat(pattern = "dd/MMM/yyyy")
         LocalDate dateOfBirth,

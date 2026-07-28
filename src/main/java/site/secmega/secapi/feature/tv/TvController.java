@@ -15,6 +15,28 @@ public class TvController {
 
     private final TvService tvService;
 
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PatchMapping("/orders/{id}/styles")
+    @ResponseStatus(HttpStatus.CREATED)
+    void updateTvOrderIsNewStyle(@PathVariable Long id, @RequestParam Boolean isNewStyle){
+        tvService.updateTvOrderIsNewStyle(id, isNewStyle);
+    }
+
+
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PatchMapping("/orders")
+    @ResponseStatus(HttpStatus.CREATED)
+    void updateTvOrderStatus(@RequestBody List<TvOrderStatusRequest> tvOrderStatusRequests){
+        tvService.updateTvOrderStatus(tvOrderStatusRequests);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PostMapping("/orders")
+    @ResponseStatus(HttpStatus.CREATED)
+    TvDataResponse createOrder(@RequestParam String tvName, @RequestParam Long styleId){
+        return tvService.createOrder(tvName, styleId);
+    }
+
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN', 'ROLE_VIEWER')")
     @GetMapping("/tv-general")
     @ResponseStatus(HttpStatus.OK)
@@ -25,8 +47,15 @@ public class TvController {
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
     @PostMapping("/data/{name}")
     @ResponseStatus(HttpStatus.CREATED)
-    TvDataResponse createDataTv(@PathVariable String name){
-        return tvService.createDataTv(name);
+    TvDataResponse createDataTv(@PathVariable String name, @RequestParam Long tvOrderId){
+        return tvService.createDataTv(name, tvOrderId);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
+    @PostMapping("/data/{name}/style")
+    @ResponseStatus(HttpStatus.CREATED)
+    TvDataResponse createNewStyle(@PathVariable String name){
+        return tvService.createNewStyle(name);
     }
 
     @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_ADMIN')")
