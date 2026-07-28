@@ -207,7 +207,7 @@ public class OutputDetailServiceImpl implements OutputDetailService{
             );
             outputDetail.setFromLine(fromLine);
 
-            if (!tvDataRepository.existByDateAndLineAndStyle(od.outputDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), fromLine.getLine(), workOrder.getPurchaseOrder().getStyle().getId())){
+            if (!tvDataRepository.existByDateAndLineAndStyle(od.outputDate().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), fromLine.getLine(), workOrder.getPurchaseOrder().getStyle().getId())  && fromLine.getDepartment().getProcessNo() == 2){
                 throw new ResponseStatusException(HttpStatus.NOT_FOUND, "TV didn't have date today");
             }
 

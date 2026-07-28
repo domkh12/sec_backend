@@ -47,8 +47,23 @@ public class TvServiceImpl implements TvService{
         TvOrder tvOrder = tvOrderRepository.findById(id).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv order not found")
         );
+        Tv tv = tvRepository.findByName(tvOrder.getTv().getName())
+                .orElseThrow(
+                        () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv Not found!")
+                );
+        boolean checkIsNewStyleMoreThanTwo = tv.getTvOrders().stream().anyMatch(item -> Boolean.TRUE.equals(item.getIsNewStyle()));
+        if (Boolean.TRUE.equals(isNewStyle) && checkIsNewStyleMoreThanTwo) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "This TV already has an order marked as new style."
+            );
+        }
         tvOrder.setIsNewStyle(isNewStyle);
         tvOrderRepository.save(tvOrder);
+        messagingTemplate.convertAndSend("/topic/messages/tv-data-update", MessageRequest.builder()
+                .message("update")
+                .isUpdate(true)
+                .build());
     }
 
     @Override
@@ -71,9 +86,30 @@ public class TvServiceImpl implements TvService{
         Sort sort = Sort.by(Sort.Direction.ASC, "line");
         List<Tv> tvs = tvRepository.findByNameNotOrderByLineAsc("General", sort);
         LocalDate now = LocalDate.now();
+        String today = now.format(
+                DateTimeFormatter.ofPattern("yyyy-MM-dd")
+        );
+        String yesterday = now.minusDays(1)
+                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
         return tvs.stream()
                 .map(tv -> {
+
+                    List<TvOrder> activeOrders = tv.getTvOrders().stream()
+                            .filter(tvOrder ->
+                                    Objects.equals(tvOrder.getTv(), tv)
+                                            && Objects.equals(tvOrder.getStatus(), "ACTIVE")
+                            )
+                            .toList();
+
+                    int allOrdersYesterdayTotal = tv.getTvOrders().stream()
+                            .flatMap(tvOrder -> tvOrder.getTvDatas().stream())
+                            .filter(tvData ->
+                                    Objects.equals(tvData.getDate(), yesterday)
+                            )
+                            .mapToInt(this::calculateOutputTotal)
+                            .sum();
 
                     List<TvGeneralStyleResponse> tvGeneralResponses = tv.getTvOrders().stream().filter(tvOrder -> tvOrder.getTv().equals(tv) && tvOrder.getStatus().equals("ACTIVE")).map(
                              tvOrder -> {
@@ -86,13 +122,28 @@ public class TvServiceImpl implements TvService{
                                     .sorted(Comparator.comparing(TvData::getDate).reversed())
                                     .toList();
 
-                                 TvData latest    = sortedDatas.size() > 0 ? sortedDatas.get(0) : TvData.builder().build();
+                                 TvData latest  = sortedDatas.size() > 0 ? sortedDatas.get(0) : TvData.builder().build();
 
-                                int todayDefectTotal = Stream.of(
-                                        latest.getDh8(), latest.getDh9(), latest.getDh10(), latest.getDh11(),
-                                        latest.getDh13(), latest.getDh14(), latest.getDh15(), latest.getDh16(),
-                                        latest.getDh17(), latest.getDh18()
-                                    ).mapToInt(h -> h != null ? h : 0).sum();
+                                 int orderYesterdayTotal = tvOrder.getTvDatas().stream()
+                                         .filter(tvData ->
+                                                 Objects.equals(tvData.getDate(), yesterday)
+                                         )
+                                         .mapToInt(this::calculateOutputTotal)
+                                         .sum();
+
+                                 int yesterdayTotal = activeOrders.size() == 1
+                                         ? allOrdersYesterdayTotal
+                                         : orderYesterdayTotal;
+
+
+                                 TvData todayData = tvOrder.getTvDatas().stream()
+                                         .filter(tvData ->
+                                                 Objects.equals(tvData.getDate(), today)
+                                         )
+                                         .findFirst()
+                                         .orElseGet(() -> TvData.builder().build());
+
+                                 int todayDefectTotal = calculateDefectTotal(todayData);
 
                                  return TvGeneralStyleResponse.builder()
                                          .orderNo(tvOrder.getStyle().getStyleNo())
@@ -114,6 +165,7 @@ public class TvServiceImpl implements TvService{
                                          .h17(latest.getH17())
                                          .h18(latest.getH18())
                                          .defects(todayDefectTotal)
+                                         .yFinish(yesterdayTotal)
                                          .build();
                              }
                     ).toList();
@@ -123,55 +175,6 @@ public class TvServiceImpl implements TvService{
                             .helper(tv.getHelper())
                             .styles(tvGeneralResponses)
                             .build();
-//                    LocalDate startDate = tv.getStartDate();
-//                    Long days = (startDate == null) ? null : ChronoUnit.DAYS.between(startDate, now) + 1;
-//
-//                    List<TvData> sortedDatas = tv.getTvDatas().stream()
-//                            .sorted(Comparator.comparing(TvData::getDate).reversed())
-//                            .toList();
-//
-//                    TvData latest    = sortedDatas.size() > 0 ? sortedDatas.get(0) : TvData.builder().build();
-//                    TvData yesterday = sortedDatas.size() > 1 ? sortedDatas.get(1) : TvData.builder().build();
-//                    log.info("TV Line [{}] - yesterday: {}", tv.getLine(), yesterday);
-//                    int yesterdayTotal = Stream.of(
-//                            yesterday.getH8(), yesterday.getH9(), yesterday.getH10(), yesterday.getH11(),
-//                            yesterday.getH13(), yesterday.getH14(), yesterday.getH15(), yesterday.getH16(),
-//                            yesterday.getH17(), yesterday.getH18()
-//                    ).mapToInt(h -> h != null ? h : 0).sum();
-//
-//                    int todayTotal = Stream.of(
-//                            latest.getH8(), latest.getH9(), latest.getH10(), latest.getH11(),
-//                            latest.getH13(), latest.getH14(), latest.getH15(), latest.getH16(),
-//                            latest.getH17(), latest.getH18()
-//                    ).mapToInt(h -> h != null ? h : 0).sum();
-//
-
-//
-//                    return TvGeneralResponse.builder()
-//                            .line(tv.getLine())
-//                            .styleNo(tv.getOrderNo())
-//                            .sewStart(startDate != null ? startDate.format(DateTimeFormatter.ofPattern("dd/MM")) : null)
-//                            .day(days)
-//                            .worker(tv.getWorker())
-//                            .helper(tv.getHelper())
-//                            .act("0-0")
-//                            .hour(tv.getWHour())
-//                            .tarH(tv.getHTarg())
-//                            .tarDay(latest.getDTarget())
-//                            .h8(latest.getH8())
-//                            .h9(latest.getH9())
-//                            .h10(latest.getH10())
-//                            .h11(latest.getH11())
-//                            .h13(latest.getH13())
-//                            .h14(latest.getH14())
-//                            .h15(latest.getH15())
-//                            .h16(latest.getH16())
-//                            .h17(latest.getH17())
-//                            .h18(latest.getH18())
-//                            .finish(todayTotal)
-//                            .yFinish(yesterdayTotal)
-//                            .defects(todayDefectTotal)
-//                            .build();
                 })
                 .toList();
     }
@@ -359,6 +362,11 @@ public class TvServiceImpl implements TvService{
                 .map(
             tvOrder -> {
 
+                long day = 0;
+                if (tvOrder.getFinishDate() != null){
+                    day = ChronoUnit.DAYS.between(tvOrder.getStartDate(), LocalDate.now());
+                }
+
                 List<DailyRecord> dailyRecords = tvOrder.getTvDatas().stream()
                     .sorted(Comparator.comparing(TvData::getDate).reversed())
                     .limit(3)
@@ -405,6 +413,7 @@ public class TvServiceImpl implements TvService{
                         .id(tvOrder.getId())
                         .orderNo(tvOrder.getStyle().getStyleNo())
                         .isNewStyle(tvOrder.getIsNewStyle())
+                        .day((int) day + 1)
                         .status(tvOrder.getStatus())
                         .orderQty(tvOrder.getOrderQty())
                         .totalInLine(tvOrder.getTotalInLine())
@@ -459,5 +468,44 @@ public class TvServiceImpl implements TvService{
         return tvs.stream().map(tvMapper::toTvResponse).toList();
     }
 
+    private int calculateOutputTotal(TvData tvData) {
+        if (tvData == null) {
+            return 0;
+        }
+
+        return Stream.of(
+                        tvData.getH8(),
+                        tvData.getH9(),
+                        tvData.getH10(),
+                        tvData.getH11(),
+                        tvData.getH13(),
+                        tvData.getH14(),
+                        tvData.getH15(),
+                        tvData.getH16(),
+                        tvData.getH17(),
+                        tvData.getH18()
+                ).mapToInt(value -> value != null ? value : 0)
+                .sum();
+    }
+
+    private int calculateDefectTotal(TvData tvData) {
+        if (tvData == null) {
+            return 0;
+        }
+
+        return Stream.of(
+                        tvData.getDh8(),
+                        tvData.getDh9(),
+                        tvData.getDh10(),
+                        tvData.getDh11(),
+                        tvData.getDh13(),
+                        tvData.getDh14(),
+                        tvData.getDh15(),
+                        tvData.getDh16(),
+                        tvData.getDh17(),
+                        tvData.getDh18()
+                ).mapToInt(value -> value != null ? value : 0)
+                .sum();
+    }
 
 }

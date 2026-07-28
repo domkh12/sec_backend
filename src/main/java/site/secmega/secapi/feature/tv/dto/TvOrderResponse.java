@@ -11,6 +11,7 @@ public record TvOrderResponse(
         Long id,
         String orderNo,
         Boolean isNewStyle,
+        Integer day,
         String status,
         Integer orderQty,
         Integer totalInLine,

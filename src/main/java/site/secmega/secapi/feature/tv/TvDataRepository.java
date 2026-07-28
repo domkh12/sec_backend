@@ -55,4 +55,6 @@ public interface TvDataRepository extends JpaRepository<TvData, Long> {
     boolean existByDateAndLineAndStyle(String date, String name, Long id);
 
 
+
+
 }

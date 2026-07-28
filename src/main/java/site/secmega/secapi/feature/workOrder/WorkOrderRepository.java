@@ -27,6 +27,8 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long>, Jpa
     @Query("SELECT COALESCE(SUM(w.qty), 0) from WorkOrder w where w.deletedAt is null")
     long countByDeletedAtNull();
 
+    @Query("select COALESCE(SUM(w.qty), 0) from WorkOrder w where w.deletedAt is null and w.isActive = true")
+    long countByDeletedAtNullAndIsActiveTrue();
 
     @Query("select (count(w) > 0) from WorkOrder w where upper(w.mo) = upper(?1) and w.deletedAt is null and w.id <> ?2")
     boolean existsByMoIgnoreCaseAndDeletedAtNullAndIdNot(String mo, Long id);

@@ -162,12 +162,14 @@ public class WorkOrderServiceImpl implements WorkOrderService{
         long totalMO = workOrderRepository.countFirstBy();
         long totalWorkOrderQty = workOrderRepository.countByDeletedAtNull();
         long totalOutput = outputDetailRepository.sumGoodOutputQty();
+        long totalWorkOrderQtyActive = workOrderRepository.countByDeletedAtNullAndIsActiveTrue();
+        long totalOutputActive = outputDetailRepository.sumGoodOutputQtyActive();
 
         return WorkOrderStatResponse.builder()
                 .totalMO(totalMO)
-                .totalWorkOrderQty(totalWorkOrderQty)
-                .totalOutput(totalOutput)
-                .totalBalance((totalWorkOrderQty - totalOutput) < 0 ? 0 : (totalWorkOrderQty - totalOutput))
+                .totalWorkOrderQty(totalWorkOrderQtyActive)
+                .totalOutput(totalOutputActive)
+                .totalBalance((totalWorkOrderQtyActive - totalOutputActive) < 0 ? 0 : (totalWorkOrderQtyActive - totalOutputActive))
                 .build();
     }
 
