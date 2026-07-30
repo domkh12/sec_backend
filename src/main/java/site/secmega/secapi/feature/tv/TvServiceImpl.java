@@ -143,7 +143,12 @@ public class TvServiceImpl implements TvService{
                                          .findFirst()
                                          .orElseGet(() -> TvData.builder().build());
 
-                                 int todayDefectTotal = calculateDefectTotal(todayData);
+
+                                 int todayDefectTotal = Stream.of(
+                                        latest.getDh8(), latest.getDh9(), latest.getDh10(), latest.getDh11(),
+                                        latest.getDh13(), latest.getDh14(), latest.getDh15(), latest.getDh16(),
+                                        latest.getDh17(), latest.getDh18()
+                                ).mapToInt(h -> h != null ? h : 0).sum();
 
                                  return TvGeneralStyleResponse.builder()
                                          .orderNo(
@@ -496,26 +501,6 @@ public class TvServiceImpl implements TvService{
                         tvData.getH16(),
                         tvData.getH17(),
                         tvData.getH18()
-                ).mapToInt(value -> value != null ? value : 0)
-                .sum();
-    }
-
-    private int calculateDefectTotal(TvData tvData) {
-        if (tvData == null) {
-            return 0;
-        }
-
-        return Stream.of(
-                        tvData.getDh8(),
-                        tvData.getDh9(),
-                        tvData.getDh10(),
-                        tvData.getDh11(),
-                        tvData.getDh13(),
-                        tvData.getDh14(),
-                        tvData.getDh15(),
-                        tvData.getDh16(),
-                        tvData.getDh17(),
-                        tvData.getDh18()
                 ).mapToInt(value -> value != null ? value : 0)
                 .sum();
     }

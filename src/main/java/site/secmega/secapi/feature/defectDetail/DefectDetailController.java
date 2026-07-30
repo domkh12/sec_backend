@@ -16,6 +16,13 @@ public class DefectDetailController {
     private final DefectDetailService defectDetailService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
+    @PatchMapping("/{id}")
+    @ResponseStatus(HttpStatus.CREATED)
+    void updateDefectQty(@PathVariable Long id, @RequestParam Integer qty){
+        defectDetailService.updateDefectQty(id, qty);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN')")
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.CREATED)
     void deleteDefect(@PathVariable Long id){

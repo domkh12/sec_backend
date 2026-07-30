@@ -15,6 +15,7 @@ import site.secmega.secapi.domain.DefectDetail;
 import site.secmega.secapi.feature.buyer.dto.BuyerLookupResponse;
 import site.secmega.secapi.feature.defectDetail.dto.DefectDetailFilterRequest;
 import site.secmega.secapi.feature.defectDetail.dto.DefectDetailResponse;
+import site.secmega.secapi.feature.outputDetail.OutputDetailServiceImpl;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineLookupResponse;
 import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderLookupResponse;
 import site.secmega.secapi.feature.style.dto.StyleLookupResponse;
@@ -27,6 +28,22 @@ import java.time.LocalDateTime;
 public class DefectDetailServiceImpl implements DefectDetailService {
 
     private final DefectDetailRepository defectDetailRepository;
+    private final OutputDetailServiceImpl outputDetailService;
+
+    @Override
+    public void updateDefectQty(Long id, Integer qty) {
+        DefectDetail defectDetail = defectDetailRepository.findById(id).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Defect Detail not found")
+        );
+        defectDetail.setDefectQty(qty);
+        defectDetailRepository.save(defectDetail);
+
+        outputDetailService.updateTvDataDefect(
+                defectDetail.getProductionLine().getId(),
+                defectDetail.getDefectDate(),
+                defectDetail.getWorkOrder().getMo()
+        );
+    }
 
     @Override
     public void deleteDefect(Long id) {
@@ -89,7 +106,7 @@ public class DefectDetailServiceImpl implements DefectDetailService {
                                     .mo(workOrder.getMo())
                                     .defectDate(defectDetail.getDefectDate())
                                     .defectQty(defectDetail.getDefectQty())
-
+                                    .image(defectDetail.getWorkOrder().getImage())
                                     .style(
                                             purchaseOrder.getStyle() != null
                                                     ? StyleLookupResponse.builder()

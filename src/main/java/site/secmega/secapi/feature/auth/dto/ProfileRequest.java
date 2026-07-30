@@ -5,10 +5,11 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import java.time.LocalDate;
 
 public record ProfileRequest(
-        String firstName,
-        String lastName,
+        String nameKh,
+        String nameEn,
         String phoneNumber,
         LocalDate dateOfBirth,
-        String avatar
+        String avatar,
+        String employeeId
 ) {
 }

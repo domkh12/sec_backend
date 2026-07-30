@@ -108,6 +108,7 @@ public class AuthServiceImpl implements AuthService{
         return ProfileResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())
+                .employeeId(user.getEmployeeId())
                 .dateOfBirth(user.getDateOfBirth())
                 .phoneNumber(user.getPhoneNumber())
                 .avatar(user.getAvatar())

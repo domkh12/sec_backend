@@ -6,6 +6,8 @@ import site.secmega.secapi.feature.defectDetail.dto.DefectDetailResponse;
 
 public interface DefectDetailService {
 
+    void updateDefectQty(Long id, Integer qty);
+
     Page<DefectDetailResponse> findAll(DefectDetailFilterRequest defectDetailFilterRequest);
 
     void deleteDefect(Long id);

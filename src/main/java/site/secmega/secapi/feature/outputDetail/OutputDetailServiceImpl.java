@@ -132,6 +132,7 @@ public class OutputDetailServiceImpl implements OutputDetailService{
             outputDetails.stream().map(
                 detail -> OutputDetailResponse.builder()
                         .id(detail.getId())
+                        .image(detail.getWorkOrder().getImage())
                         .reportDate(detail.getCreatedAt())
                         .qty(detail.getGoodQty())
                         .size(SizeLookupResponse.builder()
@@ -258,7 +259,7 @@ public class OutputDetailServiceImpl implements OutputDetailService{
         return null;
     }
 
-    private void updateTvDataDefect(Long lineId, LocalDate outputDate, String mo) {
+    public void updateTvDataDefect(Long lineId, LocalDate outputDate, String mo) {
 
         ProductionLine productionLine = productionLineRepository.findById(lineId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Line not found!"));

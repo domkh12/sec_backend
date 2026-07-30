@@ -16,6 +16,7 @@ public record ProfileResponse(
         String role,
         String avatar,
         String nameEn,
-        String nameKh
+        String nameKh,
+        String employeeId
 ) {
 }

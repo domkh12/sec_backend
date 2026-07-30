@@ -23,6 +23,7 @@ public record DefectDetailResponse(
         ProductionLineLookupResponse line,
         PurchaseOrderLookupResponse purchaseOrder,
         StyleLookupResponse style,
-        BuyerLookupResponse buyer
+        BuyerLookupResponse buyer,
+        String image
 ) {
 }
