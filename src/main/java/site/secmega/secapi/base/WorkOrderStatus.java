@@ -1,7 +1,7 @@
 package site.secmega.secapi.base;
 
 public enum WorkOrderStatus {
-    COMPELLED,
+    COMPLETED,
     DELAYED,
     ACTIVE,
     PENDING
