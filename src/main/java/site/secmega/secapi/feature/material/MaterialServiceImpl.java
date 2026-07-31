@@ -157,7 +157,7 @@ public class MaterialServiceImpl implements MaterialService{
                                         .collect(Collectors.joining(", "))
                         )
                         .unit(detail.getUnit())
-                        .size(detail.getSize().getSize() != null ? detail.getSize().getSize() : "")
+                        .size(detail.getSize() != null ? detail.getSize().getSize() : "")
                         .color(detail.getColor() != null ? detail.getColor().getColor() : "")
                         .balance(materialDetailRepository.sumStockQtyByType(detail.getId(), TransactionType.INVENTORY_IN) - materialDetailRepository.sumStockQtyByType(detail.getId(), TransactionType.INVENTORY_OUT))
                         .build()
