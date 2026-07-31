@@ -29,6 +29,7 @@ public record WorkOrderResponse(
         @JsonFormat(pattern = "dd-MM-yyyy")
         LocalDate endDate,
         String image,
-        Boolean isActive
+        Boolean isActive,
+        OutputByDepartmentResponse departmentOutput
 ) {
 }

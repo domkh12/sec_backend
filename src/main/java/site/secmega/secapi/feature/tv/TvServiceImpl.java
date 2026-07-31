@@ -103,11 +103,21 @@ public class TvServiceImpl implements TvService{
                             )
                             .toList();
 
-                    int allOrdersYesterdayTotal = tv.getTvOrders().stream()
-                            .flatMap(tvOrder -> tvOrder.getTvDatas().stream())
-                            .filter(tvData ->
-                                    Objects.equals(tvData.getDate(), yesterday)
-                            )
+//                    int allOrdersYesterdayTotal = tv.getTvOrders().stream()
+//                            .flatMap(tvOrder -> tvOrder.getTvDatas().stream())
+//                            .filter(tvData ->
+//                                    Objects.equals(tvData.getDate(), yesterday)
+//                            )
+//                            .mapToInt(this::calculateOutputTotal)
+//                            .sum();
+
+                    int allOrdersYesterdayTotal = activeOrders.stream()
+                            .map(tvOrder -> tvOrder.getTvDatas().stream()
+                                    .sorted(Comparator.comparing(TvData::getId).reversed()) // or createdAt
+                                    .skip(1)   // second latest row
+                                    .findFirst()
+                                    .orElse(null))
+                            .filter(Objects::nonNull)
                             .mapToInt(this::calculateOutputTotal)
                             .sum();
 
@@ -124,17 +134,24 @@ public class TvServiceImpl implements TvService{
 
                                  TvData latest  = sortedDatas.size() > 0 ? sortedDatas.get(0) : TvData.builder().build();
 
-                                 int orderYesterdayTotal = tvOrder.getTvDatas().stream()
-                                         .filter(tvData ->
-                                                 Objects.equals(tvData.getDate(), yesterday)
-                                         )
-                                         .mapToInt(this::calculateOutputTotal)
-                                         .sum();
+//                                 int orderYesterdayTotal = tvOrder.getTvDatas().stream()
+//                                         .filter(tvData ->
+//                                                 Objects.equals(tvData.getDate(), yesterday)
+//                                         )
+//                                         .mapToInt(this::calculateOutputTotal)
+//                                         .sum();
+                                 TvData previousData = sortedDatas.size() > 1
+                                         ? sortedDatas.get(1)
+                                         : null;
+
+                                 Integer orderYesterdayTotal = previousData == null
+                                         ? null
+                                         : calculateOutputTotal(previousData);
+
 
                                  int yesterdayTotal = activeOrders.size() == 1
                                          ? allOrdersYesterdayTotal
                                          : orderYesterdayTotal;
-
 
                                  TvData todayData = tvOrder.getTvDatas().stream()
                                          .filter(tvData ->
