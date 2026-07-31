@@ -111,15 +111,40 @@ public class TvServiceImpl implements TvService{
 //                            .mapToInt(this::calculateOutputTotal)
 //                            .sum();
 
+//                    int allOrdersYesterdayTotal = activeOrders.stream()
+//                            .map(tvOrder -> tvOrder.getTvDatas().stream()
+//                                    .sorted(Comparator.comparing(TvData::getId).reversed()) // or createdAt
+//                                    .skip(1)   // second latest row
+//                                    .findFirst()
+//                                    .orElse(null))
+//                            .filter(Objects::nonNull)
+//                            .mapToInt(this::calculateOutputTotal)
+//                            .sum();
+
                     int allOrdersYesterdayTotal = activeOrders.stream()
-                            .map(tvOrder -> tvOrder.getTvDatas().stream()
-                                    .sorted(Comparator.comparing(TvData::getId).reversed()) // or createdAt
-                                    .skip(1)   // second latest row
-                                    .findFirst()
-                                    .orElse(null))
-                            .filter(Objects::nonNull)
-                            .mapToInt(this::calculateOutputTotal)
+                            .mapToInt(tvOrder -> {
+                                boolean hasToday = tvOrder.getTvDatas().stream()
+                                        .anyMatch(tvData -> Objects.equals(tvData.getDate(), today));
+
+                                if (hasToday) {
+                                    // date-based match: find the row that is literally "yesterday"
+                                    return tvOrder.getTvDatas().stream()
+                                            .filter(tvData -> Objects.equals(tvData.getDate(), yesterday))
+                                            .findFirst()
+                                            .map(this::calculateOutputTotal)
+                                            .orElse(0);
+                                } else {
+                                    // no row for today -> fall back to positional "second latest" row
+                                    return tvOrder.getTvDatas().stream()
+                                            .sorted(Comparator.comparing(TvData::getId).reversed())
+                                            .skip(1)
+                                            .findFirst()
+                                            .map(this::calculateOutputTotal)
+                                            .orElse(0);
+                                }
+                            })
                             .sum();
+
 
                     List<TvGeneralStyleResponse> tvGeneralResponses = tv.getTvOrders().stream().filter(tvOrder -> tvOrder.getTv().equals(tv) && tvOrder.getStatus().equals("ACTIVE")).map(
                              tvOrder -> {
@@ -149,9 +174,12 @@ public class TvServiceImpl implements TvService{
                                          : calculateOutputTotal(previousData);
 
 
+//                                 int yesterdayTotal = activeOrders.size() == 1
+//                                         ? allOrdersYesterdayTotal
+//                                         : orderYesterdayTotal;
                                  int yesterdayTotal = activeOrders.size() == 1
                                          ? allOrdersYesterdayTotal
-                                         : orderYesterdayTotal;
+                                         : (orderYesterdayTotal == null ? 0 : orderYesterdayTotal);
 
                                  TvData todayData = tvOrder.getTvDatas().stream()
                                          .filter(tvData ->
