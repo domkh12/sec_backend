@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 import site.secmega.secapi.domain.OutputDetail;
 
 import java.time.LocalDate;
+import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -89,6 +90,12 @@ public interface OutputDetailRepository extends JpaRepository<OutputDetail, Long
     """)
     List<Object[]> getDailySummaryBetweenDates(@Param("dateFrom") LocalDate dateFrom,
                                                @Param("dateTo") LocalDate dateTo);
+
+    @Query("select COALESCE(SUM(o.goodQty), 0) from OutputDetail o " +
+            "where o.workOrder.id = ?1 and o.fromLine.id in ?2 and o.deletedAt is null")
+    Integer sumGoodQtyByWorkOrder_IdAndFromLine_IdIn(Long workOrderId, Collection<Long> lineIds);
+
+
 
 //    @Query("""
 //        SELECT COALESCE(SUM(od.goodQty), 0)

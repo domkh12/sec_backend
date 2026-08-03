@@ -6,6 +6,7 @@ public record DefectDetailFilterRequest(
         Integer pageNo,
         Integer pageSize,
         String search,
+        Long defectTypeId,
         Long lineId,
         Long buyerId,
         LocalDate reportDate

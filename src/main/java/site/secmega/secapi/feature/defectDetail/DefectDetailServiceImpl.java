@@ -88,6 +88,10 @@ public class DefectDetailServiceImpl implements DefectDetailService {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("defectDate"), defectDetailFilterRequest.reportDate()));
         }
 
+        if (defectDetailFilterRequest.defectTypeId() != null){
+            spec = spec.and((root, query, cb) -> cb.equal(root.get("defectType").get("id"), defectDetailFilterRequest.defectTypeId()));
+        }
+
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         PageRequest pageRequest = PageRequest.of(defectDetailFilterRequest.pageNo() - 1, defectDetailFilterRequest.pageSize(), sort);
         Page<DefectDetail> defectDetails = defectDetailRepository.findAll(spec, pageRequest);
@@ -115,7 +119,7 @@ public class DefectDetailServiceImpl implements DefectDetailService {
                                                     .build()
                                                     : null
                                     )
-
+                                    .type(defectDetail.getDefectType().getName())
                                     .line(
                                             defectDetail.getProductionLine() != null
                                                     ? ProductionLineLookupResponse.builder()

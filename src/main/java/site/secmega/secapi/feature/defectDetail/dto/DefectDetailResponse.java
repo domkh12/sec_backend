@@ -24,6 +24,7 @@ public record DefectDetailResponse(
         PurchaseOrderLookupResponse purchaseOrder,
         StyleLookupResponse style,
         BuyerLookupResponse buyer,
-        String image
+        String image,
+        String type
 ) {
 }

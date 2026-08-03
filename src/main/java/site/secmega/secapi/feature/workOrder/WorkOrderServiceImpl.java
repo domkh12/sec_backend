@@ -28,8 +28,11 @@ import site.secmega.secapi.mapper.WorkOrderMapper;
 import site.secmega.secapi.util.AuthUtil;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -286,6 +289,28 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                                     .line(line.getLine())
                                     .build()).toList() : List.of();
 
+                    List<OutputByDepartmentResponse> outputByDepartmentResponses = w.getProductionLines().stream()
+                            .filter(line -> line.getDepartment() != null)
+                            .collect(Collectors.groupingBy(ProductionLine::getDepartment))
+                            .entrySet().stream()
+                            .sorted(Comparator.comparing(entry -> entry.getKey().getProcessNo()))
+                            .map(entry -> {
+                                Department department = entry.getKey();
+                                List<Long> lineIds = entry.getValue().stream()
+                                        .map(ProductionLine::getId)
+                                        .toList();
+
+                                Integer deptOutput = outputDetailRepository
+                                        .sumGoodQtyByWorkOrder_IdAndFromLine_IdIn(w.getId(), lineIds);
+
+                                return OutputByDepartmentResponse.builder()
+                                        .id(department.getId())
+                                        .name(department.getDepartment())
+                                        .output(deptOutput != null ? deptOutput : 0)
+                                        .build();
+                            })
+                            .toList();
+
                     return WorkOrderResponse.builder()
                             .id(w.getId())
                             .mo(w.getMo())
@@ -305,6 +330,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
                             .output(output)
                             .balance((w.getQty() - output) < 0 ? 0 : (w.getQty() - output))
                             .isActive(w.getIsActive())
+                            .departmentOutput(outputByDepartmentResponses)
                             .build();
                 })
                 .toList();

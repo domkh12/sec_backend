@@ -30,6 +30,6 @@ public record WorkOrderResponse(
         LocalDate endDate,
         String image,
         Boolean isActive,
-        OutputByDepartmentResponse departmentOutput
+        List<OutputByDepartmentResponse> departmentOutput
 ) {
 }
