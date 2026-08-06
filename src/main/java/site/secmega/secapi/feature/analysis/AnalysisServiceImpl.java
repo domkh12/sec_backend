@@ -42,6 +42,18 @@ public class AnalysisServiceImpl implements AnalysisService{
     private final TimeRepository timeRepository;
 
     @Override
+    public AnalysisInputTodayResponse getAnalysisInputToday() {
+
+        LocalDate today = LocalDate.now();
+        Integer totalInputToday = outputDetailRepository.totalInputByDate(today, 1);
+        Integer totalJob = workOrderRepository.totalMOActiveByProcessNo(1);
+        return AnalysisInputTodayResponse.builder()
+                .totalCutting(totalInputToday)
+                .totalJob(totalJob)
+                .build();
+    }
+
+    @Override
     public AnalysisDefectResponse defectToday() {
         LocalDate today = LocalDate.now();
         List<ProductionLine> productionLines = productionLineRepository.findByDeletedAtNullAndDepartment_ProcessNo(2);

@@ -19,8 +19,6 @@ public interface TvService {
 
     TvDataResponse createDataTv(String name, Long tvOrderId);
 
-    TvDataResponse createNewStyle(String name);
-
     TvDataResponse createOrder(String tvName, Long styleId);
 
     void updateTvOrderStatus(List<TvOrderStatusRequest> tvOrderStatusRequests);

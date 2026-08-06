@@ -54,5 +54,10 @@ public interface WorkOrderRepository extends JpaRepository<WorkOrder, Long>, Jpa
             where w.deletedAt is null and w.isActive = true and productionLines.id = ?1""")
     List<WorkOrder> findByDeletedAtNullAndIsActiveTrueAndProductionLines_Id(Long id);
 
+    @Query("""
+            select count(w) from WorkOrder w inner join w.productionLines productionLines
+            where w.isActive = true and productionLines.department.processNo = ?1""")
+    Integer totalMOActiveByProcessNo(Integer processNo);
+
 
 }

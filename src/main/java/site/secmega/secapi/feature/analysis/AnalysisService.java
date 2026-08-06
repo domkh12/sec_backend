@@ -1,14 +1,13 @@
 package site.secmega.secapi.feature.analysis;
 
-import site.secmega.secapi.feature.analysis.dto.AnalysisDefectResponse;
-import site.secmega.secapi.feature.analysis.dto.AnalysisOutputResponse;
-import site.secmega.secapi.feature.analysis.dto.AnalysisOutputTodayResponse;
-import site.secmega.secapi.feature.analysis.dto.OutputLast48Hrs;
+import site.secmega.secapi.feature.analysis.dto.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
 public interface AnalysisService {
+    AnalysisInputTodayResponse getAnalysisInputToday();
+
     AnalysisOutputResponse getAnalysis(LocalDate dateFrom, LocalDate dateTo);
 
     AnalysisOutputTodayResponse getAnalysisOutputToday();

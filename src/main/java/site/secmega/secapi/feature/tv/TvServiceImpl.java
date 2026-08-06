@@ -72,6 +72,9 @@ public class TvServiceImpl implements TvService{
                 tvOrder -> {
                     TvOrder tvOrder1 = tvOrderRepository.findById(tvOrder.id()).orElseThrow();
                     tvOrder1.setStatus(tvOrder.status());
+                    if (Objects.equals(tvOrder.status(), "COMPLETED")){
+                        tvOrder1.setIsNewStyle(false);
+                    }
                     tvOrderRepository.save(tvOrder1);
                 }
         );
@@ -89,8 +92,6 @@ public class TvServiceImpl implements TvService{
         String today = now.format(
                 DateTimeFormatter.ofPattern("yyyy-MM-dd")
         );
-        String yesterday = now.minusDays(1)
-                .format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM");
         return tvs.stream()
@@ -103,45 +104,25 @@ public class TvServiceImpl implements TvService{
                             )
                             .toList();
 
-//                    int allOrdersYesterdayTotal = tv.getTvOrders().stream()
-//                            .flatMap(tvOrder -> tvOrder.getTvDatas().stream())
-//                            .filter(tvData ->
-//                                    Objects.equals(tvData.getDate(), yesterday)
-//                            )
-//                            .mapToInt(this::calculateOutputTotal)
-//                            .sum();
-
-//                    int allOrdersYesterdayTotal = activeOrders.stream()
-//                            .map(tvOrder -> tvOrder.getTvDatas().stream()
-//                                    .sorted(Comparator.comparing(TvData::getId).reversed()) // or createdAt
-//                                    .skip(1)   // second latest row
-//                                    .findFirst()
-//                                    .orElse(null))
-//                            .filter(Objects::nonNull)
-//                            .mapToInt(this::calculateOutputTotal)
-//                            .sum();
-
                     int allOrdersYesterdayTotal = activeOrders.stream()
                             .mapToInt(tvOrder -> {
-                                boolean hasToday = tvOrder.getTvDatas().stream()
-                                        .anyMatch(tvData -> Objects.equals(tvData.getDate(), today));
+                                LocalDate startDate = tvOrder.getStartDate();
 
-                                if (hasToday) {
-                                    // date-based match: find the row that is literally "yesterday"
-                                    return tvOrder.getTvDatas().stream()
-                                            .filter(tvData -> Objects.equals(tvData.getDate(), yesterday))
-                                            .findFirst()
-                                            .map(this::calculateOutputTotal)
-                                            .orElse(0);
-                                } else {
-                                    // no row for today -> fall back to positional "second latest" row
-                                    return tvOrder.getTvDatas().stream()
-                                            .sorted(Comparator.comparing(TvData::getId).reversed())
-                                            .skip(1)
-                                            .findFirst()
-                                            .map(this::calculateOutputTotal)
-                                            .orElse(0);
-                                }
+                                return tvOrder.getTvDatas().stream()
+                                        .filter(tvData -> !Objects.equals(tvData.getDate(), today))
+                                        // ignore any data from before this order's current run started
+                                        .filter(tvData -> startDate == null
+                                                || !LocalDate.parse(tvData.getDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                                                .isBefore(startDate))
+                                        .max(Comparator.comparing(TvData::getDate))
+                                        // extra safety net: even within this run, don't reach back further
+                                        // than a normal weekend gap (Sat -> Mon = 2 days off)
+                                        .filter(tvData -> {
+                                            LocalDate dataDate = LocalDate.parse(tvData.getDate(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+                                            return ChronoUnit.DAYS.between(dataDate, LocalDate.now()) <= 3;
+                                        })
+                                        .map(this::calculateOutputTotal)
+                                        .orElse(0);
                             })
                             .sum();
 
@@ -158,37 +139,7 @@ public class TvServiceImpl implements TvService{
                                     .toList();
 
                                  TvData latest  = sortedDatas.size() > 0 ? sortedDatas.get(0) : TvData.builder().build();
-
-//                                 int orderYesterdayTotal = tvOrder.getTvDatas().stream()
-//                                         .filter(tvData ->
-//                                                 Objects.equals(tvData.getDate(), yesterday)
-//                                         )
-//                                         .mapToInt(this::calculateOutputTotal)
-//                                         .sum();
-                                 TvData previousData = sortedDatas.size() > 1
-                                         ? sortedDatas.get(1)
-                                         : null;
-
-                                 Integer orderYesterdayTotal = previousData == null
-                                         ? null
-                                         : calculateOutputTotal(previousData);
-
-
-//                                 int yesterdayTotal = activeOrders.size() == 1
-//                                         ? allOrdersYesterdayTotal
-//                                         : orderYesterdayTotal;
-                                 int yesterdayTotal = activeOrders.size() == 1
-                                         ? allOrdersYesterdayTotal
-                                         : (orderYesterdayTotal == null ? 0 : orderYesterdayTotal);
-
-                                 TvData todayData = tvOrder.getTvDatas().stream()
-                                         .filter(tvData ->
-                                                 Objects.equals(tvData.getDate(), today)
-                                         )
-                                         .findFirst()
-                                         .orElseGet(() -> TvData.builder().build());
-
-
+                                 int yesterdayTotal = computeYesterdayTotal(tvOrder, today);
                                  int todayDefectTotal = Stream.of(
                                         latest.getDh8(), latest.getDh9(), latest.getDh10(), latest.getDh11(),
                                         latest.getDh13(), latest.getDh14(), latest.getDh15(), latest.getDh16(),
@@ -265,47 +216,6 @@ public class TvServiceImpl implements TvService{
         } else {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Today data already exists");
         }
-    }
-
-    @Override
-    public TvDataResponse createNewStyle(String name) {
-//        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-//
-//        Tv tv = tvRepository.findByName(name).orElseThrow(
-//                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv not found!")
-//        );
-//
-//        TvData tvData = TvData.builder()
-//                .date(today)
-//                .isToday(true)
-//                .tv(tv)
-//                .build();
-//
-//        tvDataRepository.save(tvData); // ✅ save new record
-//
-//        messagingTemplate.convertAndSend("/topic/messages/tv-data-update", MessageRequest.builder()
-//                .message("update")
-//                .isUpdate(true)
-//                .build());
-//
-//        return TvDataResponse.builder()
-//                .line(tv.getLine())
-//                .worker(tv.getWorker())
-//                .helper(tv.getHelper())
-//                .orderNo(tv.getOrderNo())
-//                .totalInLine(tv.getTotalInLine())
-//                .balanceInLine(tv.getBalanceInLine())
-//                .orderQty(tv.getOrderQty())
-//                .totalOutput(tv.getTotalOutput())
-//                .qcRepairBack(tv.getQcRepairBack())
-//                .orderInline(tv.getOrderInline())
-//                .balanceDay(tv.getBalanceDay())
-//                .wHour(tv.getWHour())
-//                .hTarg(tv.getHTarg())
-//                .input(tv.getInput())
-//                .build();
-        return null;
-
     }
 
     @Override
@@ -506,14 +416,13 @@ public class TvServiceImpl implements TvService{
 
     @Override
     public TvResponse create(TvRequest tvRequest) {
-//        if (tvRepository.existsByName(tvRequest.name())){
-//            throw new ResponseStatusException(HttpStatus.CONFLICT, "TV name already exist");
-//        }
-//        Tv tv = tvMapper.fromTvRequest(tvRequest);
-//        tv.setCreatedAt(LocalDateTime.now());
-//        Tv savedTv = tvRepository.save(tv);
-//        return tvMapper.toTvResponse(savedTv);
-        return null;
+        if (tvRepository.existsByName(tvRequest.name())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "TV name already exist");
+        }
+        Tv tv = tvMapper.fromTvRequest(tvRequest);
+        tv.setCreatedAt(LocalDateTime.now());
+        Tv savedTv = tvRepository.save(tv);
+        return tvMapper.toTvResponse(savedTv);
     }
 
     @Override
@@ -550,4 +459,21 @@ public class TvServiceImpl implements TvService{
                 .sum();
     }
 
+    private int computeYesterdayTotal(TvOrder tvOrder, String today) {
+        LocalDate startDate = tvOrder.getStartDate();
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        List<TvData> datas = tvOrder.getTvDatas();
+        if (datas.size() <= 1) {
+            return 0; // only one record ever -> no "yesterday" to show
+        }
+        return tvOrder.getTvDatas().stream()
+                .filter(d -> !Objects.equals(d.getDate(), today))              // skip today
+                .filter(d -> startDate == null
+                        || !LocalDate.parse(d.getDate(), fmt).isBefore(startDate)) // skip data from before restart
+                .max(Comparator.comparing(TvData::getDate))                    // most recent remaining day
+                .filter(d -> ChronoUnit.DAYS.between(
+                        LocalDate.parse(d.getDate(), fmt), LocalDate.now()) <= 30) // don't reach back too far
+                .map(this::calculateOutputTotal)
+                .orElse(0);
+    }
 }
