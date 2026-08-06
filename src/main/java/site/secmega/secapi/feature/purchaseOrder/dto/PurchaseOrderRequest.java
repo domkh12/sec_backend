@@ -18,7 +18,6 @@ public record PurchaseOrderRequest(
         @Positive(message = "Qty must be greater than 0!")
         Integer qty,
         @NotNull(message = "Shipment date is required!")
-        @FutureOrPresent(message = "Shipment date cannot be in the past!")
         LocalDate shipmentDate
 ) {
 }

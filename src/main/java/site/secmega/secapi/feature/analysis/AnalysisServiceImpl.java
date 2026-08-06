@@ -1,6 +1,8 @@
 package site.secmega.secapi.feature.analysis;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import lombok.RequiredArgsConstructor;
 import site.secmega.secapi.domain.DefectType;
@@ -22,10 +24,7 @@ import site.secmega.secapi.feature.workOrder.WorkOrderRepository;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -47,9 +46,11 @@ public class AnalysisServiceImpl implements AnalysisService{
         LocalDate today = LocalDate.now();
         Integer totalInputToday = outputDetailRepository.totalInputByDate(today, 1);
         Integer totalJob = workOrderRepository.totalMOActiveByProcessNo(1);
+        Integer totalActiveStyle = styleRepository.countByPurchaseOrders_WorkOrders_IsActiveTrue();
         return AnalysisInputTodayResponse.builder()
                 .totalCutting(totalInputToday)
                 .totalJob(totalJob)
+                .activeStyle(totalActiveStyle)
                 .build();
     }
 
@@ -108,6 +109,13 @@ public class AnalysisServiceImpl implements AnalysisService{
 
     @Override
     public AnalysisOutputResponse getAnalysis(LocalDate dateFrom, LocalDate dateTo) {
+
+        LocalDate now = LocalDate.now();
+
+        if(dateFrom == null || dateTo == null || dateFrom.isAfter(dateTo) || dateFrom.isAfter(now) ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid date range");
+        }
+
         long periodDays = ChronoUnit.DAYS.between(dateFrom, dateTo) + 1;
         LocalDate compareDateFrom = dateFrom.minusDays(periodDays);
         LocalDate compareDateTo = dateFrom.minusDays(1);
@@ -259,7 +267,6 @@ public class AnalysisServiceImpl implements AnalysisService{
                 ))
                 .toList();
     }
-
 
     private ComparisonResponse buildComparison(Integer current, Integer previous) {
         int curr = current != null ? current : 0;

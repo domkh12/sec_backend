@@ -40,5 +40,9 @@ public interface StyleRepository extends JpaRepository<Style, Long>, JpaSpecific
     @Query("select s from Style s inner join s.purchaseOrders.workOrders workOrders where workOrders.mo = ?1")
     Optional<Style> findByPurchaseOrders_WorkOrders_Mo(String mo);
 
+    @Query("""
+            select count(DISTINCT s) from Style s inner join s.purchaseOrders.workOrders workOrders
+            where workOrders.isActive = true""")
+    Integer countByPurchaseOrders_WorkOrders_IsActiveTrue();
 
 }

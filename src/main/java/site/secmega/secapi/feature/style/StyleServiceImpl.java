@@ -3,6 +3,7 @@ package site.secmega.secapi.feature.style;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -44,9 +45,18 @@ public class StyleServiceImpl implements StyleService {
 
     @Override
     public StyleStateResponse getStyleState() {
-        long totalStyle = styleRepository.count();
-        long totalActive = styleRepository.countByStatus(StyleStatus.Active);
-        long totalDraft = styleRepository.countByStatus(StyleStatus.Draft);
+        List<Style> styles = styleRepository.findAll();
+
+        long totalStyle = styles.size();
+
+        long totalActive = styles.stream()
+                .filter(style -> style.getPurchaseOrders().stream()
+                        .flatMap(po -> po.getWorkOrders().stream())
+                        .anyMatch(WorkOrder::getIsActive))
+                .count();
+
+        long totalDraft = totalStyle - totalActive;
+
         return StyleStateResponse.builder()
                 .totalStyleNo(totalStyle)
                 .totalActive(totalActive)
@@ -106,6 +116,23 @@ public class StyleServiceImpl implements StyleService {
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
         PageRequest pageRequest = PageRequest.of(styleFilterRequest.pageNo() - 1, styleFilterRequest.pageSize(), sort);
         Page<Style> styles = styleRepository.findAll(spec, pageRequest);
-        return styles.map(styleMapper::toStyleResponse);
+        return new PageImpl<>(toStyleResponse(styles), pageRequest, styles.getTotalElements());
+    }
+
+    private List<StyleResponse> toStyleResponse(Page<Style> styles){
+        return styles.stream()
+                .map(
+                        style -> {
+                            boolean active = style.getPurchaseOrders().stream()
+                                    .flatMap(po -> po.getWorkOrders().stream())
+                                    .anyMatch(WorkOrder::getIsActive);
+                            return StyleResponse.builder()
+                                    .id(style.getId())
+                                    .styleNo(style.getStyleNo())
+                                    .description(style.getDescription())
+                                    .status(active ? StyleStatus.Active : StyleStatus.Draft)
+                                    .build();
+                        }
+                ).toList();
     }
 }

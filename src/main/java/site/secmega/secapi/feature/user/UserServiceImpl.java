@@ -1,5 +1,7 @@
 package site.secmega.secapi.feature.user;
 
+import jakarta.persistence.criteria.Join;
+import jakarta.persistence.criteria.JoinType;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -255,14 +257,29 @@ public class UserServiceImpl implements UserService{
     @Override
     public Page<UserResponse> findAll(UserFilterRequest userFilterRequest) {
         Long userId = authUtil.loggedUserId();
-        Specification<User> spec = Specification.where((root, query, cb) -> cb.conjunction());
-        if (userFilterRequest.pageNo() <= 0 || userFilterRequest.pageSize() <= 0 ){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Page no and Page size must be greater than 0");
+
+        if (userFilterRequest.pageNo() <= 0 || userFilterRequest.pageSize() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Page no and Page size must be greater than 0");
         }
 
-        // Exclude the logged-in user
+        Specification<User> spec = Specification.where((root, query, cb) -> cb.conjunction());
+
+        // 1. Exclude the currently logged-in user
         spec = spec.and((root, query, cb) -> cb.notEqual(root.get("id"), userId));
-        if (userFilterRequest.search() != null){
+
+        // 2. Exclude users who have the ADMIN role
+        //    (works for @ManyToMany / @OneToMany roles collection)
+        spec = spec.and((root, query, cb) -> {
+            // Make the query distinct because of the join
+            query.distinct(true);
+
+            Join<User, Role> rolesJoin = root.join("roles", JoinType.INNER);
+            return cb.notEqual(rolesJoin.get("name"), "ADMIN");
+        });
+
+        // 3. Free-text search
+        if (userFilterRequest.search() != null && !userFilterRequest.search().isBlank()) {
             String searchTerm = "%" + userFilterRequest.search().toLowerCase() + "%";
             spec = spec.and((root, query, cb) ->
                     cb.or(
@@ -271,30 +288,42 @@ public class UserServiceImpl implements UserService{
                             cb.like(cb.lower(root.get("nameKh")), searchTerm),
                             cb.like(cb.lower(root.get("phoneNumber")), searchTerm),
                             cb.like(cb.lower(root.get("position")), searchTerm)
-                        )
-                    );
-        }
-
-        if (userFilterRequest.roleId() != null){
-            spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("roles").get("id"), userFilterRequest.roleId())
+                    )
             );
         }
 
-        if (userFilterRequest.departmentId() != null){
+        // 4. Filter by roleId (if provided)
+        if (userFilterRequest.roleId() != null) {
+            spec = spec.and((root, query, cb) -> {
+                query.distinct(true);
+                Join<User, Role> rolesJoin = root.join("roles", JoinType.INNER);
+                return cb.equal(rolesJoin.get("id"), userFilterRequest.roleId());
+            });
+        }
+
+        // 5. Filter by department
+        if (userFilterRequest.departmentId() != null) {
             spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("productionLine").get("department").get("id"), userFilterRequest.departmentId())
+                    cb.equal(root.get("productionLine").get("department").get("id"),
+                            userFilterRequest.departmentId())
             );
         }
 
-        if (userFilterRequest.status() != null){
+        // 6. Filter by status
+        if (userFilterRequest.status() != null) {
             spec = spec.and((root, query, cb) ->
                     cb.equal(root.get("status"), userFilterRequest.status())
             );
         }
 
         Sort sort = Sort.by(Sort.Direction.DESC, "createdAt");
-        PageRequest pageRequest = PageRequest.of(userFilterRequest.pageNo() - 1, userFilterRequest.pageSize(), sort);
+        PageRequest pageRequest = PageRequest.of(
+                userFilterRequest.pageNo() - 1,
+                userFilterRequest.pageSize(),
+                sort
+        );
+
+        // Use the standard JpaSpecificationExecutor method
         Page<User> users = userRepository.findAll(spec, pageRequest);
 
         return users.map(userMapper::toUserResponse);
