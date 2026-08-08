@@ -1,7 +1,9 @@
 package site.secmega.secapi.feature.outputDetail;
 
 import jakarta.validation.Valid;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
+import org.springframework.http.ResponseEntity;
 import site.secmega.secapi.feature.outputDetail.dto.OutputDetailRequest;
 import site.secmega.secapi.feature.outputDetail.dto.OutputDetailResponse;
 import site.secmega.secapi.feature.outputDetail.dto.OutputFilterRequest;
@@ -10,6 +12,8 @@ import site.secmega.secapi.feature.outputDetail.dto.OutputLast48Hrs;
 import java.util.List;
 
 public interface OutputDetailService {
+
+    ResponseEntity<InputStreamResource> getReportOutputDetail();
 
     List<OutputLast48Hrs> outputLast48Hrs();
 
@@ -20,5 +24,4 @@ public interface OutputDetailService {
     Page<OutputDetailResponse> findAll(OutputFilterRequest outputFilterRequest);
 
     void delete(Long id);
-
 }

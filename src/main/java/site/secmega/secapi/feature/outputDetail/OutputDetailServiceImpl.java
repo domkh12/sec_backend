@@ -3,12 +3,14 @@ package site.secmega.secapi.feature.outputDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -56,7 +58,11 @@ public class OutputDetailServiceImpl implements OutputDetailService{
     private final DefectDetailRepository defectDetailRepository;
     private final DefectTypeRepository defectTypeRepository;
     private final StyleRepository styleRepository;
-    private final TvRepository tvRepository;
+
+    @Override
+    public ResponseEntity<InputStreamResource> getReportOutputDetail() {
+        return null;
+    }
 
     @Override
     public List<OutputLast48Hrs> outputLast48Hrs() {

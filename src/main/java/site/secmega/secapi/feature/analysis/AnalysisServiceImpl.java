@@ -47,10 +47,14 @@ public class AnalysisServiceImpl implements AnalysisService{
         Integer totalInputToday = outputDetailRepository.totalInputByDate(today, 1);
         Integer totalJob = workOrderRepository.totalMOActiveByProcessNo(1);
         Integer totalActiveStyle = styleRepository.countByPurchaseOrders_WorkOrders_IsActiveTrue();
+        Integer totalWorkOrderQty = workOrderRepository.sumByIsActiveTrue();
+        Integer totalOutput = outputDetailRepository.countByFromLine_Department_ProcessNoAndWorkOrder_IsActiveTrue(1);
+        Integer balanceCutting = totalWorkOrderQty - totalOutput;
         return AnalysisInputTodayResponse.builder()
                 .totalCutting(totalInputToday)
                 .totalJob(totalJob)
                 .activeStyle(totalActiveStyle)
+                .balanceCutting(balanceCutting)
                 .build();
     }
 
@@ -178,7 +182,7 @@ public class AnalysisServiceImpl implements AnalysisService{
         Integer totalOutputToday = outputDetailRepository.totalOutputSewingByDate(today, 2);
         Integer totalStyleActive = styleRepository.countStylesWithOutputDetailsToday(today);
         Integer totalWorkOrderQty = workOrderRepository.sumByIsActiveTrue();
-        Integer totalOutput = outputDetailRepository.totalOutputQty(2);
+        Integer totalOutput = outputDetailRepository.countByFromLine_Department_ProcessNoAndWorkOrder_IsActiveTrue(2);
         Integer totalBalance = totalWorkOrderQty - totalOutput;
         List<MoResponse> moResponses = workOrderRepository.findByIsActive(true).stream().map(
                 wo -> MoResponse.builder()
