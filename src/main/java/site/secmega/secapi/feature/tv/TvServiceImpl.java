@@ -220,7 +220,6 @@ public class TvServiceImpl implements TvService{
 
     @Override
     public TvDataResponse createOrder(String tvName, Long styleId) {
-        String today = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
         Tv tv = tvRepository.findByName(tvName).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Tv not found")
@@ -235,8 +234,8 @@ public class TvServiceImpl implements TvService{
         }
 
         TvOrder tvOrder = new TvOrder();
-        tvOrder.setStyle(style);
         tvOrder.setTv(tv);
+        tvOrder.setStyle(style);
         tvOrder.setOrderNo(style.getStyleNo());
         tvOrder.setOrderInline(0);
         tvOrder.setOrderQty(0);
