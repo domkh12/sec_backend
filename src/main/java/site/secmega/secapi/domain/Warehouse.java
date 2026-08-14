@@ -20,6 +20,10 @@ public class Warehouse extends BaseEntity {
     private Long id;
 
     @NotBlank
+    @Column(nullable = false)
+    private String uuid;
+
+    @NotBlank
     @Size(max = 50)
     @Column(nullable = false, length = 50)
     private String code;
@@ -36,7 +40,7 @@ public class Warehouse extends BaseEntity {
     private String city;
 
     @Column(nullable = false)
-    private Boolean isActive;
+    private Boolean isActive = true;
 
     @OneToMany(mappedBy = "warehouse")
     private List<Rack> racks;
