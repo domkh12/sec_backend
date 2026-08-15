@@ -3,29 +3,32 @@ package site.secmega.secapi.feature.outputDetail;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import site.secmega.secapi.base.TransactionType;
 import site.secmega.secapi.domain.*;
 import site.secmega.secapi.feature.buyer.dto.BuyerLookupResponse;
 import site.secmega.secapi.feature.defectDetail.DefectDetailRepository;
 import site.secmega.secapi.feature.defectType.DefectTypeRepository;
+import site.secmega.secapi.feature.material.dto.MaterialReportResponse;
 import site.secmega.secapi.feature.message.dto.MessageRequest;
-import site.secmega.secapi.feature.outputDetail.dto.OutputDetailRequest;
-import site.secmega.secapi.feature.outputDetail.dto.OutputDetailResponse;
-import site.secmega.secapi.feature.outputDetail.dto.OutputFilterRequest;
-import site.secmega.secapi.feature.outputDetail.dto.OutputLast48Hrs;
+import site.secmega.secapi.feature.outputDetail.dto.*;
 import site.secmega.secapi.feature.productionLine.ProductionLineRepository;
 import site.secmega.secapi.feature.productionLine.dto.ProductionLineLookupResponse;
 import site.secmega.secapi.feature.purchaseOrder.dto.PurchaseOrderLookupResponse;
+import site.secmega.secapi.feature.report.GenerateReportService;
 import site.secmega.secapi.feature.size.SizeRepository;
 import site.secmega.secapi.feature.size.dto.SizeLookupResponse;
 import site.secmega.secapi.feature.style.StyleRepository;
@@ -36,11 +39,16 @@ import site.secmega.secapi.feature.tv.TvDataRepository;
 import site.secmega.secapi.feature.tv.TvRepository;
 import site.secmega.secapi.feature.workOrder.WorkOrderRepository;
 import site.secmega.secapi.mapper.OutputDetailMapper;
+import site.secmega.secapi.util.Util;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -58,10 +66,73 @@ public class OutputDetailServiceImpl implements OutputDetailService{
     private final DefectDetailRepository defectDetailRepository;
     private final DefectTypeRepository defectTypeRepository;
     private final StyleRepository styleRepository;
+    private final GenerateReportService generateReportService;
+
+    @Value("${outputDetailExcel.template.path}")
+    String outputDetailExcelPath;
 
     @Override
-    public ResponseEntity<InputStreamResource> getReportOutputDetail() {
-        return null;
+    public ResponseEntity<InputStreamResource> getReportOutputDetail(OutputFilterRequest outputFilterRequest) throws IOException {
+
+        Specification<OutputDetail> spec = Specification.where((root, query, cb) -> cb.conjunction());
+
+        if (outputFilterRequest.search() != null && !outputFilterRequest.search().isBlank()) {
+            String search = "%" + outputFilterRequest.search().toLowerCase() + "%";
+            spec = spec.and((root, query, cb) ->
+                    cb.or(
+                            cb.like(cb.lower(root.get("workOrder").get("mo")), search),
+                            cb.like(cb.lower(root.get("workOrder").get("purchaseOrder").get("po")), search),
+                            cb.like(cb.lower(root.get("workOrder").get("purchaseOrder").get("style").get("styleNo")), search)
+                    )
+            );
+        }
+
+        if (outputFilterRequest.buyerId() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("workOrder").get("purchaseOrder").get("buyer").get("id"), outputFilterRequest.buyerId())
+            );
+        }
+
+        if (outputFilterRequest.reportDate() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("outputDate"), outputFilterRequest.reportDate())
+            );
+        }
+
+        if (outputFilterRequest.lineId() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("fromLine").get("id"), outputFilterRequest.lineId())
+            );
+        }
+
+        if (outputFilterRequest.sizeId() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.equal(root.get("size").get("id"), outputFilterRequest.sizeId())
+            );
+        }
+
+        Sort sort = Sort.by(Sort.Direction.DESC, "id");
+        List<OutputDetail> outputDetails = outputDetailRepository.findAll(spec, sort);
+
+        // Map to flat report beans
+        List<OutputReportResponse> reportBeans = outputDetails.stream()
+                .map(detail -> OutputReportResponse.builder()
+                        .reportDate(detail.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mma")))
+                        .mo(detail.getWorkOrder().getMo())
+                        .po(detail.getWorkOrder().getPurchaseOrder().getPo())
+                        .style(detail.getWorkOrder().getPurchaseOrder().getStyle().getStyleNo())
+                        .buyer(detail.getWorkOrder().getPurchaseOrder().getBuyer().getName())
+                        .size(detail.getSize().getSize())
+                        .goodQty(detail.getGoodQty().toString())
+                        .image(detail.getWorkOrder().getImage())
+                        .outputDate(detail.getOutputDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                        .build()
+                )
+                .toList();
+        File file = generateReportService.generateExcelReport(reportBeans, outputDetailExcelPath);
+        HttpHeaders headers = Util.getHttpHeaders("Material", file, "xlsx", MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+
+        return new ResponseEntity<>(new InputStreamResource(new FileInputStream(file)), headers, HttpStatus.OK);
     }
 
     @Override

@@ -24,8 +24,8 @@ public class OutputDetailController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @GetMapping("/report-excel")
     @ResponseStatus(HttpStatus.OK)
-    ResponseEntity<InputStreamResource> getReportOutputDetail() throws IOException {
-        return outputDetailService.getReportOutputDetail();
+    ResponseEntity<InputStreamResource> getReportOutputDetail(@ModelAttribute OutputFilterRequest outputFilterRequest) throws IOException {
+        return outputDetailService.getReportOutputDetail(outputFilterRequest);
     }
 
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 @Table
 @Entity(name = "warehouses")
+@SQLRestriction("deleted_at IS NULL")
 public class Warehouse extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +32,7 @@ public class Warehouse extends BaseEntity {
 
     @NotBlank
     @Size(max = 155)
-    @Column(nullable = false, length = 155)
+    @Column(nullable = false, length = 155, unique = true)
     private String name;
 
     @Size(max = 255)

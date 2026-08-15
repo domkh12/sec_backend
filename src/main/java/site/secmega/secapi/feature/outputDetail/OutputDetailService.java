@@ -9,11 +9,12 @@ import site.secmega.secapi.feature.outputDetail.dto.OutputDetailResponse;
 import site.secmega.secapi.feature.outputDetail.dto.OutputFilterRequest;
 import site.secmega.secapi.feature.outputDetail.dto.OutputLast48Hrs;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface OutputDetailService {
 
-    ResponseEntity<InputStreamResource> getReportOutputDetail();
+    ResponseEntity<InputStreamResource> getReportOutputDetail(OutputFilterRequest outputFilterRequest) throws IOException;
 
     List<OutputLast48Hrs> outputLast48Hrs();
 

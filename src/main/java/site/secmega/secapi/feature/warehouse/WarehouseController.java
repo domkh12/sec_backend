@@ -17,6 +17,20 @@ public class WarehouseController {
     private final WarehouseService warehouseService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_WAREHOUSE')")
+    @DeleteMapping("/{uuid}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteWarehouse(@PathVariable String uuid){
+        warehouseService.deleteWarehouse(uuid);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_WAREHOUSE')")
+    @PutMapping("/{uuid}")
+    @ResponseStatus(HttpStatus.CREATED)
+    WarehouseResponse updateWarehouse(@PathVariable String uuid, @RequestBody WarehouseRequest warehouseRequest){
+        return warehouseService.updateWarehouse(uuid, warehouseRequest);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_WAREHOUSE')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     WarehouseResponse createWarehouse(@RequestBody WarehouseRequest warehouseRequest){

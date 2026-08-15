@@ -15,6 +15,7 @@ import site.secmega.secapi.feature.warehouse.dto.WarehouseRequest;
 import site.secmega.secapi.feature.warehouse.dto.WarehouseResponse;
 import site.secmega.secapi.mapper.WarehouseMapper;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -25,7 +26,45 @@ public class WarehouseServiceImpl implements WarehouseService{
     private final WarehouseMapper warehouseMapper;
 
     @Override
+    public void deleteWarehouse(String uuid) {
+        Warehouse warehouse = warehouseRepository.findByUuid(uuid).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Warehouse not found!")
+        );
+        warehouse.setDeletedAt(LocalDateTime.now());
+        warehouseRepository.save(warehouse);
+    }
+
+    @Override
+    public WarehouseResponse updateWarehouse(String uuid, WarehouseRequest warehouseRequest) {
+
+        if (warehouseRepository.existsByNameAndUuidNot(warehouseRequest.name(), uuid)){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Warehouse name already exist!");
+        }
+
+        if (warehouseRepository.existsByCodeAndUuidNot(warehouseRequest.code(), uuid)){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Warehouse code already exist!");
+        }
+
+        Warehouse warehouse = warehouseRepository.findByUuid(uuid).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Warehouse not found!")
+        );
+        warehouseMapper.updateFromWarehouseRequest(warehouseRequest, warehouse);
+        Warehouse savedWarehouse = warehouseRepository.save(warehouse);
+
+        return warehouseMapper.toWarehouseResponse(savedWarehouse);
+    }
+
+    @Override
     public WarehouseResponse createWarehouse(WarehouseRequest warehouseRequest) {
+
+        if (warehouseRepository.existsByCode(warehouseRequest.code())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Warehouse code already exist!");
+        }
+
+        if (warehouseRepository.existsByName(warehouseRequest.name())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Warehouse name already exist!");
+        }
+
         Warehouse warehouse = warehouseMapper.formWarehouseRequest(warehouseRequest);
         warehouse.setUuid(UUID.randomUUID().toString());
         Warehouse savedWarehouse = warehouseRepository.save(warehouse);
