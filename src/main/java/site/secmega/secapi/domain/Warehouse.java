@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.util.List;
 
@@ -16,29 +17,23 @@ import java.util.List;
 @Table
 @Entity(name = "warehouses")
 @SQLRestriction("deleted_at IS NULL")
+@EntityListeners(AuditingEntityListener.class)
 public class Warehouse extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
     @Column(nullable = false)
     private String uuid;
 
-    @NotBlank
-    @Size(max = 50)
     @Column(nullable = false, length = 50)
     private String code;
 
-    @NotBlank
-    @Size(max = 155)
     @Column(nullable = false, length = 155, unique = true)
     private String name;
 
-    @Size(max = 255)
     private String address;
 
-    @Size(max = 100)
     private String city;
 
     @Column(nullable = false)

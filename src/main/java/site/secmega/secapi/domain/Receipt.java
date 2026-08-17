@@ -5,38 +5,34 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Table
-@Entity(name = "racks")
+@Entity(name = "receipts")
 @SQLRestriction("deleted_at IS NULL")
 @EntityListeners(AuditingEntityListener.class)
-public class Rack extends BaseEntity{
+public class Receipt extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @Column(nullable = false, unique = true)
     private String uuid;
+    private String receiptNo;
+    private LocalDateTime receiptDate;
+    private String status;
+    private Double totalQty;
+    private String approvedBy;
+    private LocalDateTime approvedDate;
+    private String remark;
 
-    private String qrCode;
-    private String code;
-    private Boolean isActive;
+    @OneToMany
+    private PurchaseOrder purchaseOrder;
 
-    @OneToMany(mappedBy = "rack")
-    private List<Carton> cartons;
-
-    @ManyToOne
-    private Warehouse warehouse;
-
+    @OneToMany
+    private Supplier supplier;
 }

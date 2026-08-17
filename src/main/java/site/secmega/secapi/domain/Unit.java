@@ -7,29 +7,20 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.List;
-
-@Entity
-@Table(name = "colors")
 @Getter
 @Setter
 @NoArgsConstructor
+@Table
+@Entity(name = "units")
 @SQLRestriction("deleted_at IS NULL")
 @EntityListeners(AuditingEntityListener.class)
-public class Color extends BaseEntity {
+public class Unit extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false)
-    private String color;
 
-    /**
-     * Relationship
-     * */
+    private String unitCode;
+    private String unitName;
+    private Boolean isActive;
 
-    @OneToMany(mappedBy = "color")
-    private List<Material> materials;
-
-    @OneToMany(mappedBy = "color")
-    private List<WorkOrder> workOrders;
 }

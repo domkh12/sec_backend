@@ -6,28 +6,25 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Table
 @Entity(name = "cartons")
+@EntityListeners(AuditingEntityListener.class)
 public class Carton {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
-    @Size(max = 50)
     @Column(nullable = false, length = 50)
     private String code;
 
-    @NotBlank
-    @Size(max = 100)
     @Column(nullable = false, length = 100)
     private String qrCode;
 
-    @Size(max = 50)
     private String barCode;
 
     @ManyToOne

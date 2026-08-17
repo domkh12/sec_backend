@@ -6,8 +6,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import site.secmega.secapi.feature.warehouse.dto.WarehouseFilterRequest;
+import site.secmega.secapi.feature.warehouse.dto.WarehouseLookupResponse;
 import site.secmega.secapi.feature.warehouse.dto.WarehouseRequest;
 import site.secmega.secapi.feature.warehouse.dto.WarehouseResponse;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/warehouses")
@@ -15,6 +18,13 @@ import site.secmega.secapi.feature.warehouse.dto.WarehouseResponse;
 public class WarehouseController {
 
     private final WarehouseService warehouseService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_WAREHOUSE')")
+    @GetMapping("/lookup")
+    @ResponseStatus(HttpStatus.OK)
+    List<WarehouseLookupResponse> findLookup(){
+        return warehouseService.findLookup();
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_WAREHOUSE')")
     @DeleteMapping("/{uuid}")

@@ -3,6 +3,7 @@ package site.secmega.secapi.domain;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import site.secmega.secapi.base.TransactionType;
 
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @SQLRestriction("deleted_at IS NULL")
+@EntityListeners(AuditingEntityListener.class)
 public class MaterialDetail extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

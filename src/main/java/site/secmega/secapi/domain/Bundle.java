@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 import site.secmega.secapi.base.BundleStatus;
 
 @Entity
@@ -13,6 +14,7 @@ import site.secmega.secapi.base.BundleStatus;
 @Setter
 @NoArgsConstructor
 @SQLRestriction("deleted_at IS NULL")
+@EntityListeners(AuditingEntityListener.class)
 public class Bundle extends BaseEntity{
     @Id
     @GeneratedValue

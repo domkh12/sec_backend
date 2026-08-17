@@ -11,11 +11,13 @@ import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.User;
 import site.secmega.secapi.domain.Warehouse;
 import site.secmega.secapi.feature.warehouse.dto.WarehouseFilterRequest;
+import site.secmega.secapi.feature.warehouse.dto.WarehouseLookupResponse;
 import site.secmega.secapi.feature.warehouse.dto.WarehouseRequest;
 import site.secmega.secapi.feature.warehouse.dto.WarehouseResponse;
 import site.secmega.secapi.mapper.WarehouseMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -24,6 +26,14 @@ public class WarehouseServiceImpl implements WarehouseService{
 
     private final WarehouseRepository warehouseRepository;
     private final WarehouseMapper warehouseMapper;
+
+    @Override
+    public List<WarehouseLookupResponse> findLookup() {
+
+        List<Warehouse> warehouses = warehouseRepository.findAll();
+
+        return warehouses.stream().map(warehouseMapper::toWarehouseLookupResponse).toList();
+    }
 
     @Override
     public void deleteWarehouse(String uuid) {

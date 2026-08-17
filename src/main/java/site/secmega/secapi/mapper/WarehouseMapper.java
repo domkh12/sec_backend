@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import site.secmega.secapi.domain.Warehouse;
+import site.secmega.secapi.feature.warehouse.dto.WarehouseLookupResponse;
 import site.secmega.secapi.feature.warehouse.dto.WarehouseRequest;
 import site.secmega.secapi.feature.warehouse.dto.WarehouseResponse;
 
@@ -14,4 +15,5 @@ public interface WarehouseMapper {
     WarehouseResponse toWarehouseResponse(Warehouse warehouse);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromWarehouseRequest(WarehouseRequest warehouseRequest, @MappingTarget Warehouse warehouse);
+    WarehouseLookupResponse toWarehouseLookupResponse(Warehouse warehouse);
 }
