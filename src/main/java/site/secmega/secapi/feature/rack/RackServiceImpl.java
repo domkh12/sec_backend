@@ -85,7 +85,7 @@ public class RackServiceImpl implements RackService{
         Specification<Rack> spec = Specification.where((root, query, cb) -> cb.conjunction());
 
         if (rackFilterRequest.search() != null){
-            String searchTerm = "%" + rackFilterRequest.search() + "%";
+            String searchTerm = "%" + rackFilterRequest.search().toLowerCase() + "%";
             spec = spec.and((root, query, cb) -> cb.or(
                     cb.like(cb.lower(root.get("code")), searchTerm)
             ));

@@ -42,4 +42,7 @@ public class PurchaseOrder extends BaseEntity{
 
     @ManyToOne
     private Buyer buyer;
+
+    @OneToMany(mappedBy = "purchaseOrder")
+    private List<Receipt> receipts;
 }

@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -27,6 +29,6 @@ public class Supplier extends BaseEntity{
     private String address;
     private Boolean isActive;
 
-    @OneToMany
-    private Supplier supplier;
+    @OneToMany(mappedBy = "supplier")
+    private List<Receipt> receipts;
 }

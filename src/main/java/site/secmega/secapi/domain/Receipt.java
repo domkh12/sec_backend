@@ -30,9 +30,9 @@ public class Receipt extends BaseEntity{
     private LocalDateTime approvedDate;
     private String remark;
 
-    @OneToMany
+    @ManyToOne
     private PurchaseOrder purchaseOrder;
 
-    @OneToMany
+    @ManyToOne
     private Supplier supplier;
 }
