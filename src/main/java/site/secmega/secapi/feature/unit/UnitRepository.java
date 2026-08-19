@@ -16,5 +16,12 @@ public interface UnitRepository extends JpaRepository<Unit, Long>, JpaSpecificat
     @Query("select (count(u) > 0) from units u where u.unitName = ?1 and u.deletedAt is null")
     boolean existsByUnitNameAndDeletedAtNull(String unitName);
 
+    @Query("select (count(u) > 0) from units u where u.unitCode = ?1 and u.deletedAt is null and u.uuid <> ?2")
+    boolean existsByUnitCodeAndDeletedAtNullAndUuidNot(String unitCode, String uuid);
+
+    @Query("select (count(u) > 0) from units u where u.unitName = ?1 and u.deletedAt is null and u.uuid <> ?2")
+    boolean existsByUnitNameAndDeletedAtNullAndUuidNot(String unitName, String uuid);
+
+
     Optional<Unit> findByUuid(String uuid);
 }

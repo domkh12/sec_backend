@@ -14,6 +14,7 @@ import site.secmega.secapi.feature.unit.dto.UnitRequest;
 import site.secmega.secapi.feature.unit.dto.UnitResponse;
 import site.secmega.secapi.mapper.UnitMapper;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -24,16 +25,25 @@ public class UnitServiceImpl implements UnitService{
     private final UnitMapper unitMapper;
 
     @Override
+    public void deleteUnit(String uuid) {
+        Unit unit = unitRepository.findByUuid(uuid).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Unit not found!")
+        );
+        unit.setDeletedAt(LocalDateTime.now());
+        unitRepository.save(unit);
+    }
+
+    @Override
     public UnitResponse updateUnit(String uuid, UnitRequest unitRequest) {
 
         Unit unit = unitRepository.findByUuid(uuid).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Unit not found!")
         );
-        if (unitRepository.existsByUnitCodeAndDeletedAtNull(unitRequest.unitCode())){
+        if (unitRepository.existsByUnitCodeAndDeletedAtNullAndUuidNot(unitRequest.unitCode(), uuid)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unit code already exist!");
         }
 
-        if (unitRepository.existsByUnitNameAndDeletedAtNull(unitRequest.unitName())){
+        if (unitRepository.existsByUnitNameAndDeletedAtNullAndUuidNot(unitRequest.unitName(), uuid)){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unit name already exist!");
         }
         unitMapper.updateFromUnitRequest(unitRequest, unit);

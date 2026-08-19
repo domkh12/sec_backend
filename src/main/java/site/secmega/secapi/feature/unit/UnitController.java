@@ -18,6 +18,13 @@ public class UnitController {
     private final UnitService unitService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_WAREHOUSE')")
+    @DeleteMapping("/{uuid}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteUnit(@PathVariable String uuid){
+        unitService.deleteUnit(uuid);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_WAREHOUSE')")
     @PutMapping("/{uuid}")
     @ResponseStatus(HttpStatus.CREATED)
     UnitResponse updateUnit(@PathVariable String uuid, @Valid @RequestBody UnitRequest unitRequest){
