@@ -14,6 +14,7 @@ import site.secmega.secapi.feature.supplier.dto.SupplierRequest;
 import site.secmega.secapi.feature.supplier.dto.SupplierResponse;
 import site.secmega.secapi.mapper.SupplierMapper;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Service
@@ -24,7 +25,36 @@ public class SupplierServiceImpl implements SupplierService{
     private final SupplierMapper supplierMapper;
 
     @Override
+    public void deleteSupplier(String uuid) {
+        Supplier supplier = supplierRepository.findByUuid(uuid).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Supplier not found!")
+        );
+        supplier.setDeletedAt(LocalDateTime.now());
+        supplierRepository.save(supplier);
+    }
+
+    @Override
+    public SupplierResponse updateSupplier(String uuid, SupplierRequest supplierRequest) {
+
+        if (supplierRepository.existsBySupplierNameAndDeletedAtNullAndUuidNot(supplierRequest.supplierName(), uuid)){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Supplier not found!");
+        }
+
+        Supplier supplier = supplierRepository.findByUuid(uuid).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Supplier not found!")
+        );
+        supplierMapper.updateFromSupplierRequest(supplierRequest, supplier);
+        Supplier savedSupplier = supplierRepository.save(supplier);
+
+        return supplierMapper.toSupplierResponse(savedSupplier);
+    }
+
+    @Override
     public SupplierResponse createSupplier(SupplierRequest supplierRequest) {
+
+        if (supplierRepository.existsBySupplierNameAndDeletedAtNull(supplierRequest.supplierName())){
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Supplier name already exist!");
+        }
 
         Supplier supplier = supplierMapper.fromSupplierRequest(supplierRequest);
         supplier.setUuid(UUID.randomUUID().toString());

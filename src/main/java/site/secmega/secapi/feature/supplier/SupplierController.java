@@ -20,6 +20,20 @@ public class SupplierController {
     private final SupplierService supplierService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_WAREHOUSE')")
+    @DeleteMapping("/{uuid}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteSupplier(@PathVariable String uuid){
+        supplierService.deleteSupplier(uuid);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_WAREHOUSE')")
+    @PutMapping("/{uuid}")
+    @ResponseStatus(HttpStatus.CREATED)
+    SupplierResponse updateSupplier(@PathVariable String uuid, @Valid @RequestBody SupplierRequest supplierRequest){
+        return supplierService.updateSupplier(uuid, supplierRequest);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_WAREHOUSE')")
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     SupplierResponse createSupplier(@Valid @RequestBody SupplierRequest supplierRequest){
