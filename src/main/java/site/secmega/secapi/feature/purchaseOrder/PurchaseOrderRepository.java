@@ -11,6 +11,7 @@ import site.secmega.secapi.base.POStatus;
 import site.secmega.secapi.domain.PurchaseOrder;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @Repository
 public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Long>, JpaSpecificationExecutor<PurchaseOrder> {
@@ -26,6 +27,9 @@ public interface PurchaseOrderRepository extends JpaRepository<PurchaseOrder, Lo
     @Modifying
     @Query("update PurchaseOrder p set p.status = ?1 where p.shipmentDate < ?2")
     int updateStatusByShipmentDateBefore(@NonNull POStatus status, LocalDate shipmentDate);
+
+    @Query("select p from PurchaseOrder p where p.uuid = ?1")
+    Optional<PurchaseOrder> findByUuid(String uuid);
 
 
 

@@ -5,6 +5,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import site.secmega.secapi.domain.Supplier;
+import site.secmega.secapi.feature.supplier.dto.SupplierLookupResponse;
 import site.secmega.secapi.feature.supplier.dto.SupplierRequest;
 import site.secmega.secapi.feature.supplier.dto.SupplierResponse;
 
@@ -14,4 +15,5 @@ public interface SupplierMapper {
     Supplier fromSupplierRequest(SupplierRequest supplierRequest);
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateFromSupplierRequest(SupplierRequest supplierRequest,@MappingTarget Supplier supplier);
+    SupplierLookupResponse toSupplierLookupResponse(Supplier supplier);
 }

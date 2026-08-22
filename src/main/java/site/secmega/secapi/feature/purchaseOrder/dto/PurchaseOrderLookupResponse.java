@@ -5,6 +5,7 @@ import lombok.Builder;
 @Builder
 public record PurchaseOrderLookupResponse(
         Long id,
+        String uuid,
         String po
 ) {
 }

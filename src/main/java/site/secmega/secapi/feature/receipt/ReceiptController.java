@@ -11,7 +11,7 @@ import site.secmega.secapi.feature.receipt.dto.ReceiptRequest;
 import site.secmega.secapi.feature.receipt.dto.ReceiptResponse;
 
 @RestController
-@RequestMapping("/api/v1/receipt")
+@RequestMapping("/api/v1/receipts")
 @RequiredArgsConstructor
 public class ReceiptController {
 

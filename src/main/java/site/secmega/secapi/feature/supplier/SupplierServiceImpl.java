@@ -10,11 +10,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import site.secmega.secapi.domain.Supplier;
 import site.secmega.secapi.feature.supplier.dto.SupplierFilterRequest;
+import site.secmega.secapi.feature.supplier.dto.SupplierLookupResponse;
 import site.secmega.secapi.feature.supplier.dto.SupplierRequest;
 import site.secmega.secapi.feature.supplier.dto.SupplierResponse;
 import site.secmega.secapi.mapper.SupplierMapper;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -23,6 +25,12 @@ public class SupplierServiceImpl implements SupplierService{
 
     private final SupplierRepository supplierRepository;
     private final SupplierMapper supplierMapper;
+
+    @Override
+    public List<SupplierLookupResponse> getLookupSupplier() {
+        List<Supplier> suppliers = supplierRepository.findAll();
+        return suppliers.stream().map(supplierMapper::toSupplierLookupResponse).toList();
+    }
 
     @Override
     public void deleteSupplier(String uuid) {

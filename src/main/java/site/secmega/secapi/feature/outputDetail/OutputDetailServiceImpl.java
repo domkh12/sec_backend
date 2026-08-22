@@ -324,14 +324,15 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                 );
             }
 
+            // logic update qty in TV
+            updateTvDataForSewing(
+                    outputDetailRequest.get(0).fromLineId(),
+                    outputDetailRequest.get(0).outputDate(),
+                    od.mo()
+            );
         });
 
-        // logic update qty in TV
-        updateTvDataForSewing(
-            outputDetailRequest.get(0).fromLineId(),
-            outputDetailRequest.get(0).outputDate(),
-            outputDetailRequest.get(0).mo()
-        );
+
 
         return null;
     }
