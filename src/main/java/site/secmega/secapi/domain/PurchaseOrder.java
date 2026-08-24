@@ -23,8 +23,6 @@ public class PurchaseOrder extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, unique = true)
-    private String uuid;
-    @Column(nullable = false, unique = true)
     private String po;
     @Column(nullable = false)
     private Integer qty;

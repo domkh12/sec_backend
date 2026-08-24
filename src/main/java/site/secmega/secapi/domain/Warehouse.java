@@ -23,9 +23,6 @@ public class Warehouse extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String uuid;
-
     @Column(nullable = false, length = 50)
     private String code;
 

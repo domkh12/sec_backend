@@ -20,8 +20,6 @@ public class Receipt extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, unique = true)
-    private String uuid;
     private String receiptNo;
     private LocalDateTime receiptDate;
     private String status;

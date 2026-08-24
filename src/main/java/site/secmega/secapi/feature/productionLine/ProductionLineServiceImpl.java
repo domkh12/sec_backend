@@ -18,6 +18,7 @@ import site.secmega.secapi.mapper.ProductionLineMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -118,6 +119,7 @@ public class ProductionLineServiceImpl implements ProductionLineService{
 
         ProductionLine productionLine = productionLineMapper.fromProductionLineRequest(productionLineRequest);
         productionLine.setDepartment(dept);
+        productionLine.setUuid(UUID.randomUUID().toString());
         productionLine.setCreatedAt(LocalDateTime.now());
         productionLine.setUpdatedAt(LocalDateTime.now());
         productionLine.setStatus(ProductionLineStatus.inactive);

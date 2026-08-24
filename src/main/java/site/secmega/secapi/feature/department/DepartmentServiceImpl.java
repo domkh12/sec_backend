@@ -18,6 +18,7 @@ import site.secmega.secapi.mapper.DepartmentMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -114,6 +115,7 @@ public class DepartmentServiceImpl implements DepartmentService{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Department name already exist!");
         }
         Department dept = departmentMapper.fromDepartmentRequest(deptRequest);
+        dept.setUuid(UUID.randomUUID().toString());
         dept.setCreatedAt(LocalDateTime.now());
         dept.setUpdatedAt(LocalDateTime.now());
         dept.setStatus(DepartmentStatus.Inactive);

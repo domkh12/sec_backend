@@ -17,6 +17,7 @@ import site.secmega.secapi.mapper.DefectTypeMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -90,6 +91,7 @@ public class DefectTypeServiceImpl implements DefectTypeService{
         }
 
         DefectType defectType = defectTypeMapper.fromDefectTypeRequest(defectTypeRequest);
+        defectType.setUuid(UUID.randomUUID().toString());
         defectTypeRepository.save(defectType);
 
         return defectTypeMapper.toDefectTypeResponse(defectType);

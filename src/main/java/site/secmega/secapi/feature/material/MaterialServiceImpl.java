@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -418,6 +419,7 @@ public class MaterialServiceImpl implements MaterialService{
     public MaterialResponse createMaterial(MaterialRequest materialRequest) throws IOException {
 
         Material material = materialMapper.fromMaterialRequest(materialRequest);
+        material.setUuid(UUID.randomUUID().toString());
         if (!materialRequest.styleIds().isEmpty()){
             List<Style> styles = styleRepository.findByIdInAndDeletedAtNull(materialRequest.styleIds());
             material.setStyles(styles);

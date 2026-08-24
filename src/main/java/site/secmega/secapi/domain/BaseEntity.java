@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
 @Setter
 public abstract class BaseEntity {
 
+    @Column(nullable = false, unique = true)
+    private String uuid;
+
     // ===== Create =====
     @CreatedBy
     @Column(name = "created_by", updatable = false)

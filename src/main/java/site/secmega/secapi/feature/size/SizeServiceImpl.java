@@ -17,6 +17,7 @@ import site.secmega.secapi.mapper.SizeMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -87,6 +88,7 @@ public class SizeServiceImpl implements SizeService{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Size already exist");
         }
         Size size = sizeMapper.fromSizeRequest(sizeRequest);
+        size.setUuid(UUID.randomUUID().toString());
         Size savedSize = sizeRepository.save(size);
         return sizeMapper.toSizeResponse(savedSize);
     }

@@ -23,6 +23,7 @@ import site.secmega.secapi.mapper.PurchaseOrderMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -154,6 +155,7 @@ public class PurchaseOrderServiceImpl implements PurchaseOrderService {
         }
 
         PurchaseOrder po = purchaseOrderMapper.fromPurchaseOrderRequest(purchaseOrderRequest);
+        po.setUuid(UUID.randomUUID().toString());
         po.setStyle(styleRepository.findById(purchaseOrderRequest.styleId()).orElseThrow(
                 () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Style not found!")
         ));

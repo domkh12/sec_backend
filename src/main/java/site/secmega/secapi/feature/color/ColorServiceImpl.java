@@ -17,6 +17,7 @@ import site.secmega.secapi.mapper.ColorMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -87,6 +88,7 @@ public class ColorServiceImpl implements ColorService{
         }
 
         Color color = colorMapper.fromColorRequest(colorRequest);
+        color.setUuid(UUID.randomUUID().toString());
         Color savedColor = colorRepository.save(color);
         return colorMapper.toColorResponse(savedColor);
     }

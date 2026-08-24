@@ -17,6 +17,7 @@ import site.secmega.secapi.mapper.StyleMapper;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -84,6 +85,7 @@ public class StyleServiceImpl implements StyleService {
         }
 
         Style style = styleMapper.formStyleRequest(styleRequest);
+        style.setUuid(UUID.randomUUID().toString());
         style.setStatus(StyleStatus.Draft);
         Style savedStyle = styleRepository.save(style);
 

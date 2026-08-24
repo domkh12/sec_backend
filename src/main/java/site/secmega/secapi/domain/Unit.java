@@ -19,9 +19,6 @@ public class Unit extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true)
-    private String uuid;
-
     private String unitCode;
     private String unitName;
     private Boolean isActive;

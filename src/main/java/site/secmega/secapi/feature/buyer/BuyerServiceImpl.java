@@ -15,6 +15,7 @@ import site.secmega.secapi.util.FileUtil;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -125,6 +126,7 @@ public class BuyerServiceImpl implements BuyerService{
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Buyer name already exist");
         }
         Buyer buyer = buyerMapper.fromBuyerRequest(buyerRequest);
+        buyer.setUuid(UUID.randomUUID().toString());
         Buyer savedBuyer = buyerRepository.save(buyer);
         return buyerMapper.toBuyerResponse(savedBuyer);
     }

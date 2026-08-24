@@ -31,6 +31,7 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -183,7 +184,7 @@ public class WorkOrderServiceImpl implements WorkOrderService{
         }
 
         WorkOrder workOrder = workOrderMapper.fromWorkOrderRequest(workOrderRequest);
-
+        workOrder.setUuid(UUID.randomUUID().toString());
         if (workOrderRequest.colorId() != null){
             Color color = colorRepository.findById(workOrderRequest.colorId()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Color not found!")

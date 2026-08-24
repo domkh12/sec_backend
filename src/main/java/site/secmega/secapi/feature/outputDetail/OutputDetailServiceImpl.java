@@ -48,6 +48,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -116,7 +117,12 @@ public class OutputDetailServiceImpl implements OutputDetailService{
 
         // Map to flat report beans
         List<OutputReportResponse> reportBeans = outputDetails.stream()
-                .map(detail -> OutputReportResponse.builder()
+                .map(detail -> {
+                        String dbImage = detail.getWorkOrder().getImage();
+                        String reportImage = (dbImage != null && !dbImage.isBlank())
+                                ? dbImage
+                                : "https://sec-mega.site/images/placeholder.png";
+                        return OutputReportResponse.builder()
                         .reportDate(detail.getCreatedAt().format(DateTimeFormatter.ofPattern("dd/MM/yyyy hh:mma")))
                         .mo(detail.getWorkOrder().getMo())
                         .po(detail.getWorkOrder().getPurchaseOrder().getPo())
@@ -124,9 +130,10 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                         .buyer(detail.getWorkOrder().getPurchaseOrder().getBuyer().getName())
                         .size(detail.getSize().getSize())
                         .goodQty(detail.getGoodQty().toString())
-                        .image(detail.getWorkOrder().getImage())
+                        .image(reportImage)
                         .outputDate(detail.getOutputDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
-                        .build()
+                        .build();
+                }
                 )
                 .toList();
         File file = generateReportService.generateExcelReport(reportBeans, outputDetailExcelPath);
@@ -274,6 +281,7 @@ public class OutputDetailServiceImpl implements OutputDetailService{
             OutputDetail outputDetail = outputDetailMapper.fromOutputDetailRequest(od);
 
             outputDetail.setTime(time);
+            outputDetail.setUuid(UUID.randomUUID().toString());
 
             WorkOrder workOrder = workOrderRepository.findByMo(od.mo()).orElseThrow(
                     () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "MO not found")
@@ -312,6 +320,7 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                 DefectDetail defectDetail = new DefectDetail();
                 defectDetail.setDefectType(df);
                 defectDetail.setTime(time);
+                defectDetail.setUuid(UUID.randomUUID().toString());
                 defectDetail.setDefectQty(od.defectQty());
                 defectDetail.setProductionLine(fromLine);
                 defectDetail.setWorkOrder(workOrder);
