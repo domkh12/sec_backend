@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Getter
@@ -14,7 +15,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Table
 @Entity(name = "cartons")
 @EntityListeners(AuditingEntityListener.class)
-public class Carton {
+@SQLRestriction("deleted_at IS NULL")
+public class Carton extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

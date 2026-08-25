@@ -124,7 +124,7 @@ public class MaterialServiceImpl implements MaterialService{
                         .nameReceiver(detail.getUser().getNameEn())
                         .date(detail.getTransactionDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")))
                         .quantity(detail.getQuantity())
-                        .unit(detail.getMaterial().getUnit())
+                        .unit(detail.getMaterial().getUnit().getUnitName())
                         .style(detail.getMaterial().getStyles().stream()
                                 .map(Style::getStyleNo)
                                 .collect(Collectors.joining(", "))
@@ -150,14 +150,13 @@ public class MaterialServiceImpl implements MaterialService{
                 .map(detail -> MaterialReportResponse.builder()
                         .code(detail.getCode())
                         .name(detail.getName())
-                        .description(detail.getDescription())
                         .styles(
                                 detail.getStyles() == null ? "" :
                                         detail.getStyles().stream()
                                         .map(Style::getStyleNo)
                                         .collect(Collectors.joining(", "))
                         )
-                        .unit(detail.getUnit())
+                        .unit(detail.getUnit().getUnitCode())
                         .size(detail.getSize() != null ? detail.getSize().getSize() : "")
                         .color(detail.getColor() != null ? detail.getColor().getColor() : "")
                         .balance(materialDetailRepository.sumStockQtyByType(detail.getId(), TransactionType.INVENTORY_IN) - materialDetailRepository.sumStockQtyByType(detail.getId(), TransactionType.INVENTORY_OUT))
@@ -271,7 +270,7 @@ public class MaterialServiceImpl implements MaterialService{
                 .requester(detail.getUser().getNameEn())
                 .materialName(detail.getMaterial().getName())
                 .qtyOutput(detail.getQuantity())
-                .unit(detail.getMaterial().getUnit())
+                .unit(detail.getMaterial().getUnit().getUnitCode())
                 .dateOutput(detail.getTransactionDate())
                 .build());
     }
@@ -314,7 +313,7 @@ public class MaterialServiceImpl implements MaterialService{
                     .user(detail.getUser().getNameEn())
                     .materialName(detail.getMaterial().getName())
                     .qtyInput(detail.getQuantity())
-                    .unit(detail.getMaterial().getUnit())
+                    .unit(detail.getMaterial().getUnit().getUnitCode())
                     .dateInput(detail.getTransactionDate())
                     .build();
         });
@@ -391,14 +390,13 @@ public class MaterialServiceImpl implements MaterialService{
                 .id(material.getId())
                 .code(material.getCode())
                 .name(material.getName())
-                .description(material.getDescription())
                 .balance(materialDetailRepository.sumStockQtyByType(material.getId(), TransactionType.INVENTORY_IN) - materialDetailRepository.sumStockQtyByType(material.getId(), TransactionType.INVENTORY_OUT))
                 .styles(material.getStyles().stream().map(style -> StyleLookupResponse.builder()
                         .id(style.getId())
                         .styleNo(style.getStyleNo())
                         .build()).toList())
                 .status(material.getStatus())
-                .unit(material.getUnit())
+//                .unit(material.getUnit().getUnitCode())
                 .image(material.getImage())
                 .size(material.getSize() == null ? null :
                         SizeLookupResponse.builder()

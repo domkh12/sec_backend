@@ -4,6 +4,7 @@ public record UnitResponse(
         Long id,
         String uuid,
         String unitCode,
-        String unitName
+        String unitName,
+        String description
 ) {
 }

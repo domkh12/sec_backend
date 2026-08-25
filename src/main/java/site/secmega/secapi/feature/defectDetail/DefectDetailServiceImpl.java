@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-public class DefectDetailServiceImpl implements DefectDetailService {
+public class DefectDetailServiceImpl implements DefectDetailService{
 
     private final DefectDetailRepository defectDetailRepository;
     private final OutputDetailServiceImpl outputDetailService;

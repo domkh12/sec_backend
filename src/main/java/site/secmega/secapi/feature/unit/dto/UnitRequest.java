@@ -6,6 +6,7 @@ public record UnitRequest(
     @NotBlank(message = "unit code is required")
     String unitCode,
     @NotBlank(message = "unit name is required")
-    String unitName
+    String unitName,
+    String description
 ) {
 }

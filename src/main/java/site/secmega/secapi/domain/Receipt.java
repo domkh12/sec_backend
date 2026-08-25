@@ -8,6 +8,7 @@ import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -33,4 +34,9 @@ public class Receipt extends BaseEntity{
 
     @ManyToOne
     private Supplier supplier;
+
+    @OneToMany(mappedBy = "receipt")
+    private List<ReceiptDetail> receiptDetails;
+
+
 }

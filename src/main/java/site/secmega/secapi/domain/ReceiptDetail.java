@@ -7,25 +7,22 @@ import lombok.Setter;
 import org.hibernate.annotations.SQLRestriction;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.util.List;
-
 @Getter
 @Setter
-@NoArgsConstructor
 @Table
-@Entity(name = "units")
+@Entity(name = "receipt_details")
+@NoArgsConstructor
 @SQLRestriction("deleted_at IS NULL")
 @EntityListeners(AuditingEntityListener.class)
-public class Unit extends BaseEntity{
+public class ReceiptDetail extends BaseEntity{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private Double expectedQty;
+    private Double receivedQty;
 
-    private String unitCode;
-    private String unitName;
-    private String description;
-    private Boolean isActive;
-
-    @OneToMany(mappedBy = "unit")
-    private List<Material> materials;
+    @ManyToOne
+    private Material material;
+    @ManyToOne
+    private Receipt receipt;
 }
