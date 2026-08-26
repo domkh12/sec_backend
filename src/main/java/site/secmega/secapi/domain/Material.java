@@ -43,9 +43,6 @@ public class Material extends BaseEntity{
     @ManyToOne
     private Color color;
 
-    @ManyToOne
-    private Size size;
-
     @OneToMany(mappedBy = "material")
     private List<MaterialDetail> materialDetails;
 

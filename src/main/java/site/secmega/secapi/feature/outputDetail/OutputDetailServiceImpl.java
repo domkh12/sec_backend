@@ -94,9 +94,17 @@ public class OutputDetailServiceImpl implements OutputDetailService{
             );
         }
 
-        if (outputFilterRequest.reportDate() != null) {
+        if (outputFilterRequest.fromDate() != null && outputFilterRequest.toDate() != null) {
             spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("outputDate"), outputFilterRequest.reportDate())
+                    cb.between(root.get("outputDate"), outputFilterRequest.fromDate(), outputFilterRequest.toDate())
+            );
+        } else if (outputFilterRequest.fromDate() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.greaterThanOrEqualTo(root.get("outputDate"), outputFilterRequest.fromDate())
+            );
+        } else if (outputFilterRequest.toDate() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.lessThanOrEqualTo(root.get("outputDate"), outputFilterRequest.toDate())
             );
         }
 
@@ -132,6 +140,8 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                         .goodQty(detail.getGoodQty().toString())
                         .image(reportImage)
                         .outputDate(detail.getOutputDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
+                        .fromDate(outputFilterRequest.fromDate() != null ? outputFilterRequest.fromDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : null)
+                        .toDate(outputFilterRequest.toDate() != null ? outputFilterRequest.toDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")): null)
                         .build();
                 }
                 )
@@ -190,9 +200,17 @@ public class OutputDetailServiceImpl implements OutputDetailService{
             );
         }
 
-        if (outputFilterRequest.reportDate() != null) {
+        if (outputFilterRequest.fromDate() != null && outputFilterRequest.toDate() != null) {
             spec = spec.and((root, query, cb) ->
-                    cb.equal(root.get("outputDate"), outputFilterRequest.reportDate())
+                    cb.between(root.get("outputDate"), outputFilterRequest.fromDate(), outputFilterRequest.toDate())
+            );
+        } else if (outputFilterRequest.fromDate() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.greaterThanOrEqualTo(root.get("outputDate"), outputFilterRequest.fromDate())
+            );
+        } else if (outputFilterRequest.toDate() != null) {
+            spec = spec.and((root, query, cb) ->
+                    cb.lessThanOrEqualTo(root.get("outputDate"), outputFilterRequest.toDate())
             );
         }
 

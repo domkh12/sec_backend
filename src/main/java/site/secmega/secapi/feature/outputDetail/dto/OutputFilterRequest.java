@@ -9,7 +9,8 @@ public record OutputFilterRequest(
         Long lineId,
         Long sizeId,
         Long buyerId,
-        LocalDate reportDate
+        LocalDate fromDate,
+        LocalDate toDate
 ) {
     public OutputFilterRequest{
         if (pageNo == null){

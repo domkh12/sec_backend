@@ -119,7 +119,6 @@ public class MaterialServiceImpl implements MaterialService{
                 .map(detail -> MaterialReportStockInResponse.builder()
                         .code(detail.getMaterial().getCode())
                         .material(detail.getMaterial().getName())
-                        .size(detail.getMaterial().getSize() != null ? detail.getMaterial().getSize().getSize() : "")
                         .color(detail.getMaterial().getColor() != null ? detail.getMaterial().getColor().getColor() : "")
                         .nameReceiver(detail.getUser().getNameEn())
                         .date(detail.getTransactionDate().format(DateTimeFormatter.ofPattern("dd-MM-yyyy")))
@@ -157,7 +156,6 @@ public class MaterialServiceImpl implements MaterialService{
                                         .collect(Collectors.joining(", "))
                         )
                         .unit(detail.getUnit().getUnitCode())
-                        .size(detail.getSize() != null ? detail.getSize().getSize() : "")
                         .color(detail.getColor() != null ? detail.getColor().getColor() : "")
                         .balance(materialDetailRepository.sumStockQtyByType(detail.getId(), TransactionType.INVENTORY_IN) - materialDetailRepository.sumStockQtyByType(detail.getId(), TransactionType.INVENTORY_OUT))
                         .build()
@@ -179,16 +177,6 @@ public class MaterialServiceImpl implements MaterialService{
 
         List<Style> styles = styleRepository.findByIdInAndDeletedAtNull(materialRequest.styleIds());
         material.setStyles(styles);
-
-
-        if (materialRequest.sizeId() != null){
-            Size size = sizeRepository.findById(materialRequest.sizeId()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Size not found")
-            );
-            material.setSize(size);
-        }else {
-            material.setSize(null);
-        }
 
         if (materialRequest.colorId() != null){
             Color color = colorRepository.findById(materialRequest.colorId()).orElseThrow(
@@ -398,11 +386,6 @@ public class MaterialServiceImpl implements MaterialService{
                 .status(material.getStatus())
 //                .unit(material.getUnit().getUnitCode())
                 .image(material.getImage())
-                .size(material.getSize() == null ? null :
-                        SizeLookupResponse.builder()
-                        .id(material.getSize().getId())
-                        .size(material.getSize().getSize())
-                        .build())
                 .color(material.getColor() == null ? null :
                         ColorLookupResponse.builder()
                         .id(material.getColor().getId())
@@ -421,13 +404,6 @@ public class MaterialServiceImpl implements MaterialService{
         if (!materialRequest.styleIds().isEmpty()){
             List<Style> styles = styleRepository.findByIdInAndDeletedAtNull(materialRequest.styleIds());
             material.setStyles(styles);
-        }
-
-        if (materialRequest.sizeId() != null){
-            Size size = sizeRepository.findById(materialRequest.sizeId()).orElseThrow(
-                    () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Size not found")
-            );
-            material.setSize(size);
         }
 
         if (materialRequest.colorId() != null){

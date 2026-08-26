@@ -17,4 +17,6 @@ public class OutputReportResponse{
     private String goodQty;
     private String outputDate;
     private String image;
+    private String fromDate;
+    private String toDate;
 }
