@@ -1,5 +1,5 @@
 <!-- Created with Jaspersoft Studio version 7.0.6.final using JasperReports Library version 7.0.6-5d2a603fdc6b3db8f842a83383e594f41891534d  -->
-<jasperReport name="outputDetailExcel" language="java" columnCount="1" pageWidth="1350" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="1310" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty" uuid="9a8ef7c6-dd47-4db0-a619-a93437f956d2">
+<jasperReport name="outputDetailExcel" language="java" columnCount="1" pageWidth="1350" pageHeight="842" whenNoDataType="AllSectionsNoDetail" columnWidth="1310" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" whenResourceMissingType="Empty" uuid="9a8ef7c6-dd47-4db0-a619-a93437f956d2" ignorePagination="true">
 	<style name="Table_CH" mode="Transparent">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
