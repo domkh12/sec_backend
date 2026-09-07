@@ -142,6 +142,8 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                         .outputDate(detail.getOutputDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                         .fromDate(outputFilterRequest.fromDate() != null ? outputFilterRequest.fromDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : null)
                         .toDate(outputFilterRequest.toDate() != null ? outputFilterRequest.toDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")): null)
+                        .line(detail.getFromLine().getLine())
+                        .time(detail.getTime().getName())
                         .build();
                 }
                 )

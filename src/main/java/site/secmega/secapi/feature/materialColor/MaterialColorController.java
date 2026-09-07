@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import site.secmega.secapi.feature.materialColor.dto.MaterialColorFilterResponse;
 import site.secmega.secapi.feature.materialColor.dto.MaterialColorRequest;
@@ -15,6 +16,13 @@ import site.secmega.secapi.feature.materialColor.dto.MaterialColorResponse;
 public class MaterialColorController {
 
     private final MaterialColorService materialColorService;
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
+    @PutMapping("/{uuid}")
+    @ResponseStatus(HttpStatus.CREATED)
+    MaterialColorResponse updateMaterialColor(@PathVariable String uuid, @RequestBody @Validated MaterialColorRequest materialColorRequest){
+        return materialColorService.updateMaterialColor(uuid, materialColorRequest);
+    }
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @GetMapping

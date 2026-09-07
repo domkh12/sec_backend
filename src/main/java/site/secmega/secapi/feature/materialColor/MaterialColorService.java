@@ -6,6 +6,8 @@ import site.secmega.secapi.feature.materialColor.dto.MaterialColorRequest;
 import site.secmega.secapi.feature.materialColor.dto.MaterialColorResponse;
 
 public interface MaterialColorService {
+    MaterialColorResponse updateMaterialColor(String uuid, MaterialColorRequest materialColorRequest);
+
     MaterialColorResponse createMaterialColor(MaterialColorRequest materialColorRequest);
 
     Page<MaterialColorResponse> findAll(MaterialColorFilterResponse materialColorFilterResponse);

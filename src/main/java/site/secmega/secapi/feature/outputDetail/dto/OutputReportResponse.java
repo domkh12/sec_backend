@@ -19,4 +19,6 @@ public class OutputReportResponse{
     private String image;
     private String fromDate;
     private String toDate;
+    private String line;
+    private String time;
 }
