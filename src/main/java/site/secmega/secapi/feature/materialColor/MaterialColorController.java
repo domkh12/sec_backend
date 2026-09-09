@@ -18,6 +18,13 @@ public class MaterialColorController {
     private final MaterialColorService materialColorService;
 
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
+    @DeleteMapping("/{uuid}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void deleteMaterialColor(@PathVariable String uuid){
+        materialColorService.deleteMaterialColor(uuid);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER', 'ROLE_WAREHOUSE')")
     @PutMapping("/{uuid}")
     @ResponseStatus(HttpStatus.CREATED)
     MaterialColorResponse updateMaterialColor(@PathVariable String uuid, @RequestBody @Validated MaterialColorRequest materialColorRequest){

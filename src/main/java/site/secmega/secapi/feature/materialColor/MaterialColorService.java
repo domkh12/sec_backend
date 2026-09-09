@@ -6,6 +6,8 @@ import site.secmega.secapi.feature.materialColor.dto.MaterialColorRequest;
 import site.secmega.secapi.feature.materialColor.dto.MaterialColorResponse;
 
 public interface MaterialColorService {
+    void deleteMaterialColor(String uuid);
+
     MaterialColorResponse updateMaterialColor(String uuid, MaterialColorRequest materialColorRequest);
 
     MaterialColorResponse createMaterialColor(MaterialColorRequest materialColorRequest);

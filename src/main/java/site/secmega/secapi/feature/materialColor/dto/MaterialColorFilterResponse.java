@@ -5,4 +5,12 @@ public record MaterialColorFilterResponse(
         Integer pageSize,
         String search
 ) {
+    public MaterialColorFilterResponse{
+        if (pageNo == null){
+            pageNo = 1;
+        }
+        if (pageSize == null){
+            pageSize = 20;
+        }
+    }
 }
