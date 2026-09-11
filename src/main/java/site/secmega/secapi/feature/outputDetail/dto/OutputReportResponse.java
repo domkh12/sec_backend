@@ -14,7 +14,7 @@ public class OutputReportResponse{
     private String style;
     private String buyer;
     private String size;
-    private String goodQty;
+    private Integer goodQty;
     private String outputDate;
     private String image;
     private String fromDate;

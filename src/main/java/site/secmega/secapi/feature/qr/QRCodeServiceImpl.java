@@ -23,6 +23,7 @@ import java.awt.image.RenderedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +32,7 @@ public class QRCodeServiceImpl implements QRCodeService{
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public ResponseEntity<byte[]> generateQRCode(QrDataRequest data) throws WriterException, IOException {
+    public ResponseEntity<byte[]> generateQRCode(Map<String, Object> data) throws WriterException, IOException {
         String jsonData = objectMapper.writeValueAsString(data);
 
         QRCodeWriter qrCodeWriter = new QRCodeWriter();

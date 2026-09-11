@@ -137,7 +137,7 @@ public class OutputDetailServiceImpl implements OutputDetailService{
                         .style(detail.getWorkOrder().getPurchaseOrder().getStyle().getStyleNo())
                         .buyer(detail.getWorkOrder().getPurchaseOrder().getBuyer().getName())
                         .size(detail.getSize().getSize())
-                        .goodQty(detail.getGoodQty().toString())
+                        .goodQty(detail.getGoodQty())
                         .image(reportImage)
                         .outputDate(detail.getOutputDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")))
                         .fromDate(outputFilterRequest.fromDate() != null ? outputFilterRequest.fromDate().format(DateTimeFormatter.ofPattern("dd/MM/yyyy")) : null)

@@ -26,7 +26,7 @@
 		<field name="style" class="java.lang.String"/>
 		<field name="buyer" class="java.lang.String"/>
 		<field name="size" class="java.lang.String"/>
-		<field name="goodQty" class="java.lang.String"/>
+		<field name="goodQty" class="java.lang.Integer"/>
 		<field name="outputDate" class="java.lang.String"/>
 		<field name="image" class="java.lang.String"/>
 		<field name="line" class="java.lang.String"/>

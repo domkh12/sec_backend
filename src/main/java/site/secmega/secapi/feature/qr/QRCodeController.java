@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import site.secmega.secapi.feature.qr.dto.QrDataRequest;
 
 import java.io.IOException;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/qr")
@@ -21,7 +22,7 @@ public class QRCodeController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_MANAGER')")
     @PostMapping("/generateQRCode")
     @ResponseStatus(HttpStatus.OK)
-    ResponseEntity<byte []> generateQRCode(@RequestBody QrDataRequest data) throws IOException, WriterException {
+    ResponseEntity<byte []> generateQRCode(@RequestBody Map<String, Object> data) throws IOException, WriterException {
         return qrCodeService.generateQRCode(data);
     }
 
